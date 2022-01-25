@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Runs a command on the php cli container.
+#
+# Examples:
+# "./bin/cli" (opens a tty)
+# "./bin/cli composer update"
+# "./bin/cli grunt exec:mytheme"
+
+cd "$( dirname "${BASH_SOURCE[0]}" )"
+cd ..
+
+if [ -z "$1" ]; then
+    docker-compose run --rm cli /bin/bash
+else
+    docker-compose run --rm cli "$@"
+fi

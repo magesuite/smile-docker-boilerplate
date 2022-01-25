@@ -1,0 +1,183 @@
+#!/usr/bin/env bash
+
+# This script must be executed within your project directory.
+
+set -e
+
+# Usage function
+function usage
+{
+    echo ${YELLOW}Description:${RESET}
+    echo "Initializes a Magento 2 docker environment in the specified directory.${RESET}"
+    echo "If no directory is specified, the project will be initialized in the current working directory."
+    echo
+    echo "An interactive prompt will ask for the project information if it wasn't provided in the command-line options."
+    echo "This prompt will not be shown if the --no-interaction option is passed."
+    echo
+    echo ${YELLOW}Usage:${RESET}
+    echo "setup [directory]"
+    echo
+    echo ${YELLOW}Options:${RESET}
+    echo "  --magento-edition <edition>             Magento edition to use (\"community\", \"enterprise\", \"cloud\") ${GREEN}[${DEFAULT_MAGENTO_EDITION}]${RESET}"
+    echo "  --magento-version <version>             Magento version to use ${GREEN}[${DEFAULT_MAGENTO_VERSION}]${RESET}"
+    echo "  --magento-repository <url>              Magento repository to use ${GREEN}[${DEFAULT_MAGENTO_REPOSITORY}]${RESET}"
+    echo "  --skip-smile-modules                    Smile modules won't be installed if this option is passed (module-cron, module-indexer, module-patch, module-reconfigure)"
+    echo "  --skip-smile-tools                      Smile tools won't be installed if this option is passed (spbuilder, smileanalyser)"
+    echo "  --smile-packagist-user <user>           User of the Smile packagist ACL (only useful if you use the public packagist repository)"
+    echo "  --smile-packagist-password <password>   Password of the Smile packagist ACL (only useful if you use the public packagist repository)"
+    echo "  -n, --no-interaction                    Skips interactive mode."
+    echo "  -h, --help                              Displays this help message"
+}
+
+# Colors
+RESET="$(tput sgr0)"
+RED="$(tput setaf 1)"
+GREEN="$(tput setaf 2)"
+YELLOW="$(tput setaf 3)"
+BLUE="$(tput setaf 4)"
+
+# Git parameters
+GIT_URL=git@git.smile.fr:guvra/magento-docker.git
+GIT_BRANCH=master
+
+# Default values of parameters that will be requested in interactive mode
+DEFAULT_MAGENTO_EDITION=community
+DEFAULT_MAGENTO_VERSION=2.4.3-p1
+DEFAULT_MAGENTO_REPOSITORY=https://packagist.galaxy.intranet/mirror/magento_official/
+DEFAULT_MAGENTO_REPOSITORY_CLOUD=https://packagist.smile.fr/
+DEFAULT_SMILE_MODULES=y
+DEFAULT_SMILE_TOOLS=y
+
+while [ "$1" != "" ]; do
+    case $1 in
+        --git-url)
+            shift
+            GIT_URL=$1
+            ;;
+        --git-branch)
+            shift
+            GIT_BRANCH=$1
+            ;;
+        --magento-edition)
+            shift
+            MAGENTO_EDITION=$1
+            ;;
+        --magento-version)
+            shift
+            MAGENTO_VERSION=$1
+            ;;
+        --magento-repository)
+            shift
+            MAGENTO_REPOSITORY=$1
+            ;;
+        --smile-packagist-user)
+            shift
+            SMILE_PACKAGIST_USER=$1
+            ;;
+        --smile-packagist-password)
+            shift
+            SMILE_PACKAGIST_PASSWORD=$1
+            ;;
+        --skip-smile-modules)
+            SMILE_MODULES=n
+            ;;
+        --skip-smile-tools)
+            SMILE_TOOLS=n
+            ;;
+        -n | --no-interaction)
+            NO_INTERACTION=y
+            ;;
+        -h | --help)
+            usage
+            exit
+            ;;
+        -*)
+            # Unknown options
+            echo -e "${RED}Unknown option \"$1\".${RESET}\n"
+            usage
+            exit 1
+            ;;
+        *)
+            # Project directory
+            if [ -n "${PROJECT_DIR}" ]; then
+                echo -e "${RED}Too many parameters in command-line.${RESET}\n"
+                usage
+                exit 1
+            fi
+            PROJECT_DIR=$1
+    esac
+    shift
+done
+
+# Initialize the project directory
+if [ -z "${PROJECT_DIR}" ]; then
+    PROJECT_DIR=$(pwd)
+fi
+
+if [ -f "${PROJECT_DIR}" ]; then
+    echo "${RED}Invalid parameter \"${PROJECT_DIR}\". Expected a directory, got a file.${RESET}"
+    exit 1
+elif [ ! -d "${PROJECT_DIR}" ]; then
+     mkdir ${PROJECT_DIR} &> /dev/null \
+     || { echo "${RED}Failed to create the directory \"${PROJECT_DIR}\".${RESET}"; exit; }
+fi
+
+# Abort if the project directory is not empty
+if [[ ! -z $(ls -A ${PROJECT_DIR}) ]]; then
+    echo "${RED}The directory \"${PROJECT_DIR}\" is not empty.${RESET}"
+    exit 1
+fi
+
+TEMP_DIR=$(mktemp -d "${TMPDIR:-${TMP:-${TEMP:-/tmp}}}"/magento-docker-XXXXXXXXXX)
+
+if [ "${GIT_BRANCH}" == "local" ]; then
+    # Fetch files from a local repository
+    LOCAL_FOLDER=$(dirname "${BASH_SOURCE[0]}")
+    echo "${GREEN}Fetching files from local folder \"${LOCAL_FOLDER}\".${RESET}"
+    #cp -r ${LOCAL_FOLDER}/docker ${LOCAL_FOLDER}/lib ${TEMP_DIR}
+    # TODO: replace rsync by cp (rsync used for now to exclude src/ folder which might not be empty)
+    rsync -a ${LOCAL_FOLDER}/ ${TEMP_DIR}/ --exclude docker/src/ --exclude .git/
+else
+    # Fetch files from a git repository
+    echo "${GREEN}Fetching files from git repository \"${GIT_URL}\".${RESET}"
+    git -C ${TEMP_DIR} init -q
+    git -C ${TEMP_DIR} remote add origin ${GIT_URL}
+    git -C ${TEMP_DIR} sparse-checkout init --cone
+    # Move files to the project dir (TODO: remove "images" dir after uploading the images to the registry)
+    git -C ${TEMP_DIR} sparse-checkout set docker images lib
+    git -C ${TEMP_DIR} pull -q origin master
+fi
+
+source ${TEMP_DIR}/lib/config.sh
+source ${TEMP_DIR}/lib/interactive.sh
+
+# Move files to the project dir (TODO: remove "images" dir after uploading the images to the registry)
+mv ${TEMP_DIR}/docker/* ${TEMP_DIR}/images ${PROJECT_DIR}
+rm -rf ${TEMP_DIR}
+
+# Initialize Magento (TODO)
+#${PROJECT_DIR}/bin/setup-composer-auth
+#${PROJECT_DIR}/bin/composer create-project --repository=${REPOSITORY} magento/project-"${EDITION}"-edition="${VERSION}" magento
+
+if [ "${MAGENTO_EDITION}" != "cloud" ]; then
+    echo -e "\n${YELLOW}Composer - Create the magento project.${RESET}"
+    ${PROJECT_DIR}/bin/cli bash -c "composer create-project --no-interaction --no-install --repository=${MAGENTO_REPOSITORY} magento/project-${MAGENTO_EDITION}-edition=${MAGENTO_VERSION} .; \
+        composer config --unset repositories.0; \
+        composer config repositories.magento_mirror composer https://packagist.galaxy.intranet/mirror/magento_official; \
+        composer config repositories.smile_libraries composer https://packagist.galaxy.intranet/libraries/; \
+        composer config repositories.smile_magento2 composer https://packagist.galaxy.intranet/magento2/; \
+        composer config allow-plugins.magento/* true; \
+        composer config allow-plugins.laminas/* true; \
+        composer config allow-plugins.cweagans/composer-patches true; \
+        composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true; \
+        composer install"
+else
+    echo -e "\n${YELLOW}Composer - Update repository.${RESET}"
+    ${PROJECT_DIR}/bin/cli bash -c "composer config repositories.magento_mirror composer https://packagist.galaxy.intranet/mirror/magento_official; \
+        composer config repositories.smile_libraries composer https://packagist.galaxy.intranet/libraries/; \
+        composer config repositories.smile_magento2 composer https://packagist.galaxy.intranet/magento2/; \
+        composer config http-basic.\"packagist.smile.fr\" \"${SMILE_PACKAGIST_USER}\" \"${SMILE_PACKAGIST_PASSWORD}\"; \
+        composer update"
+fi
+
+echo -e "\n${GREEN}The project was set up successfully.${RESET}"

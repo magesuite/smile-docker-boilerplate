@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Connects to the MySQL database.
+
+cd "$( dirname "${BASH_SOURCE[0]}" )"
+cd ..
+source env/database.env
+
+docker-compose exec db mysql --user=${MYSQL_USER} --password=${MYSQL_PASSWORD} ${MYSQL_DATABASE}

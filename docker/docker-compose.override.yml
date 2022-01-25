@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+    web:
+        volumes:
+            - ./src:/var/www/html:rw,cached
+
+    fpm:
+        volumes:
+            - ./src:/var/www/html:rw,cached
+
+    cli:
+        volumes:
+            - ./src:/var/www/html:rw,cached
+            #- composer-cache:/composer/cache
+
+    cron:
+        volumes:
+            - ./src:/var/www/html:rw,cached
+
+#volumes:
+#    appdata:
+#        driver: local
+#        driver_opts:
+#            type: none
+#            o: bind
+#            device: ${PWD}/src

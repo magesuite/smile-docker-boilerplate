@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Runs the magento command utility.
+#
+# Examples:
+# "bin/magento cache:clean config"
+# "bin/magento setup:di:compile"
+
+cd "$( dirname "${BASH_SOURCE[0]}" )"
+cd ..
+
+./bin/cli sudo -u www-data bin/magento "$@"

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+MAGENTO_COMMAND="$MAGENTO_ROOT/bin/magento"
+exec sudo -u www-data -- $MAGENTO_COMMAND "$@"
