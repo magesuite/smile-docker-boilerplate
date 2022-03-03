@@ -13,7 +13,7 @@ help:
 
 ## Docker
 build: ## Builds all images
-	@docker-compose build --pull --no-cache
+	@docker-compose build
 
 up: ## Starts all containers in detached mode (no logs)
 	@docker-compose up -d
@@ -29,11 +29,11 @@ logs: ## Show Docker logs. Pass the parameter "service=" to get logs of a given 
 	@docker-compose logs --tail=0 --follow $(service)
 
 ## Services
-bash: ## Opens a bash terminal on the php-cli container. Pass the parameter "s=" to connect to another service. Example: make bash s=redis.
+bash: ## Opens a bash terminal on the php-cli container. Pass the parameter "service=" to connect to another service. Example: make bash s=redis.
 	@$(eval service ?= cli)
 	@echo "Connecting to container \"$(service)\""
 	@if [ "$(service)" = "cli" ]; then $(PHP_CLI) bash; \
-	elif [ "$(service)" = "cli" ]; then $(PHP_FPM) bash; \
+	elif [ "$(service)" = "fpm" ]; then $(PHP_FPM) bash; \
 	else docker-compose exec $(service) bash; fi
 
 db: ## Connects to the Magento database.
