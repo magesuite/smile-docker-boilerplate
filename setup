@@ -5,8 +5,7 @@
 set -e
 
 # Usage function
-function usage
-{
+usage () {
     echo ${YELLOW}Description:${RESET}
     echo "Initializes a Magento 2 docker environment in the specified directory.${RESET}"
     echo "If no directory is specified, the project will be initialized in the current working directory."
@@ -20,13 +19,30 @@ function usage
     echo ${YELLOW}Options:${RESET}
     echo "  --magento-edition <edition>             Magento edition to use (\"community\", \"enterprise\", \"cloud\") ${GREEN}[${DEFAULT_MAGENTO_EDITION}]${RESET}"
     echo "  --magento-version <version>             Magento version to use ${GREEN}[${DEFAULT_MAGENTO_VERSION}]${RESET}"
-    echo "  --magento-repository <url>              Magento repository to use ${GREEN}[${DEFAULT_MAGENTO_REPOSITORY}]${RESET}"
+    echo "  --smile-packagist <url>                 Smile packagist repository to use (\"internal\", \"public\") ${GREEN}[${DEFAULT_SMILE_PACKAGIST}]${RESET}"
     echo "  --skip-smile-modules                    Smile modules won't be installed if this option is passed (module-cron, module-indexer, module-patch, module-reconfigure)"
     echo "  --skip-smile-tools                      Smile tools won't be installed if this option is passed (spbuilder, smileanalyser)"
     echo "  --smile-packagist-user <user>           User of the Smile packagist ACL (only useful if you use the public packagist repository)"
     echo "  --smile-packagist-password <password>   Password of the Smile packagist ACL (only useful if you use the public packagist repository)"
+    echo "  --magento-git-url                       URL of the Magento git repository (only useful for Cloud projects)"
     echo "  -n, --no-interaction                    Skips interactive mode."
     echo "  -h, --help                              Displays this help message"
+}
+
+validate_magento_edition () {
+    [[ "$1" = "community" || "$1" = "enterprise" || "$1" = "cloud" ]]
+}
+
+validate_magento_version () {
+    [[ " ${MAGENTO_VERSIONS[*]} " = *" $1 "* ]]
+}
+
+validate_smile_packagist () {
+    [[ "$1" = "internal" || "$1" = "public" ]]
+}
+
+validate_answer () {
+    [[ "$1" = "y" || "$1" = "n" ]]
 }
 
 # Colors
@@ -43,10 +59,14 @@ GIT_BRANCH=master
 # Default values of parameters that will be requested in interactive mode
 DEFAULT_MAGENTO_EDITION=community
 DEFAULT_MAGENTO_VERSION=2.4.3-p1
-DEFAULT_MAGENTO_REPOSITORY=https://packagist.galaxy.intranet/mirror/magento_official/
-DEFAULT_MAGENTO_REPOSITORY_CLOUD=https://packagist.smile.fr/
+DEFAULT_SMILE_PACKAGIST=internal
 DEFAULT_SMILE_MODULES=y
 DEFAULT_SMILE_TOOLS=y
+
+# Compatible versions
+MAGENTO_VERSIONS=('2.4.3-p1' '2.4.3' '2.4.2-p2' '2.4.2-p1' '2.4.2' '2.4.1-p1' '2.4.1' '2.4.0-p1' '2.4.0' \
+    '2.3.7-p2' '2.3.7-p1' '2.3.7' '2.3.6-p1' '2.3.6' '2.3.5-p2' '2.3.5-p1' '2.3.5' '2.3.4-p2' '2.3.4' '2.3.3-p1'
+    '2.3.3' '2.3.2-p2' '2.3.2' '2.3.1' '2.3.0')
 
 while [ "$1" != "" ]; do
     case $1 in
@@ -60,29 +80,39 @@ while [ "$1" != "" ]; do
             ;;
         --magento-edition)
             shift
+            ! validate_magento_edition $1 && echo "${RED}The Magento edition \"$1\" is not valid.${RESET}" && exit 1
             MAGENTO_EDITION=$1
             ;;
         --magento-version)
             shift
+            ! validate_magento_version $1 && echo "${RED}The Magento version \"$1\" is not valid.${RESET}" && exit 1
             MAGENTO_VERSION=$1
             ;;
-        --magento-repository)
+        --smile-packagist)
             shift
-            MAGENTO_REPOSITORY=$1
-            ;;
-        --smile-packagist-user)
-            shift
-            SMILE_PACKAGIST_USER=$1
-            ;;
-        --smile-packagist-password)
-            shift
-            SMILE_PACKAGIST_PASSWORD=$1
+            ! validate_smile_packagist $1 && echo "${RED}The Smile packagist repository \"$1\" is not valid.${RESET}" && exit 1
+            SMILE_PACKAGIST=$1
             ;;
         --skip-smile-modules)
             SMILE_MODULES=n
             ;;
         --skip-smile-tools)
             SMILE_TOOLS=n
+            ;;
+        --smile-packagist-user)
+            shift
+            [ -z "${SMILE_PACKAGIST}" ] && SMILE_PACKAGIST=public
+            SMILE_PACKAGIST_USER=$1
+            ;;
+        --smile-packagist-password)
+            shift
+            [ -z "${SMILE_PACKAGIST}" ] && SMILE_PACKAGIST=public
+            SMILE_PACKAGIST_PASSWORD=$1
+            ;;
+        --magento-git-url)
+            shift
+            [ -z "${MAGENTO_EDITION}" ] && MAGENTO_EDITION=cloud
+            MAGENTO_GIT_URL=$1
             ;;
         -n | --no-interaction)
             NO_INTERACTION=y
@@ -148,7 +178,6 @@ else
     git -C ${TEMP_DIR} pull -q origin master
 fi
 
-source ${TEMP_DIR}/lib/config.sh
 source ${TEMP_DIR}/lib/interactive.sh
 
 # Move files to the project dir (TODO: remove "images" dir after uploading the images to the registry)
@@ -156,29 +185,41 @@ mv ${TEMP_DIR}/docker/* ${TEMP_DIR}/images ${PROJECT_DIR}
 rm -rf ${TEMP_DIR}
 cd ${PROJECT_DIR}
 
-# Initialize Magento (TODO)
+# Initialize authentication tokens (TODO)
 #${PROJECT_DIR}/bin/setup-composer-auth
-#${PROJECT_DIR}/bin/composer create-project --repository=${REPOSITORY} magento/project-"${EDITION}"-edition="${VERSION}" magento
 
+# Initialize Magento
 if [ "${MAGENTO_EDITION}" != "cloud" ]; then
     echo -e "\n${YELLOW}Composer - Create the magento project.${RESET}"
-    # TODO: use public repository URLs (instead of internal) if smile public repository was provided
-    docker-compose run --rm cli bash -c "composer create-project --no-interaction --no-install --repository=${MAGENTO_REPOSITORY} magento/project-${MAGENTO_EDITION}-edition=${MAGENTO_VERSION} .; \
-        composer config --unset repositories.0; \
-        composer config repositories.magento_mirror composer https://packagist.galaxy.intranet/mirror/magento_official; \
-        composer config repositories.smile_libraries composer https://packagist.galaxy.intranet/libraries/; \
-        composer config repositories.smile_magento2 composer https://packagist.galaxy.intranet/magento2/; \
+
+    COMMAND="composer create-project --no-interaction --no-install --repository=${MAGENTO_PACKAGIST_URL} magento/project-${MAGENTO_EDITION}-edition=${MAGENTO_VERSION} ."
+
+    if [ "${SMILE_PACKAGIST}" = "internal" ]; then
+        COMMAND="${COMMAND}; \
+            composer config --unset repositories.0; \
+            composer config repositories.magento_mirror composer ${MAGENTO_PACKAGIST_URL}"
+    else
+        COMMAND="${COMMAND}; \
+            composer config http-basic.\"packagist.smile.fr\" \"${SMILE_PACKAGIST_USER}\" \"${SMILE_PACKAGIST_PASSWORD}\""
+    fi
+
+    COMMAND="${COMMAND}; \
+        composer config repositories.smile_libraries composer ${SMILE_PACKAGIST_URL}/libraries/; \
+        composer config repositories.smile_magento2 composer ${SMILE_PACKAGIST_URL}/magento2/; \
         composer config allow-plugins.magento/* true; \
         composer config allow-plugins.laminas/* true; \
         composer config allow-plugins.cweagans/composer-patches true; \
         composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true; \
         composer install"
+
+    docker-compose run --rm cli bash -c "${COMMAND}"
 else
+    echo -e "\n${YELLOW}Clone the Magento cloud project.${RESET}"
+    git clone --branch master ${MAGENTO_GIT_URL} src
+
     echo -e "\n${YELLOW}Composer - Update repository.${RESET}"
-    # TODO: use public repository URLs (instead of internal) if smile public repository was provided
-    docker-compose run --rm cli bash -c "composer config repositories.magento_mirror composer https://packagist.galaxy.intranet/mirror/magento_official; \
-        composer config repositories.smile_libraries composer https://packagist.galaxy.intranet/libraries/; \
-        composer config repositories.smile_magento2 composer https://packagist.galaxy.intranet/magento2/; \
+    docker-compose run --rm cli bash -c "composer config repositories.smile_libraries composer ${SMILE_PACKAGIST_URL}/libraries/; \
+        composer config repositories.smile_magento2 composer ${SMILE_PACKAGIST_URL}/magento2/; \
         composer config http-basic.\"packagist.smile.fr\" \"${SMILE_PACKAGIST_USER}\" \"${SMILE_PACKAGIST_PASSWORD}\"; \
         composer update"
 fi
