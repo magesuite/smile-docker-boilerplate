@@ -154,6 +154,7 @@ source ${TEMP_DIR}/lib/interactive.sh
 # Move files to the project dir (TODO: remove "images" dir after uploading the images to the registry)
 mv ${TEMP_DIR}/docker/* ${TEMP_DIR}/images ${PROJECT_DIR}
 rm -rf ${TEMP_DIR}
+cd ${PROJECT_DIR}
 
 # Initialize Magento (TODO)
 #${PROJECT_DIR}/bin/setup-composer-auth
