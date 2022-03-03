@@ -13,6 +13,5 @@ YELLOW="$(tput setaf 3)"
 BLUE="$(tput setaf 4)"
 
 # Magento
-MAGENTO_ROOT=./src/
-MAGENTO_COMMAND="./bin/magento"
-
+MAGENTO_ROOT="./src/"
+MAGENTO_COMMAND="docker-compose run --rm --user=www-data cli bin/magento"

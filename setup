@@ -161,7 +161,8 @@ rm -rf ${TEMP_DIR}
 
 if [ "${MAGENTO_EDITION}" != "cloud" ]; then
     echo -e "\n${YELLOW}Composer - Create the magento project.${RESET}"
-    ${PROJECT_DIR}/bin/cli bash -c "composer create-project --no-interaction --no-install --repository=${MAGENTO_REPOSITORY} magento/project-${MAGENTO_EDITION}-edition=${MAGENTO_VERSION} .; \
+    # TODO: use public repository URLs (instead of internal) if smile public repository was provided
+    docker-compose run --rm cli bash -c "composer create-project --no-interaction --no-install --repository=${MAGENTO_REPOSITORY} magento/project-${MAGENTO_EDITION}-edition=${MAGENTO_VERSION} .; \
         composer config --unset repositories.0; \
         composer config repositories.magento_mirror composer https://packagist.galaxy.intranet/mirror/magento_official; \
         composer config repositories.smile_libraries composer https://packagist.galaxy.intranet/libraries/; \
@@ -173,11 +174,14 @@ if [ "${MAGENTO_EDITION}" != "cloud" ]; then
         composer install"
 else
     echo -e "\n${YELLOW}Composer - Update repository.${RESET}"
-    ${PROJECT_DIR}/bin/cli bash -c "composer config repositories.magento_mirror composer https://packagist.galaxy.intranet/mirror/magento_official; \
+    # TODO: use public repository URLs (instead of internal) if smile public repository was provided
+    docker-compose run --rm cli bash -c "composer config repositories.magento_mirror composer https://packagist.galaxy.intranet/mirror/magento_official; \
         composer config repositories.smile_libraries composer https://packagist.galaxy.intranet/libraries/; \
         composer config repositories.smile_magento2 composer https://packagist.galaxy.intranet/magento2/; \
         composer config http-basic.\"packagist.smile.fr\" \"${SMILE_PACKAGIST_USER}\" \"${SMILE_PACKAGIST_PASSWORD}\"; \
         composer update"
 fi
+
+# TODO: install smile modules/tools
 
 echo -e "\n${GREEN}The project was set up successfully.${RESET}"
