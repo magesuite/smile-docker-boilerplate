@@ -6,7 +6,7 @@ PHP_FPM = docker-compose exec --user=www-data fpm
 PHP_DATABASE = docker-compose exec db
 
 .DEFAULT_GOAL:=help
-.PHONY: help build up down ps logs bash db composer magento bin-vendor
+.PHONY: help build up down ps logs bash db composer magento phpcs phpunit phpstan php-cs-fixer
 
 help:
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /\n[33m/'
