@@ -12,24 +12,24 @@ help:
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /\n[33m/'
 
 ## Docker
-build: ## Builds all images
+build: ## Builds all images.
 	@docker-compose build
 
-up: ## Starts all containers in detached mode (no logs)
+up: ## Starts all containers in detached mode (no logs).
 	@docker-compose up -d
 
-down: ## Stops all containers
+down: ## Stops all containers.
 	@docker-compose down --remove-orphans
 
-ps: ## Lists active containers
+ps: ## Lists active containers.
 	@docker-compose ps
 
-logs: ## Show Docker logs. Pass the parameter "service=" to get logs of a given service. Example: make logs service=elasticsearch.
+logs: ## Shows Docker logs. Pass the parameter "service=" to get logs of a given service. Example: make logs service=elasticsearch.
 	@$(eval service ?=)
 	@docker-compose logs --tail=0 --follow $(service)
 
 ## Services
-bash: ## Opens a bash terminal on the php-cli container. Pass the parameter "service=" to connect to another service. Example: make bash s=redis.
+bash: ## Opens a bash terminal on the php-cli container. Pass the parameter "service=" to connect to another service. Example: make bash service=redis.
 	@$(eval service ?= cli)
 	@echo "Connecting to container \"$(service)\""
 	@if [ "$(service)" = "cli" ]; then $(PHP_CLI) bash; \

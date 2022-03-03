@@ -4,7 +4,8 @@
 
 Pre-requisites:
 
-- git, curl
+- git
+- curl
 - docker, docker-compose
 - any bash terminal
 
@@ -47,7 +48,6 @@ However, if they are not defined, you will have to specify them during the scrip
 To initialize the Magento database, run the following scripts at the root of the project:
 
 ```
-./bin/setup-magento
 ./bin/install-magento
 ```
 
@@ -58,28 +58,37 @@ TODO: decide how to customize parameters (e.g. project URL). Possible implementa
 - Using environment vars (e.g. $PROJECT_URL)
 - Using command-line options (e.g. --project-url=...)
 
-## Starting/stopping the containers
+## Interacting with the containers
 
-To start or stop the containers, you can use the Makefile:
+The makefile provides multiple commands that interact with containers:
 
-```
-# Starts the containers
-make docker-start
+- **make build**: lists all images.
+- **make up**: starts all containers in detached mode.
+- **make down**: stops all containers.
+- **make ps**: lists containers.
+- **make logs**: shows Docker logs (on all containers by default). 
+  Example: `make logs service=fpm`
 
-# Stops the containers
-make docker-stop
-```
+You can also quickly access any container with the following commands:
 
-## Running the Magento CLI
+- **make bash**: opens a bash terminal on any container (cli by default).
+  Example: `make bash service=fpm`
+- **make db**: connects to the Magento database.
 
-The directory "bin" contains several scripts that allow to run CLI commands:
+## Running command-line tools
 
-- **bin/cli**: runs a generic CLI command. Example: `bin/cli ls -l`
-- **bin/magento**: runs the Magento CLI. Example: `bin/magento setup:di:compile`
-- **bin/composer**: runs composer. Example: `bin/composer update -d magento`
-- **bin/db**: connects to the database.
-- **bin/install-magento**: initializes the Magento database.
-- **bin/set-permissions**: fixes file/folder permissions.
+The makefile provides multiple commands that interact with command-line tools:
+
+- **make magento**: runs the Magento CLI.
+  Example: `make magento cmd=indexer:reindex`
+- **make composer**: runs composer.
+  Example: `bin/composer update -d magento`
+- **make phpcs**: runs phpcs.
+  Example: `make phpcs cmd="--standard=ruleset.xml.dist"`
+- **make phpunit**: runs phpunit.
+- **make phpstan**: runs phpstan.
+- **make php-cs-fixer**: runs php-cs-fixer.
+  Example: `make php-cs-fixer cmd="fix --config=.php-cs-fixer.dist.php"`
 
 ## Kubernetes Integration
 

@@ -24,7 +24,7 @@ usage () {
     echo "  --skip-smile-tools                      Smile tools won't be installed if this option is passed (spbuilder, smileanalyser)"
     echo "  --smile-packagist-user <user>           User of the Smile packagist ACL (only useful if you use the public packagist repository)"
     echo "  --smile-packagist-password <password>   Password of the Smile packagist ACL (only useful if you use the public packagist repository)"
-    echo "  --magento-git-url                       URL of the Magento git repository (only useful for Cloud projects)"
+    echo "  --magento-git-url                       URL of the Magento git repository (only useful for cloud projects)"
     echo "  -n, --no-interaction                    Skips interactive mode."
     echo "  -h, --help                              Displays this help message"
 }
