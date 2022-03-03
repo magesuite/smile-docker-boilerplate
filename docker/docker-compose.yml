@@ -57,6 +57,7 @@ services:
     cli:
         build: ./images/php/7.4-cli
         env_file:
+            - env/composer.env
             - env/php.env
             - env/magento.env
             - env/user.env
