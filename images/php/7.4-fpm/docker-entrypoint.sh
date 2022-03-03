@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Update UID/GID
-if [ -n "${UID}" ]; then
-    usermod --uid $UID www-data
+if [ -n "${DOCKER_UID}" ]; then
+    usermod --uid $DOCKER_UID www-data
 fi
 
-if [ -n "${GID}" ]; then
-    groupmod --gid $GID www-data
+if [ -n "${DOCKER_GID}" ]; then
+    groupmod --gid $DOCKER_GID www-data
 fi
 
 # Substitute php.ini values
@@ -17,8 +17,5 @@ fi
 [ "$PHP_ENABLE_XDEBUG" = "true" ] && \
     docker-php-ext-enable xdebug && \
     echo "Xdebug is enabled"
-
-# Configure PHP-FPM
-[ ! -z "${MAGENTO_RUN_MODE}" ] && sed -i "s~!MAGENTO_RUN_MODE!~${MAGENTO_RUN_MODE}~" /usr/local/etc/php-fpm.conf
 
 exec "$@"

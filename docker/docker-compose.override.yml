@@ -6,22 +6,15 @@ services:
             - ./src:/var/www/html:rw,cached
 
     fpm:
+        user: ${DOCKER_UID?$DOCKER_UID must be set.}:${DOCKER_GID?$DOCKER_GID must be set.}
         volumes:
             - ./src:/var/www/html:rw,cached
 
     cli:
+        user: ${DOCKER_UID?$DOCKER_UID must be set.}:${DOCKER_GID?$DOCKER_GID must be set.}
         volumes:
             - ./src:/var/www/html:rw,cached
-            #- composer-cache:/composer/cache
 
     cron:
         volumes:
             - ./src:/var/www/html:rw,cached
-
-#volumes:
-#    appdata:
-#        driver: local
-#        driver_opts:
-#            type: none
-#            o: bind
-#            device: ${PWD}/src

@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Update UID/GID
-if [ -n "${UID}" ]; then
-    usermod --uid $UID www-data
+if [ -n "${DOCKER_UID}" ]; then
+    usermod --uid $DOCKER_UID www-data
 fi
 
-if [ -n "${GID}" ]; then
-    groupmod --gid $GID www-data
+if [ -n "${DOCKER_GID}" ]; then
+    groupmod --gid $DOCKER_GID www-data
 fi
 
 # Update crontab

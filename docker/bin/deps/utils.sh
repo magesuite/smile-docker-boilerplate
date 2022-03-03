@@ -14,4 +14,4 @@ BLUE="$(tput setaf 4)"
 
 # Magento
 MAGENTO_ROOT="./src/"
-MAGENTO_COMMAND="docker-compose run --rm --user=www-data cli bin/magento"
+MAGENTO_COMMAND="docker-compose run --rm cli bin/magento"

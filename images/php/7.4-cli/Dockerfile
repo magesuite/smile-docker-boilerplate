@@ -1,7 +1,5 @@
 FROM php:7.4-cli
 
-ARG CRONTAB=""
-
 # Configure Node.js version
 RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash
 
@@ -66,7 +64,7 @@ COPY ./etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
 COPY ./etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug.ini
 COPY ./bin/* /usr/local/bin/
 
-# Certificates
+# Certificates (for composer)
 RUN curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt \
     && update-ca-certificates
 

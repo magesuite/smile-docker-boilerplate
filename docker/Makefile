@@ -1,8 +1,7 @@
 SHELL := /bin/bash
 
 # Docker containers
-PHP_CLI = docker-compose run --rm --user=www-data cli
-PHP_FPM = docker-compose exec --user=www-data fpm
+PHP_CLI = docker-compose run --rm cli
 PHP_DATABASE = docker-compose exec db
 
 .DEFAULT_GOAL:=help
@@ -33,14 +32,10 @@ bash: ## Opens a bash terminal on the php-cli container. Pass the parameter "ser
 	@$(eval service ?= cli)
 	@echo "Connecting to container \"$(service)\""
 	@if [ "$(service)" = "cli" ]; then $(PHP_CLI) bash; \
-	elif [ "$(service)" = "fpm" ]; then $(PHP_FPM) bash; \
 	else docker-compose exec $(service) bash; fi
 
 db: ## Connects to the Magento database.
 	@$(PHP_DATABASE) bash -c 'mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE'
-
-#fix-perms: ## Fixes project files permissions.
-#	@$(PHP_CLI) bash -c "chown -R www-data:www-data /var/www/html; find /var/www/html/pub -type f -exec chmod 664 {} \;; find /var/www/html/pub -type d -exec chmod 775 {} \;; find /var/www/html/generated -type d -exec chmod g+s {} \;; find /var/www/html/var/composer_home -type f -exec chmod 664 {} \;"
 
 ## CLI commands
 composer: ## Runs composer. Example: make composer cmd="config --list"
