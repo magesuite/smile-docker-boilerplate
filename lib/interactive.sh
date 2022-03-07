@@ -98,6 +98,12 @@ else
     fi
 fi
 
+if [ "${SMILE_PACKAGIST}" = "internal" ] && ! curl --output /dev/null --head --silent --fail https://packagist.galaxy.intranet/; then
+    echo -e "\n${RED}The URL \"https://packagist.galaxy.intranet/\" is unreachable."
+    echo "You need to be connected to the Smile network (e.g. with a VPN) to use the internal packagist repository.${RESET}"
+    exit 1
+fi
+
 # Set the composer repository URLs
 MAGENTO_PACKAGIST_URL="https://packagist.galaxy.intranet/mirror/magento_official/" && [ "${SMILE_PACKAGIST}" = "public" ] && MAGENTO_PACKAGIST_URL="https://repo.magento.com/"
 SMILE_PACKAGIST_URL="https://packagist.galaxy.intranet" && [ "${SMILE_PACKAGIST}" = "public" ] && SMILE_PACKAGIST_URL="https://packagist.smile.fr"
