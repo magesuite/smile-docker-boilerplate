@@ -15,7 +15,7 @@ Pre-requisites:
     ```
 2. Then, run the following script in this new directory:
     ```
-    bash <(curl -sL https://git.smile.fr/guvra/magento-docker/raw/master/setup)
+    bash <(git archive --remote=git@git.smile.fr:guvra/magento-docker HEAD setup | tar -xO)
     ```
     This script will prompt for the project information (Magento edition, version...).
     It will create the following structure:
@@ -101,11 +101,11 @@ The initialization script provides command-line options that allow to automate a
 You can get the list of these options by running the following command:
 
 ```
-bash <(curl -sL https://git.smile.fr/guvra/magento-docker/raw/master/setup) --help
+bash <(git archive --remote=git@git.smile.fr:guvra/magento-docker HEAD setup | tar -xO) --help
 ```
 
 Example usage:
 
 ```
-bash <(curl -sL https://git.smile.fr/guvra/magento-docker/raw/master/setup) my-project --magento-edition enterprise --no-interaction
+bash <(git archive --remote=git@git.smile.fr:guvra/magento-docker HEAD setup | tar -xO) my-project --magento-edition enterprise --no-interaction
 ```
