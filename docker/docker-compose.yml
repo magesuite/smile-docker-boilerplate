@@ -110,6 +110,8 @@ services:
             - bootstrap.memory_lock=true
         ports:
             - 9200
+        volumes:
+            - esdata:/usr/share/elasticsearch/data
 
     redis:
         image: redis:6.2
@@ -146,11 +148,6 @@ services:
             - '8025:8025'
 
 volumes:
-#    appdata:
-#        driver: local
-#        driver_opts:
-#            type: none
-#            o: bind
-#            device: ${PWD}/src
     dbdata:
+    esdata:
     rabbitmqdata:
