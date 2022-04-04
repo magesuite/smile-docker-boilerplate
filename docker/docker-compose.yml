@@ -66,7 +66,7 @@ services:
             - redis
 #        volumes:
 #            - appdata:/var/www/html
-#            - composer-cache:/composer/cache
+            - composer-cache:/composer/cache
 
     cron:
         build: ./images/php/7.4-cli
@@ -148,6 +148,7 @@ services:
             - '8025:8025'
 
 volumes:
+    composer-cache:
     dbdata:
     esdata:
     rabbitmqdata:
