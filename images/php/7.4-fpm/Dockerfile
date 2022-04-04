@@ -28,6 +28,7 @@ RUN set -ex; \
         bcmath \
         gd \
         intl \
+        opcache \
         pcntl \
         pdo_mysql \
         soap \
