@@ -37,7 +37,7 @@ RUN set -ex; \
         zip; \
     apk del .build-deps
 
-# Add dev tools (npp, grunt, shadow utils for usermod/groupmod, xdebug, smile certificates)
+# Install dev tools (npp, grunt, shadow utils for usermod/groupmod, xdebug, smile certificates)
 RUN set -ex; \
     apk update; \
     apk add --no-cache \

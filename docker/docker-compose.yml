@@ -31,7 +31,7 @@ services:
         depends_on:
             - db
             - elasticsearch
-            - mailhog
+            - maildev
             - rabbitmq
             - redis
 #        volumes:
@@ -125,11 +125,11 @@ services:
         env_file:
             - env/config.env
 
-    mailhog:
-        image: mailhog/mailhog:latest
+    maildev:
+        image: maildev/maildev:1.1.1
         ports:
-            - '1025:1025'
-            - '8025:8025'
+            - '1025'
+            - '1080:1080'
 
 volumes:
     composer-cache:

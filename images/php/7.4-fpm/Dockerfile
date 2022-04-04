@@ -1,6 +1,6 @@
 FROM php:7.4-fpm-alpine
 
-# Install php extensions (dom and mbstring are already installed in the parent image), sendmail
+# Install php extensions (dom and mbstring are already installed in the parent image)
 RUN set -ex; \
     apk update; \
     apk add --no-cache --virtual .build-deps \
@@ -35,21 +35,19 @@ RUN set -ex; \
         sockets \
         xsl \
         zip; \
-    apk del .build-deps; \
-    curl -L -O https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64; \
-    chmod +x mhsendmail_linux_amd64; \
-    mv mhsendmail_linux_amd64 /usr/local/bin/mhsendmail
+    apk del .build-deps
 
-# Install xdebug
+# Install dev tools (msmtp, xdebug)
 RUN set -ex; \
+    apk add --no-cache msmtp; \
     apk add --no-cache --virtual .build-deps $PHPIZE_DEPS; \
     pecl install -o -f xdebug; \
     apk del .build-deps; \
     rm -rf /tmp/pear
 #    docker-php-ext-enable xdebug
+COPY ./etc/msmtprc /etc/msmtprc
 
 # PHP configuration
-COPY ./etc/mail.ini /usr/local/etc/php/conf.d/zz-mail.ini
 COPY ./etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
 COPY ./etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug.ini
 COPY ./etc/php-fpm.conf /usr/local/etc/
