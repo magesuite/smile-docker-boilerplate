@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 set -e
 
@@ -21,6 +21,7 @@ if [[ -n "$DOCKER_GID" && "$DOCKER_GID" != $(id -g www-data) ]]; then
     groupmod --gid $DOCKER_GID www-data
 fi
 
-echo "$CRONTAB" > /etc/cron.d/magento
-touch /var/log/cron.log
-cron && tail -f -n0 /var/log/cron.log
+echo "$CRONTAB" > /tmp/crontab
+crontab -u www-data /tmp/crontab
+rm -f /tmp/crontab-magento
+crond -f

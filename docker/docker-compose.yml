@@ -14,7 +14,7 @@ services:
             - varnish
 
     varnish:
-        build: ./images/varnish/6.5
+        build: ./images/varnish/7.1
         ports:
             - 8080:80
         depends_on:
@@ -60,15 +60,15 @@ services:
             - elasticsearch
             - rabbitmq
             - redis
-#        volumes:
+        volumes:
 #            - appdata:/var/www/html
-            - composer-cache:/composer/cache
+            - composer-cache:/tmp/cache
 
     cron:
         build: ./images/php/7.4-cli
         command: run-cron
         environment:
-            CRONTAB: '* * * * * www-data /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
+            CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
         env_file:
             - .env
             - env/php.env
@@ -112,7 +112,7 @@ services:
             - esdata:/usr/share/elasticsearch/data
 
     redis:
-        image: redis:6.2
+        image: redis:6.2-alpine
         ports:
             - 6379
         sysctls:

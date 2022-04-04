@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 set -e
 
@@ -24,7 +24,7 @@ fi
 # Remove env.php and config.php files if it exists, otherwise the installation would fail
 rm -f $MAGENTO_ROOT/app/etc/env.php $MAGENTO_ROOT/app/etc/config.php
 
-MAGENTO_COMMAND="magento"
+MAGENTO_COMMAND="$MAGENTO_ROOT/bin/magento"
 
 INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
     --db-host=$DB_HOST \
@@ -98,7 +98,7 @@ fi
 if [ "$MAGENTO_RUN_MODE" = "production" ]; then
     print_newline_and_run "$MAGENTO_COMMAND setup:di:compile"
     print_newline_and_run "$MAGENTO_COMMAND cache:clean"
-    print_newline_and_run "$MAGENTO_COMMAND setup:static-content:deploy -f en_US ${LANGUAGE}"
+    print_newline_and_run "$MAGENTO_COMMAND setup:static-content:deploy -f en_US $LANGUAGE"
 fi
 
 print_newline_and_run "find $MAGENTO_ROOT/pub -type f -exec chmod 664 {} \;"

@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-MAGENTO_COMMAND="$MAGENTO_ROOT/bin/magento"
-$MAGENTO_COMMAND "$@"

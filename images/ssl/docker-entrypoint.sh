@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 VHOST_FILE="/etc/nginx/conf.d/default.conf"
 

@@ -32,8 +32,8 @@ build: ## Build all images. Only useful if you project uses custom Dockerfiles.
 sh: ## Open a shell on the php-cli container. Pass the parameter "service=" to connect to another service. Example: make sh service=redis
 	@$(eval service ?= cli)
 	@echo "Connecting to container \"$(service)\""
-	@if [ "$(service)" = "cli" ]; then $(PHP_CLI) bash; \
-	else docker-compose exec $(service) bash; fi
+	@if [ "$(service)" = "cli" ]; then $(PHP_CLI) sh; \
+	else docker-compose exec $(service) sh; fi
 
 db: ## Connect to the Magento database.
 	@$(PHP_DATABASE) bash -c 'mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE'

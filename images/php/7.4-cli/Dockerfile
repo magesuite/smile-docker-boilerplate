@@ -1,62 +1,59 @@
-FROM php:7.4-cli
+FROM php:7.4-cli-alpine
 
-# Configure Node.js version
-RUN curl -sL https://deb.nodesource.com/setup_lts.x | bash
+# Install php extensions (dom and mbstring are already installed in the parent image)
+RUN set -ex; \
+    apk update; \
+    apk add --no-cache --virtual .build-deps \
+        # gd dev deps
+        freetype-dev libjpeg-turbo-dev libpng-dev libwebp-dev libxpm-dev \
+        # intl dev deps
+        icu-dev \
+        # soap dev deps
+        libxml2-dev \
+        # xlt dev deps \
+        libxslt-dev \
+        # zip dev deps
+        libzip-dev; \
+    apk add --no-cache \
+        # gd deps
+        freetype libjpeg-turbo libpng libwebp libxpm \
+        # intl deps \
+        icu-libs \
+        # xlt deps \
+        libxslt \
+        # zip deps \
+        libzip; \
+    docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp --with-xpm; \
+    docker-php-ext-install \
+        bcmath \
+        gd \
+        intl \
+        pcntl \
+        pdo_mysql \
+        soap \
+        sockets \
+        xsl \
+        zip; \
+    apk del .build-deps
 
-# Install dependencies (php dev tools, sudo for execution as www-data, curl/unzip for composer commands, nodejs)
-RUN apt-get update && apt-get install -y \
-    libfreetype6-dev \
-    libicu-dev \
-    libjpeg62-turbo-dev \
-    libpng-dev \
-    libxslt1-dev \
-    libzip-dev \
-    libonig-dev \
-    sudo \
-    cron \
-    curl \
-    unzip \
-    nodejs
-
-# Configure the gd library
-RUN docker-php-ext-configure \
-    gd --with-freetype --with-jpeg
-
-# Install required PHP extensions
-RUN docker-php-ext-install \
-    bcmath \
-    dom \
-    gd \
-    intl \
-    mbstring \
-    pcntl \
-    pdo_mysql \
-    soap \
-    sockets \
-    xsl \
-    zip
-
-RUN pecl install -o -f \
-    xdebug \
-    redis
-
-RUN docker-php-ext-enable redis
-
-ENV PHP_MEMORY_LIMIT 2G
-ENV PHP_ENABLE_XDEBUG false
-ENV MAGENTO_ROOT /var/www/html
-ENV MAGENTO_RUN_MODE developer
-
-# Install Grunt
-RUN npm install -g grunt-cli
+# Add dev tools (npp, grunt, shadow utils for usermod/groupmod, xdebug, smile certificates)
+RUN set -ex; \
+    apk update; \
+    apk add --no-cache \
+        npm \
+        shadow; \
+    npm install -g grunt-cli; \
+    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS; \
+    pecl install -o -f xdebug; \
+    apk del .build-deps; \
+    rm -rf /tmp/pear; \
+#    docker-php-ext-enable xdebug; \
+    curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt; \
+    update-ca-certificates
 
 # Install composer
 ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV COMPOSER_HOME /composer
-ENV COMPOSER_GITHUB_TOKEN ""
-ENV COMPOSER_MAGENTO_USERNAME ""
-ENV COMPOSER_MAGENTO_PASSWORD ""
-RUN mkdir -p $COMPOSER_HOME/cache
+ENV COMPOSER_HOME /tmp
 COPY --from=composer:2 /usr/bin/composer /usr/bin/
 
 # PHP configuration
@@ -64,17 +61,9 @@ COPY ./etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
 COPY ./etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug.ini
 COPY ./bin/* /usr/local/bin/
 
-# Certificates (for composer)
-RUN curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt \
-    && update-ca-certificates
-
-RUN ["chmod", "+x", "/usr/local/bin/magento-installer"]
-RUN ["chmod", "+x", "/usr/local/bin/magento"]
-RUN ["chmod", "+x", "/usr/local/bin/run-cron"]
-
 COPY ./docker-entrypoint.sh /
-RUN ["chmod", "+x", "/docker-entrypoint.sh"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-WORKDIR ${MAGENTO_ROOT}
-CMD ["bash"]
+ENV MAGENTO_ROOT /var/www/html
+WORKDIR $MAGENTO_ROOT
+CMD ["sh"]
