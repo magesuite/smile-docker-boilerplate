@@ -9,11 +9,6 @@ if [ -n "${DOCKER_GID}" ]; then
     groupmod --gid $DOCKER_GID www-data
 fi
 
-# Update crontab
-if [ ! -z "${CRONTAB}" ]; then
-    echo "${CRONTAB}" > /etc/cron.d/magento && touch /var/log/cron.log
-fi
-
 # Substitute php.ini values
 [ ! -z "${PHP_MEMORY_LIMIT}" ] && sed -i "s~!PHP_MEMORY_LIMIT!~${PHP_MEMORY_LIMIT}~" /usr/local/etc/php/conf.d/zz-magento.ini
 
