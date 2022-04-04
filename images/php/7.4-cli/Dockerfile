@@ -24,7 +24,7 @@ RUN set -ex; \
         # zip deps \
         libzip; \
     docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp --with-xpm; \
-    docker-php-ext-install \
+    docker-php-ext-install -j$(nproc) \
         bcmath \
         gd \
         intl \
