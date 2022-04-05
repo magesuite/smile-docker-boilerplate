@@ -9,10 +9,7 @@ set -e
 cd "$( dirname "${BASH_SOURCE[0]}" )"
 cd ..
 
-source env/database.env
-source env/magento.env
-source env/php.env
-source env/rabbitmq.env
+source env/config.env
 source bin/deps/utils.sh
 
 if [ ! -f "$MAGENTO_ROOT/composer.json" ]; then
@@ -24,10 +21,10 @@ fi
 rm -f $MAGENTO_ROOT/app/etc/env.php $MAGENTO_ROOT/app/etc/config.php
 
 INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
-    --db-host=$DB_HOST \
-    --db-name=$DB_NAME \
-    --db-user=$DB_USER \
-    --db-password=$DB_PASSWORD \
+    --db-host=$MYSQL_HOST \
+    --db-name=$MYSQL_DATABASE \
+    --db-user=$MYSQL_USER \
+    --db-password=$MYSQL_PASSWORD \
     --elasticsearch-host=$ELASTICSEARCH_HOST \
     --base-url=$BASE_URL \
     --base-url-secure=$SECURE_BASE_URL \

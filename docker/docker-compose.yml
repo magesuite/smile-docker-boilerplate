@@ -3,20 +3,8 @@ version: '3.4'
 # TODO: upload the images to the registry and use them instead of building them dynamically
 
 services:
-    ssl:
-        build: ./images/ssl
-        ports:
-            - 8443:443
-        environment:
-            - UPSTREAM_HOST=varnish
-            - UPSTREAM_PORT=80
-        depends_on:
-            - varnish
-
     varnish:
         build: ./images/varnish/7.1
-        ports:
-            - 8080:80
         depends_on:
             - web
 
@@ -24,11 +12,10 @@ services:
         build: ./images/nginx/1.21
         ports:
             - 80
+            - 443
+            - 8080
         env_file:
-            - env/php.env
-        environment:
-            - UPSTREAM_HOST=varnish
-            - UPSTREAM_PORT=80
+            - env/config.env
         depends_on:
             - fpm
 #        volumes:
@@ -39,7 +26,8 @@ services:
         ports:
             - 9000
         env_file:
-            - env/php.env
+            - env/config.env
+            - .env
         depends_on:
             - db
             - elasticsearch
@@ -53,8 +41,8 @@ services:
         build: ./images/php/7.4-cli
         env_file:
             - env/composer.env
-            - env/php.env
-            - env/magento.env
+            - env/config.env
+            - .env
         depends_on:
             - db
             - elasticsearch
@@ -70,8 +58,8 @@ services:
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
         env_file:
+            - env/config.env
             - .env
-            - env/php.env
         depends_on:
             - db
             - elasticsearch
@@ -84,11 +72,8 @@ services:
         image: mariadb:10.4
         ports:
             - 3306
-        environment:
-            MYSQL_ROOT_PASSWORD: 'magento2'
-            MYSQL_DATABASE: 'magento2'
-            MYSQL_USER: 'magento2'
-            MYSQL_PASSWORD: 'magento2'
+        env_file:
+            - env/config.env
         healthcheck:
             test: 'mysqladmin ping -h localhost -pmagento2'
             interval: 30s
@@ -128,16 +113,17 @@ services:
             timeout: 30s
             retries: 3
         volumes:
-            - /data
+            - redisdata:/data
 
     rabbitmq:
         image: rabbitmq:3.8.27-management-alpine
         ports:
             - '15672:15672'
             - '5672:5672'
-        env_file: env/rabbitmq.env
         volumes:
             - rabbitmqdata:/var/lib/rabbitmq
+        env_file:
+            - env/config.env
 
     mailhog:
         image: mailhog/mailhog:latest
@@ -150,3 +136,4 @@ volumes:
     dbdata:
     esdata:
     rabbitmqdata:
+    redisdata:

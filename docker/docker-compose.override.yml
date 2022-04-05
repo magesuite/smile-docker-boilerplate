@@ -2,6 +2,18 @@ version: '3.4'
 
 services:
     web:
+        labels:
+            traefik.enable: "true"
+            # magento service: bind to internal container 9000 port
+            traefik.http.services.magento-https.loadbalancer.server.port: 80
+            # magento route: redirect to magento-https
+            traefik.http.routers.magento.entrypoints: "http"
+            traefik.http.routers.magento.rule: "Host(`magento.${PROJECT_NAME}.docker.localhost`)"
+            #traefik.http.routers.magento.middlewares: "https-redirect@file" # comment this line to disable https redirection
+            # magento-https route: serve magento service hover https
+            traefik.http.routers.magento-https.entrypoints: "https"
+            traefik.http.routers.magento-https.rule: "Host(`magento.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.magento-https.tls: true
         volumes:
             - ./src:/var/www/html:rw,cached
 
@@ -18,3 +30,45 @@ services:
     cron:
         volumes:
             - ./src:/var/www/html:rw,cached
+
+    varnish:
+        labels:
+            traefik.enable: "true"
+            # varnish service: bind to internal container 80 port
+            traefik.http.services.varnish-https.loadbalancer.server.port: 80
+            # varnish route: redirect to varnish-https
+            traefik.http.routers.varnish.entrypoints: "http"
+            traefik.http.routers.varnish.rule: "Host(`varnish.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.varnish.middlewares: "https-redirect@file" # comment this line to disable https redirection
+            # varnish-https route: serve varnish service hover https
+            traefik.http.routers.varnish-https.entrypoints: "https"
+            traefik.http.routers.varnish-https.rule: "Host(`varnish.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.varnish-https.tls: true
+
+    elasticsearch:
+        labels:
+            traefik.enable: "true"
+            # elasticsearch service: bind to internal container 9200 port
+            traefik.http.services.elasticsearch-https.loadbalancer.server.port: 9200
+            # elasticsearch route: redirect to elasticsearch-https
+            traefik.http.routers.elasticsearch.entrypoints: "http"
+            traefik.http.routers.elasticsearch.rule: "Host(`elastic.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.elasticsearch.middlewares: "https-redirect@file" # comment this line to disable https redirection
+            # elasticsearch-https route: serve elasticsearch service hover https
+            traefik.http.routers.elasticsearch-https.entrypoints: "https"
+            traefik.http.routers.elasticsearch-https.rule: "Host(`elastic.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.elasticsearch-https.tls: true
+
+    mailhog:
+        labels:
+            traefik.enable: "true"
+            # mailhog service: bind to internal container 8025 port
+            traefik.http.services.mailhog-https.loadbalancer.server.port: 8025
+            # mailhog route: redirect to mailhog-https
+            traefik.http.routers.mailhog.entrypoints: "http"
+            traefik.http.routers.mailhog.rule: "Host(`mailhog.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.mailhog.middlewares: "https-redirect@file" # comment this line to disable https redirection
+            # mailhog-https route: serve mailhog service hover https
+            traefik.http.routers.mailhog-https.entrypoints: "https"
+            traefik.http.routers.mailhog-https.rule: "Host(`mailhog.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.mailhog-https.tls: true
