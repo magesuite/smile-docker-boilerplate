@@ -128,8 +128,8 @@ services:
     maildev:
         image: maildev/maildev:1.1.1
         ports:
-            - '1025'
-            - '1080:1080'
+            - 1025
+            - 1080
 
 volumes:
     composer-cache:
