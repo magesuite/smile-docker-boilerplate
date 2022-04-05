@@ -5,6 +5,8 @@ version: '3.4'
 services:
     varnish:
         build: ./images/varnish/7.1
+        ports:
+            - 80
         depends_on:
             - web
 
