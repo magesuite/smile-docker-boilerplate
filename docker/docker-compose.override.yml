@@ -59,6 +59,20 @@ services:
             traefik.http.routers.elasticsearch-https.rule: "Host(`elastic.${PROJECT_NAME}.docker.localhost`)"
             traefik.http.routers.elasticsearch-https.tls: true
 
+    rabbitmq:
+        labels:
+            traefik.enable: "true"
+            # rabbitmq service: bind to internal container 15672 port
+            traefik.http.services.rabbitmq-https.loadbalancer.server.port: 15672
+            # rabbitmq route: redirect to rabbitmq-https
+            traefik.http.routers.rabbitmq.entrypoints: "http"
+            traefik.http.routers.rabbitmq.rule: "Host(`rabbitmq.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.rabbitmq.middlewares: "https-redirect@file" # comment this line to disable https redirection
+            # rabbitmq-https route: serve rabbitmq service over https
+            traefik.http.routers.rabbitmq-https.entrypoints: "https"
+            traefik.http.routers.rabbitmq-https.rule: "Host(`rabbitmq.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.rabbitmq-https.tls: true
+
     maildev:
         labels:
             traefik.enable: "true"
