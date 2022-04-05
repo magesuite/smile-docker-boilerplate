@@ -2,20 +2,22 @@ version: '3.4'
 
 services:
     web:
+        volumes:
+            - ./src:/var/www/html:rw,cached
+
+    varnish:
         labels:
             traefik.enable: "true"
-            # magento service: bind to internal container 9000 port
+            # magento service: bind to internal container 80 port
             traefik.http.services.magento-https.loadbalancer.server.port: 80
             # magento route: redirect to magento-https
             traefik.http.routers.magento.entrypoints: "http"
-            traefik.http.routers.magento.rule: "Host(`magento.${PROJECT_NAME}.docker.localhost`)"
-            #traefik.http.routers.magento.middlewares: "https-redirect@file" # comment this line to disable https redirection
+            traefik.http.routers.magento.rule: "Host(`${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.magento.middlewares: "https-redirect@file" # comment this line to disable https redirection
             # magento-https route: serve magento service over https
             traefik.http.routers.magento-https.entrypoints: "https"
-            traefik.http.routers.magento-https.rule: "Host(`magento.${PROJECT_NAME}.docker.localhost`)"
+            traefik.http.routers.magento-https.rule: "Host(`${PROJECT_NAME}.docker.localhost`)"
             traefik.http.routers.magento-https.tls: true
-        volumes:
-            - ./src:/var/www/html:rw,cached
 
     fpm:
         user: ${DOCKER_UID?$DOCKER_UID must be set.}:${DOCKER_GID?$DOCKER_GID must be set.}
@@ -30,20 +32,6 @@ services:
     cron:
         volumes:
             - ./src:/var/www/html:rw,cached
-
-    varnish:
-        labels:
-            traefik.enable: "true"
-            # varnish service: bind to internal container 80 port
-            traefik.http.services.varnish-https.loadbalancer.server.port: 80
-            # varnish route: redirect to varnish-https
-            traefik.http.routers.varnish.entrypoints: "http"
-            traefik.http.routers.varnish.rule: "Host(`varnish.${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.varnish.middlewares: "https-redirect@file" # comment this line to disable https redirection
-            # varnish-https route: serve varnish service over https
-            traefik.http.routers.varnish-https.entrypoints: "https"
-            traefik.http.routers.varnish-https.rule: "Host(`varnish.${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.varnish-https.tls: true
 
     elasticsearch:
         labels:
