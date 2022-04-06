@@ -48,7 +48,7 @@ RUN set -ex; \
     pecl install -o -f xdebug; \
     apk del .build-deps; \
     rm -rf /tmp/pear; \
-#    docker-php-ext-enable xdebug; \
+    docker-php-ext-enable xdebug; \
     curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt; \
     update-ca-certificates
 

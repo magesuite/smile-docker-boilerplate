@@ -43,8 +43,8 @@ RUN set -ex; \
     apk add --no-cache --virtual .build-deps $PHPIZE_DEPS; \
     pecl install -o -f xdebug; \
     apk del .build-deps; \
-    rm -rf /tmp/pear
-#    docker-php-ext-enable xdebug
+    rm -rf /tmp/pear; \
+    docker-php-ext-enable xdebug
 COPY ./etc/msmtprc /etc/msmtprc
 
 # PHP configuration
