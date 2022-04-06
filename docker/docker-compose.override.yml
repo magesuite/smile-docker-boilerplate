@@ -3,14 +3,14 @@ version: '3.4'
 services:
     varnish:
         labels:
-            traefik.enable: true
+            - traefik.enable=true
             # Serve magento over http
-            traefik.http.routers.${PROJECT_NAME}-magento-http.rule: 'Host(`${PROJECT_NAME}.docker.localhost`)'
-            traefik.http.routers.${PROJECT_NAME}-magento-http.entrypoints: http
+            - traefik.http.routers.${PROJECT_NAME}-magento-http.rule=Host(`${PROJECT_NAME}.docker.localhost`)
+            - traefik.http.routers.${PROJECT_NAME}-magento-http.entrypoints=http
             # Serve magento over https
-            traefik.http.routers.${PROJECT_NAME}-magento-https.rule: 'Host(`${PROJECT_NAME}.docker.localhost`)'
-            traefik.http.routers.${PROJECT_NAME}-magento-https.entrypoints: https
-            traefik.http.routers.${PROJECT_NAME}-magento-https.tls: true
+            - traefik.http.routers.${PROJECT_NAME}-magento-https.rule=Host(`${PROJECT_NAME}.docker.localhost`)
+            - traefik.http.routers.${PROJECT_NAME}-magento-https.entrypoints=https
+            - traefik.http.routers.${PROJECT_NAME}-magento-https.tls=true
 
     web:
         volumes:
@@ -32,24 +32,21 @@ services:
 
     elasticsearch:
         labels:
-            traefik.enable: true
-            traefik.http.services.${PROJECT_NAME}-elastic.loadbalancer.server.port: 9200
-            # Serve elastic over http
-            traefik.http.routers.${PROJECT_NAME}-elastic-http.rule: 'Host(`elastic.${PROJECT_NAME}.docker.localhost`)'
-            traefik.http.routers.${PROJECT_NAME}-elastic-http.entrypoints: http
+            - traefik.enable=true
+            - traefik.http.services.${PROJECT_NAME}-elastic.loadbalancer.server.port=9200
+            - traefik.http.routers.${PROJECT_NAME}-elastic-http.rule=Host(`elastic.${PROJECT_NAME}.docker.localhost`)
+            - traefik.http.routers.${PROJECT_NAME}-elastic-http.entrypoints=http
 
     rabbitmq:
         labels:
-            traefik.enable: true
-            traefik.http.services.${PROJECT_NAME}-rabbitmq.loadbalancer.server.port: 15672
-            # Serve rabbitmq over http
-            traefik.http.routers.${PROJECT_NAME}-rabbitmq-http.rule: 'Host(`rabbitmq.${PROJECT_NAME}.docker.localhost`)'
-            traefik.http.routers.${PROJECT_NAME}-rabbitmq-http.entrypoints: http
+            - traefik.enable=true
+            - traefik.http.services.${PROJECT_NAME}-rabbitmq.loadbalancer.server.port=15672
+            - traefik.http.routers.${PROJECT_NAME}-rabbitmq-http.rule=Host(`rabbitmq.${PROJECT_NAME}.docker.localhost`)
+            - traefik.http.routers.${PROJECT_NAME}-rabbitmq-http.entrypoints=http
 
     maildev:
         labels:
-            traefik.enable: true
-            traefik.http.services.${PROJECT_NAME}-maildev.loadbalancer.server.port: 1080
-            # Serve maildev over http
-            traefik.http.routers.${PROJECT_NAME}-maildev-http.rule: 'Host(`maildev.${PROJECT_NAME}.docker.localhost`)'
-            traefik.http.routers.${PROJECT_NAME}-maildev-http.entrypoints: http
+            - traefik.enable=true
+            - traefik.http.services.${PROJECT_NAME}-maildev.loadbalancer.server.port=1080
+            - traefik.http.routers.${PROJECT_NAME}-maildev-http.rule=Host(`maildev.${PROJECT_NAME}.docker.localhost`)
+            - traefik.http.routers.${PROJECT_NAME}-maildev-http.entrypoints=http
