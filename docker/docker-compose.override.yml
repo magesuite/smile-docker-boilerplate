@@ -34,6 +34,7 @@ services:
         labels:
             - traefik.enable=true
             - traefik.http.services.${PROJECT_NAME}-elastic.loadbalancer.server.port=9200
+            # Serve elasticsearch over http
             - traefik.http.routers.${PROJECT_NAME}-elastic-http.rule=Host(`elastic.${PROJECT_NAME}.docker.localhost`)
             - traefik.http.routers.${PROJECT_NAME}-elastic-http.entrypoints=http
 
@@ -41,6 +42,7 @@ services:
         labels:
             - traefik.enable=true
             - traefik.http.services.${PROJECT_NAME}-rabbitmq.loadbalancer.server.port=15672
+            # Serve rabbitmq over http
             - traefik.http.routers.${PROJECT_NAME}-rabbitmq-http.rule=Host(`rabbitmq.${PROJECT_NAME}.docker.localhost`)
             - traefik.http.routers.${PROJECT_NAME}-rabbitmq-http.entrypoints=http
 
@@ -48,5 +50,6 @@ services:
         labels:
             - traefik.enable=true
             - traefik.http.services.${PROJECT_NAME}-maildev.loadbalancer.server.port=1080
+            # Serve maildev over http
             - traefik.http.routers.${PROJECT_NAME}-maildev-http.rule=Host(`maildev.${PROJECT_NAME}.docker.localhost`)
             - traefik.http.routers.${PROJECT_NAME}-maildev-http.entrypoints=http
