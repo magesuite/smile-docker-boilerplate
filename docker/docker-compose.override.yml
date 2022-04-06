@@ -1,23 +1,20 @@
 version: '3.4'
 
 services:
+    varnish:
+        labels:
+            traefik.enable: true
+            # Serve magento over http
+            traefik.http.routers.${PROJECT_NAME}-magento-http.rule: 'Host(`${PROJECT_NAME}.docker.localhost`)'
+            traefik.http.routers.${PROJECT_NAME}-magento-http.entrypoints: http
+            # Serve magento over https
+            traefik.http.routers.${PROJECT_NAME}-magento-https.rule: 'Host(`${PROJECT_NAME}.docker.localhost`)'
+            traefik.http.routers.${PROJECT_NAME}-magento-https.entrypoints: https
+            traefik.http.routers.${PROJECT_NAME}-magento-https.tls: true
+
     web:
         volumes:
             - ./src:/var/www/html:rw,cached
-
-    varnish:
-        labels:
-            traefik.enable: "true"
-            # magento service: bind to internal container 80 port
-            traefik.http.services.magento-https.loadbalancer.server.port: 80
-            # magento route: redirect to magento-https
-            traefik.http.routers.magento.entrypoints: "http"
-            traefik.http.routers.magento.rule: "Host(`${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.magento.middlewares: "https-redirect@file" # comment this line to disable https redirection
-            # magento-https route: serve magento service over https
-            traefik.http.routers.magento-https.entrypoints: "https"
-            traefik.http.routers.magento-https.rule: "Host(`${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.magento-https.tls: true
 
     fpm:
         user: ${DOCKER_UID?$DOCKER_UID must be set.}:${DOCKER_GID?$DOCKER_GID must be set.}
@@ -35,42 +32,24 @@ services:
 
     elasticsearch:
         labels:
-            traefik.enable: "true"
-            # elasticsearch service: bind to internal container 9200 port
-            traefik.http.services.elasticsearch-https.loadbalancer.server.port: 9200
-            # elasticsearch route: redirect to elasticsearch-https
-            traefik.http.routers.elasticsearch.entrypoints: "http"
-            traefik.http.routers.elasticsearch.rule: "Host(`elastic.${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.elasticsearch.middlewares: "https-redirect@file" # comment this line to disable https redirection
-            # elasticsearch-https route: serve elasticsearch service over https
-            traefik.http.routers.elasticsearch-https.entrypoints: "https"
-            traefik.http.routers.elasticsearch-https.rule: "Host(`elastic.${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.elasticsearch-https.tls: true
+            traefik.enable: true
+            traefik.http.services.${PROJECT_NAME}-elastic.loadbalancer.server.port: 9200
+            # Serve elastic over http
+            traefik.http.routers.${PROJECT_NAME}-elastic-http.rule: 'Host(`elastic.${PROJECT_NAME}.docker.localhost`)'
+            traefik.http.routers.${PROJECT_NAME}-elastic-http.entrypoints: http
 
     rabbitmq:
         labels:
-            traefik.enable: "true"
-            # rabbitmq service: bind to internal container 15672 port
-            traefik.http.services.rabbitmq-https.loadbalancer.server.port: 15672
-            # rabbitmq route: redirect to rabbitmq-https
-            traefik.http.routers.rabbitmq.entrypoints: "http"
-            traefik.http.routers.rabbitmq.rule: "Host(`rabbitmq.${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.rabbitmq.middlewares: "https-redirect@file" # comment this line to disable https redirection
-            # rabbitmq-https route: serve rabbitmq service over https
-            traefik.http.routers.rabbitmq-https.entrypoints: "https"
-            traefik.http.routers.rabbitmq-https.rule: "Host(`rabbitmq.${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.rabbitmq-https.tls: true
+            traefik.enable: true
+            traefik.http.services.${PROJECT_NAME}-rabbitmq.loadbalancer.server.port: 15672
+            # Serve rabbitmq over http
+            traefik.http.routers.${PROJECT_NAME}-rabbitmq-http.rule: 'Host(`rabbitmq.${PROJECT_NAME}.docker.localhost`)'
+            traefik.http.routers.${PROJECT_NAME}-rabbitmq-http.entrypoints: http
 
     maildev:
         labels:
-            traefik.enable: "true"
-            # maildev service: bind to internal container 1080 port
-            traefik.http.services.mailhog-https.loadbalancer.server.port: 1080
-            # maildev route: redirect to maildev-https
-            traefik.http.routers.maildev.entrypoints: "http"
-            traefik.http.routers.maildev.rule: "Host(`maildev.${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.maildev.middlewares: "https-redirect@file" # comment this line to disable https redirection
-            # maildev-https route: serve maildev service over https
-            traefik.http.routers.maildev-https.entrypoints: "https"
-            traefik.http.routers.maildev-https.rule: "Host(`maildev.${PROJECT_NAME}.docker.localhost`)"
-            traefik.http.routers.maildev-https.tls: true
+            traefik.enable: true
+            traefik.http.services.${PROJECT_NAME}-maildev.loadbalancer.server.port: 1080
+            # Serve maildev over http
+            traefik.http.routers.${PROJECT_NAME}-maildev-http.rule: 'Host(`maildev.${PROJECT_NAME}.docker.localhost`)'
+            traefik.http.routers.${PROJECT_NAME}-maildev-http.entrypoints: http

@@ -1,6 +1,6 @@
 # Docker containers
-PHP_CLI = docker-compose run --rm cli
-PHP_DATABASE = docker-compose exec db
+PHP_CLI = docker compose run --rm cli
+PHP_DATABASE = docker compose exec db
 
 .DEFAULT_GOAL:=help
 .PHONY: help up down ps logs images build sh db composer magento phpcs phpunit phpstan php-cs-fixer
@@ -10,30 +10,30 @@ help:
 
 ## Docker
 up: ## Build and start all containers.
-	@docker-compose up -d --remove-orphans
+	@docker compose up -d --remove-orphans
 
 down: ## Stop and remove all containers.
-	@docker-compose down --remove-orphans
+	@docker compose down --remove-orphans
 
 ps: ## List active containers.
-	@docker-compose ps
+	@docker compose ps
 
 logs: ## Show Docker logs. Pass the parameter "service=" to get logs of a given service. Example: make logs service=elasticsearch
 	@$(eval service ?=)
-	@docker-compose logs --tail=0 --follow $(service)
+	@docker compose logs --tail=0 --follow $(service)
 
 images: ## List images used by containers.
-	@docker-compose images
+	@docker compose images
 
 build: ## Build all images. Only useful if you project uses custom Dockerfiles.
-	@docker-compose build
+	@docker compose build
 
 ## Services
 sh: ## Open a shell on the php-cli container. Pass the parameter "service=" to connect to another service. Example: make sh service=redis
 	@$(eval service ?= cli)
 	@echo "Connecting to container \"$(service)\""
 	@if [ "$(service)" = "cli" ]; then $(PHP_CLI) sh; \
-	else docker-compose exec $(service) sh; fi
+	else docker compose exec $(service) sh; fi
 
 db: ## Connect to the Magento database.
 	@$(PHP_DATABASE) bash -c 'mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE'

@@ -2,12 +2,40 @@
 
 ## Setting Up the Project
 
+### Pre-requisites
+
 Pre-requisites:
 
 - git
 - curl
-- docker, docker-compose
-- any bash terminal
+- Docker
+- Docker Compose V2 (installed as a docker plugin)
+
+How to install Docker:
+
+```
+sudo apt-get install docker
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+
+How to install [Docker Compose V2](https://docs.docker.com/compose/cli-command/#install-on-linux):
+
+```
+DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
+mkdir -p $DOCKER_CONFIG/cli-plugins
+curl -SL https://github.com/docker/compose/releases/download/v2.4.1/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+```
+
+Check if it is incorrectly installed:
+
+```
+docker compose
+```
+
+### Setting up a Magento Project
+
+To setup a new Magento project with this skeleton:
 
 1. First, create a new directory that will host your project:
     ```
@@ -62,17 +90,18 @@ TODO: decide how to customize parameters (e.g. project URL). Possible implementa
 
 The makefile provides multiple commands that interact with containers:
 
-- **make build**: lists all images.
 - **make up**: starts all containers in detached mode.
 - **make down**: stops all containers.
 - **make ps**: lists containers.
-- **make logs**: shows Docker logs (on all containers by default). 
+- **make images**: lists images.
+- **make logs**: shows Docker logs (on all containers by default).
   Example: `make logs service=fpm`
+- **make build**: build images (useful only if you use custom images)
 
 You can also quickly access any container with the following commands:
 
-- **make bash**: opens a bash terminal on any container (cli by default).
-  Example: `make bash service=fpm`
+- **make sh**: opens a bash terminal on any container (php cli by default).
+  Example: `make sh service=fpm`
 - **make db**: connects to the Magento database.
 
 ## Running command-line tools
@@ -82,9 +111,10 @@ The makefile provides multiple commands that interact with command-line tools:
 - **make magento**: runs the Magento CLI.
   Example: `make magento cmd=indexer:reindex`
 - **make composer**: runs composer.
-  Example: `bin/composer update -d magento`
+  Example: `bin/composer cmd=update`
 - **make phpcs**: runs phpcs.
-  Example: `make phpcs cmd="--standard=ruleset.xml.dist"`
+- **make phpmd**: runs phpmd.
+  Example: `make phpmd cmd="app/code xml phpmd.xml"`
 - **make phpunit**: runs phpunit.
 - **make phpstan**: runs phpstan.
 - **make php-cs-fixer**: runs php-cs-fixer.
