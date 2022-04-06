@@ -1,4 +1,4 @@
-FROM php:7.4-fpm-alpine
+FROM php:7.4-fpm-alpine as base
 
 # Install php extensions (dom and mbstring are already installed in the parent image)
 RUN set -ex; \
@@ -37,6 +37,17 @@ RUN set -ex; \
         zip; \
     apk del .build-deps
 
+# PHP configuration
+COPY ./etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
+COPY ./etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug.ini
+COPY ./etc/php-fpm.conf /usr/local/etc/
+
+ENV MAGENTO_ROOT /var/www/html
+WORKDIR $MAGENTO_ROOT
+CMD ["php-fpm", "-F"]
+
+FROM base as dev
+
 # Install dev tools (msmtp, xdebug)
 RUN set -ex; \
     apk add --no-cache msmtp; \
@@ -48,10 +59,4 @@ RUN set -ex; \
 COPY ./etc/msmtprc /etc/msmtprc
 
 # PHP configuration
-COPY ./etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
 COPY ./etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug.ini
-COPY ./etc/php-fpm.conf /usr/local/etc/
-
-ENV MAGENTO_ROOT /var/www/html
-WORKDIR $MAGENTO_ROOT
-CMD ["php-fpm", "-F"]

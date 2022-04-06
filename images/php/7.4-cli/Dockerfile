@@ -1,4 +1,4 @@
-FROM php:7.4-cli-alpine
+FROM php:7.4-cli-alpine as base
 
 # Install php extensions (dom and mbstring are already installed in the parent image)
 RUN set -ex; \
@@ -37,6 +37,19 @@ RUN set -ex; \
         zip; \
     apk del .build-deps
 
+# PHP configuration
+COPY ./etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
+COPY ./bin/* /usr/local/bin/
+
+COPY ./docker-entrypoint.sh /
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+ENV MAGENTO_ROOT /var/www/html
+WORKDIR $MAGENTO_ROOT
+CMD ["sh"]
+
+FROM base as dev
+
 # Install dev tools (npp, grunt, shadow utils for usermod/groupmod, xdebug, smile certificates)
 RUN set -ex; \
     apk update; \
@@ -58,13 +71,4 @@ ENV COMPOSER_HOME /tmp
 COPY --from=composer:2 /usr/bin/composer /usr/bin/
 
 # PHP configuration
-COPY ./etc/php.ini /usr/local/etc/php/conf.d/zz-magento.ini
 COPY ./etc/php-xdebug.ini /usr/local/etc/php/conf.d/zz-xdebug.ini
-COPY ./bin/* /usr/local/bin/
-
-COPY ./docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
-ENV MAGENTO_ROOT /var/www/html
-WORKDIR $MAGENTO_ROOT
-CMD ["sh"]
