@@ -22,6 +22,10 @@ logs: ## Show Docker logs. Pass the parameter "service=" to get logs of a given 
 	@$(eval service ?=)
 	@docker compose logs --tail=0 --follow $(service)
 
+top: ## Shows all running processes. Pass the parameter "service=" to display the processes of a specific container. Eample: make top service=fpm
+	@$(eval service ?=)
+	@docker compose top $(service)
+
 images: ## List images used by containers.
 	@docker compose images
 

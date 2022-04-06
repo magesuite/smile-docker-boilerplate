@@ -96,6 +96,8 @@ The makefile provides multiple commands that interact with containers:
 - **make images**: lists images.
 - **make logs**: shows Docker logs (on all containers by default).
   Example: `make logs service=fpm`
+- **make top**: shows running processes (on all containers by default).
+  Example: `make top service=fpm`
 - **make build**: build images (useful only if you use custom images)
 
 You can also quickly access any container with the following commands:
