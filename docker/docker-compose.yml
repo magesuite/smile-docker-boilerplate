@@ -91,7 +91,7 @@ services:
             - dbdata:/var/lib/mysql
 
     elasticsearch:
-        build: ./images/elasticsearch/7.9
+        build: ./images/elasticsearch/7.17
         ulimits:
             memlock:
                 soft: -1

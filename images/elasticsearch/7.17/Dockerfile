@@ -1,17 +1,10 @@
-FROM docker.elastic.co/elasticsearch/elasticsearch:7.9.3
-
-RUN set -ex; \
-    yum -y install zip; \
-    zip -q -d /usr/share/elasticsearch/lib/log4j-core-*.jar org/apache/logging/log4j/core/lookup/JndiLookup.class; \
-    yum remove -y zip; \
-    yum -y clean all; \
-    rm -rf /var/cache
+FROM docker.elastic.co/elasticsearch/elasticsearch:7.17.2
 
 RUN set -ex; \
     echo "xpack.security.enabled: false" >> /usr/share/elasticsearch/config/elasticsearch.yml; \
     echo "discovery.type: single-node" >> /usr/share/elasticsearch/config/elasticsearch.yml
 
-RUN set-ex; \
+RUN set -ex; \
     bin/elasticsearch-plugin install -b analysis-icu; \
     bin/elasticsearch-plugin install -b analysis-phonetic
 
