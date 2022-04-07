@@ -20,8 +20,8 @@ services:
             - env/config.env
         depends_on:
             - fpm
-#        volumes:
-#            - appdata:/var/www/html
+        volumes:
+            - appdata:/var/www/html
 
     fpm:
         build:
@@ -38,8 +38,8 @@ services:
             - maildev
             - rabbitmq
             - redis
-#        volumes:
-#            - appdata:/var/www/html
+        volumes:
+            - appdata:/var/www/html
 
     cli:
         build:
@@ -55,7 +55,7 @@ services:
             - rabbitmq
             - redis
         volumes:
-#            - appdata:/var/www/html
+            - appdata:/var/www/html
             - composer-cache:/tmp/cache
 
     cron:
@@ -73,8 +73,8 @@ services:
             - elasticsearch
             - rabbitmq
             - redis
-#        volumes:
-#            - appdata:/var/www/html
+        volumes:
+            - appdata:/var/www/html
 
     db:
         image: mariadb:10.4
@@ -140,6 +140,7 @@ services:
             - 1080
 
 volumes:
+    appdata:
     composer-cache:
     dbdata:
     esdata:
