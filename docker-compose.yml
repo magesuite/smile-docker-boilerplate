@@ -4,14 +4,14 @@ version: '3.4'
 
 services:
     varnish:
-        build: ../images/varnish/7.1
+        image: registry.smile.fr/magento2/varnish:7.1
         ports:
             - 80
         depends_on:
             - web
 
     web:
-        build: ../images/nginx/1.21
+        image: registry.smile.fr/magento2/nginx:1.21
         ports:
             - 80
             - 443
@@ -24,9 +24,7 @@ services:
             - appdata:/var/www/html
 
     fpm:
-        build:
-            context: ../images/php/7.4-fpm
-            target: dev
+        image: registry.smile.fr/magento2/php:7.4-fpm
         ports:
             - 9000
         env_file:
@@ -42,9 +40,7 @@ services:
             - appdata:/var/www/html
 
     cli:
-        build:
-            context: ../images/php/7.4-cli
-            target: dev
+        image: registry.smile.fr/magento2/php:7.4-cli
         env_file:
             - env/composer.env
             - env/config.env
@@ -56,12 +52,10 @@ services:
             - redis
         volumes:
             - appdata:/var/www/html
-            - composer-cache:/tmp/cache
+            - composer-cache:/tmp/composer
 
     cron:
-        build:
-            context: ../images/php/7.4-cli
-            target: dev
+        image: registry.smile.fr/magento2/php:7.4-cli
         command: run-cron
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
@@ -91,7 +85,7 @@ services:
             - dbdata:/var/lib/mysql
 
     elasticsearch:
-        build: ../images/elasticsearch/7.17
+        image: registry.smile.fr/magento2/elasticsearch:7.17
         ulimits:
             memlock:
                 soft: -1
