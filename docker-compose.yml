@@ -4,14 +4,14 @@ version: '3.4'
 
 services:
     varnish:
-        build: ./images/varnish/7.1
+        build: ../images/varnish/7.1
         ports:
             - 80
         depends_on:
             - web
 
     web:
-        build: ./images/nginx/1.21
+        build: ../images/nginx/1.21
         ports:
             - 80
             - 443
@@ -25,7 +25,7 @@ services:
 
     fpm:
         build:
-            context: ./images/php/7.4-fpm
+            context: ../images/php/7.4-fpm
             target: dev
         ports:
             - 9000
@@ -43,7 +43,7 @@ services:
 
     cli:
         build:
-            context: ./images/php/7.4-cli
+            context: ../images/php/7.4-cli
             target: dev
         env_file:
             - env/composer.env
@@ -60,7 +60,7 @@ services:
 
     cron:
         build:
-            context: ./images/php/7.4-cli
+            context: ../images/php/7.4-cli
             target: dev
         command: run-cron
         environment:
@@ -91,7 +91,7 @@ services:
             - dbdata:/var/lib/mysql
 
     elasticsearch:
-        build: ./images/elasticsearch/7.17
+        build: ../images/elasticsearch/7.17
         ulimits:
             memlock:
                 soft: -1
