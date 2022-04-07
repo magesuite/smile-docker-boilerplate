@@ -31,6 +31,7 @@ services:
             - "host.docker.internal:host-gateway"
         volumes:
             - ./src:/var/www/html:rw,cached
+            - composer-cache:/tmp/composer
 
     cron:
         image: registry.smile.fr/magento2/php:7.4-cli-dev
@@ -62,3 +63,6 @@ services:
             # Serve maildev over http
             - traefik.http.routers.${PROJECT_NAME}-maildev-http.rule=Host(`maildev.${PROJECT_NAME}.docker.localhost`)
             - traefik.http.routers.${PROJECT_NAME}-maildev-http.entrypoints=http
+
+volumes:
+    composer-cache:

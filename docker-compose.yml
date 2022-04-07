@@ -29,7 +29,6 @@ services:
             - 9000
         env_file:
             - env/config.env
-            - .env
         depends_on:
             - db
             - elasticsearch
@@ -52,7 +51,6 @@ services:
             - redis
         volumes:
             - appdata:/var/www/html
-            - composer-cache:/tmp/composer
 
     cron:
         image: registry.smile.fr/magento2/php:7.4-cli
@@ -135,7 +133,6 @@ services:
 
 volumes:
     appdata:
-    composer-cache:
     dbdata:
     esdata:
     rabbitmqdata:
