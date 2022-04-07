@@ -1,17 +1,27 @@
 # Using Docker with Magento
 
-## Setting Up the Project
+## Description
 
-### Pre-requisites
+This repository provides a skeleton that allows to set up a Magento project using Docker Compose.
+It is the recommended skeleton to use for Smile projects.
 
-Pre-requisites:
+It is compatible with Magento >= 2.4.2.
+For older Magento versions, use the [ansible skeleton](https://git.smile.fr/magento2/architecture-skeleton).
+
+/!\ It has never been tested with Mac/Windows.
+Consider yourself a beta tester if you don't use it on Linux.
+
+## Pre-requisites
+
+This skeleton requires the following tools to be installed on your computer:
 
 - git
 - curl
 - Docker
-- Docker Compose V2 (installed as a docker plugin)
+- [Docker Compose V2](https://docs.docker.com/compose/cli-command/#install-on-linux) (installed as a docker plugin)
+- Optional: [Traefik Proxy](https://git.smile.fr/docker/traefik) (to work on multiple projects at the same time)
 
-How to install Docker:
+To install Docker (Linux):
 
 ```
 sudo apt-get install docker
@@ -19,7 +29,7 @@ sudo groupadd docker
 sudo usermod -aG docker $USER
 ```
 
-How to install [Docker Compose V2](https://docs.docker.com/compose/cli-command/#install-on-linux):
+To install Docker Compose V2 (Linux):
 
 ```
 DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
@@ -28,15 +38,11 @@ curl -SL https://github.com/docker/compose/releases/download/v2.4.1/docker-compo
 chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 ```
 
-Check if it is correctly installed:
+To install Traefik, check the [README](https://git.smile.fr/docker/traefik/-/blob/master/README.md) on the gitlab repository.
 
-```
-docker compose
-```
+## Setting Up the Project
 
-### Setting up a Magento Project
-
-To setup a new Magento project with this skeleton:
+To set up a new Magento project with this skeleton:
 
 1. First, create a new directory that will host your project:
     ```
