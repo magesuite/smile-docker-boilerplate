@@ -8,6 +8,13 @@ PHP_DATABASE = docker compose exec db
 help:
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /\n[33m/'
 
+## Setup
+install: ## Runs composer install (or compose create-project if this is the first time the command was run).
+	@./bin/setup
+
+check-requirements: ## Checks if all required tools are installed (docker, docker compose, curl...).
+	@./bin/check-requirements
+
 ## Docker
 up: ## Build and start all containers.
 	@docker compose up -d --remove-orphans

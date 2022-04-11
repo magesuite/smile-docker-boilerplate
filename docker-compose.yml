@@ -4,14 +4,14 @@ version: '3.4'
 
 services:
     varnish:
-        image: registry.smile.fr/magento2/varnish:7.1
+        image: registry.smile.fr/magento2/varnish:$VARNISH_TAG
         ports:
             - 80
         depends_on:
             - web
 
     web:
-        image: registry.smile.fr/magento2/nginx:1.21
+        image: registry.smile.fr/magento2/nginx:$NGINX_TAG
         ports:
             - 80
             - 443
@@ -24,7 +24,7 @@ services:
             - appdata:/var/www/html
 
     fpm:
-        image: registry.smile.fr/magento2/php:7.4-fpm
+        image: registry.smile.fr/magento2/php:$PHP_FPM_TAG
         ports:
             - 9000
         env_file:
@@ -39,7 +39,7 @@ services:
             - appdata:/var/www/html
 
     cli:
-        image: registry.smile.fr/magento2/php:7.4-cli
+        image: registry.smile.fr/magento2/php:$PHP_CLI_TAG
         env_file:
             - env/composer.env
             - env/config.env
@@ -53,7 +53,7 @@ services:
             - appdata:/var/www/html
 
     cron:
-        image: registry.smile.fr/magento2/php:7.4-cli
+        image: registry.smile.fr/magento2/php:$PHP_CLI_TAG
         command: run-cron
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
@@ -69,7 +69,7 @@ services:
             - appdata:/var/www/html
 
     db:
-        image: mariadb:10.4
+        image: mariadb:$MARIADB_TAG
         ports:
             - 3306
         env_file:
@@ -83,7 +83,7 @@ services:
             - dbdata:/var/lib/mysql
 
     elasticsearch:
-        image: registry.smile.fr/magento2/elasticsearch:7.17
+        image: registry.smile.fr/magento2/elasticsearch:$ELASTICSEARCH_TAG
         ulimits:
             memlock:
                 soft: -1
@@ -97,7 +97,7 @@ services:
             - esdata:/usr/share/elasticsearch/data
 
     redis:
-        image: redis:6.2-alpine
+        image: redis:$REDIS_TAG
         ports:
             - 6379
         sysctls:
@@ -116,7 +116,7 @@ services:
             - redisdata:/data
 
     rabbitmq:
-        image: rabbitmq:3.8.27-management-alpine
+        image: rabbitmq:$RABBITMQ_TAG
         ports:
             - 15672
             - 5672
@@ -126,7 +126,7 @@ services:
             - env/config.env
 
     maildev:
-        image: maildev/maildev:1.1.1
+        image: maildev/maildev:$MAILDEV_TAG
         ports:
             - 1025
             - 1080

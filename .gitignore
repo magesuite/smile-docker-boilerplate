@@ -1,3 +1,50 @@
+# Magento
+/app/*.*
+/app/design/*/Magento
+/app/etc/*
+/app/i18n/magento
+/bin
+/dev/.htaccess
+/dev/tests
+/dev/tools/*.*
+/dev/tools/grunt
+/dev/tools/Magento
+/generated
+/lib/.htaccess
+/lib/internal/GnuFreeFont
+/lib/internal/LinLibertineFont
+/lib/web
+/node_modules
+/phpserver
+/pub
+/setup
+/var
+/vendor
+/*.*
+/robots.txt
+!/app/etc/config.php
+!/dev/tools/grunt/configs/local-themes.js
+!/grunt-config.json
+!/Gruntfile.js
+!/package.json
+
+# Generic
+/.DS_Store
 /.idea
+/.vscode
+!/.gitignore
+!/composer.json
+!/composer.lock
+!/README*.md
+
+# Tools
+!/.smileanalyser.yaml
+!/.spbuilder.yaml
+!/magepack.config.js
+!/phpcs.xml
+!/phpmd.xml
+!/phpstan.neon
+!/phpunit.xml
+
+# Docker
 /env/composer.env
-/src
