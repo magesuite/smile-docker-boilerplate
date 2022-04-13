@@ -242,10 +242,8 @@ init_php_version "$MAGENTO_VERSION"
 # Step 7 - Composer
 ########
 
-[ -f "composer.json" ] && COMPOSER_JSON=y || COMPOSER_JSON=n
-
 # Create the composer project/install vendor dir (depending on whether a composer.json file was found)
-if [ "$COMPOSER_JSON" = "n" ]; then
+if [ ! -f "composer.json" ]; then
     # Display project information (Magento version, edition...)
     print_summary
 
@@ -332,5 +330,16 @@ else
         fi
 
         echo && echo "${GREEN}✓ The project was successfully initialized.${RESET}"
+    fi
+fi
+
+########
+# Step 7 - Database
+########
+
+if [ -d "vendor" ] && [ ! -f "app/etc/env.php" ]; then
+    ask_yes_no RESULT "Initialize Magento database?" y
+    if [ "$RESULT" = "y" ]; then
+        ./docker/bin/setup-db
     fi
 fi

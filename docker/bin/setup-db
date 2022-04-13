@@ -15,28 +15,30 @@ cd ../..
 
 ./docker/bin/check-requirements
 
-if [ ! -f "composer.json" ]; then
+if [ ! -d "vendor" ]; then
     echo && echo "${RED}Please setup the project before running this command.${RESET}"
     exit 1
 fi
 
 ########
-# Step 2 - Read env files
+# Step 2 - User confirmation
+########
+
+if [ -f "app/etc/env.php" ]; then
+    ask_yes_no RESULT "${YELLOW}This setup will run the setup:install command. This will reinitialize the database!\nProceed?${RESET}"
+    if [ "$RESULT" = "n" ]; then
+        echo && echo "${RED}Aborted by user.${RESET}"
+        exit
+    fi
+fi
+
+########
+# Step 3 - Read env files
 ########
 
 . ./.env # necessary because $PROJECT_NAME might be reused in other env files
 . ./docker/env/config.env
 . ./docker/env/magento.env
-
-########
-# Step 3 - User confirmation
-########
-
-ask_yes_no RESULT "${YELLOW}This setup will run the setup:install command. This will reinitialize the database!\nProceed?${RESET}"
-if [ "$RESULT" = "n" ]; then
-    echo && echo "${RED}Aborted by user.${RESET}"
-    exit
-fi
 
 ########
 # Step 4 - Install Magento
@@ -140,7 +142,6 @@ fi
 echo && print_and_run "find pub -type f -exec chmod 664 {} \;"
 print_and_run "find pub -type d -exec chmod 775 {} \;"
 print_and_run "find generated -type d -exec chmod g+s {} \;"
-print_and_run "find var/composer_home -type f -exec chmod 664 {} \;"
 
 echo
 echo "${GREEN}Installation complete.${RESET}"
