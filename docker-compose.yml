@@ -84,15 +84,10 @@ services:
 
     elasticsearch:
         image: registry.smile.fr/magento2/elasticsearch:$ELASTICSEARCH_TAG
-        ulimits:
-            memlock:
-                soft: -1
-                hard: -1
-        environment:
-            - cluster.name=docker-cluster
-            - bootstrap.memory_lock=true
         ports:
             - 9200
+        env_file:
+            - docker/env/config.env
         volumes:
             - esdata:/usr/share/elasticsearch/data
 
@@ -100,13 +95,6 @@ services:
         image: redis:$REDIS_TAG
         ports:
             - 6379
-        sysctls:
-            net.core.somaxconn: 1024
-        ulimits:
-            nproc: 65535
-            nofile:
-                soft: 20000
-                hard: 40000
         healthcheck:
             test: 'redis-cli ping || exit 1'
             interval: 30s
