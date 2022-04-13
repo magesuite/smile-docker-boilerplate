@@ -28,6 +28,9 @@
 !/Gruntfile.js
 !/package.json
 
+# Docker
+/env/composer.env
+
 # Generic
 /.DS_Store
 /.idea
@@ -45,6 +48,3 @@
 !/phpmd.xml
 !/phpstan.neon
 !/phpunit.xml
-
-# Docker
-/env/composer.env

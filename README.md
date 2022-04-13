@@ -46,26 +46,16 @@ To set up a new Magento project with this skeleton:
 
 1. First, create a new directory that will host your project:
     ```
-    mkdir ~/projects/my-magento-project && cd $_
+    git clone --depth=1 git@git.smile.fr:guvra/magento-docker myproject \
+    && cd "$_" \
+    && rm -rf .git
     ```
 2. Then, run the following script in this new directory:
     ```
-    bash <(git archive --remote=git@git.smile.fr:guvra/magento-docker HEAD setup | tar -xO)
+    make install
     ```
     This script will prompt for the project information (Magento edition, version...).
-    It will create the following structure:
-    ```
-    my-magento-project/
-        bin/
-            ... (useful scripts)
-        env/
-            ... (env files used by docker)
-        src/
-            ... (magento files)
-        docker-compose.override.yml
-        docker-compose.yml
-        Makefile
-    ```
+    It will initialize Magento with composer (you don't need to install composer, it runs within a container).
 3. Commit your project:
     ```
     git init
@@ -75,23 +65,13 @@ To set up a new Magento project with this skeleton:
     git push origin master
     ```
 
-The script will automatically fetch the Magento authentication tokens from your composer auth file.
-However, if they are not defined, you will have to specify them during the script execution.
-
 ## Installing Magento
 
 To initialize the Magento database, run the following scripts at the root of the project:
 
 ```
-./bin/install-magento
+./docker/bin/setup-db
 ```
-
-The first script runs the create-project command, the second script installs the magento database.
-
-TODO: decide how to customize parameters (e.g. project URL). Possible implementation:
-
-- Using environment vars (e.g. $PROJECT_URL)
-- Using command-line options (e.g. --project-url=...)
 
 ## Interacting with the containers
 
