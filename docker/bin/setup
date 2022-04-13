@@ -198,7 +198,35 @@ print_summary () {
 . ./docker/env/magento.env
 
 ########
-# Step 4 - Init default values
+# Step 4 - Update .env file with user id and group id
+########
+
+if [ -z "$DOCKER_UID" ] || [ "$DOCKER_UID" != "$(id -u)" ]; then
+    sed -i "s/^DOCKER_UID=.*/DOCKER_UID=$(id -u)/g" .env
+    echo "${GREEN}✓ The user id was saved saved in the .env file.${RESET}"
+fi
+
+if [ -z "$DOCKER_GID" ] || [ "$DOCKER_GID" != "$(id -g)" ]; then
+    sed -i "s/^DOCKER_GID=.*/DOCKER_GID=$(id -g)/g" .env
+    echo "${GREEN}✓ The group id was saved saved in the .env file.${RESET}"
+fi
+
+########
+# Step 5 - Project name
+########
+
+if [ -z "$PROJECT_NAME" ]; then
+    while
+        ask_input PROJECT_NAME "Please enter your project name.\n${RESET}Allowed characters: [a-z0-9-]. Do not use capitalized letters, underscores, dots, etc."
+        [ ! "$(echo "$PROJECT_NAME" | tr -d 'a-z0-9-')" = "" ] && echo "${RED}This project name is not valid. Use only lowercase letters, numbers, and hyphens.${RESET}"
+    do true; done
+
+    sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env
+    echo && echo "${GREEN}✓ The project name was saved in the .env file.${RESET}"
+fi
+
+########
+# Step 6 - Init default values
 ########
 
 # These values can be overridden with environment variables
@@ -211,21 +239,7 @@ init_packagist_urls "$SMILE_PACKAGIST"
 init_php_version "$MAGENTO_VERSION"
 
 ########
-# Step 5 - Project name
-########
-
-if [ "$PROJECT_NAME" = "" ]; then
-    while
-        ask_input PROJECT_NAME "Please enter your project name.\n${RESET}Allowed characters: [a-z0-9-]. Do not use capitalized letters, underscores, dots, etc."
-        [ ! "$(echo "$PROJECT_NAME" | tr -d 'a-z0-9-')" = "" ] && echo "${RED}This project name is not valid. Use only lowercase letters, numbers, and hyphens.${RESET}"
-    do true; done
-
-    sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env
-    echo && echo "${GREEN}✓ The project name was saved in the .env file.${RESET}"
-fi
-
-########
-# Step 6 - Composer
+# Step 7 - Composer
 ########
 
 [ -f "composer.json" ] && COMPOSER_JSON=y || COMPOSER_JSON=n
