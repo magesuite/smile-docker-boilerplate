@@ -5,13 +5,13 @@
 set -e
 
 cd "$( dirname "${BASH_SOURCE:-$0}}" )"
-cd ..
+cd ../..
 
-if [ ! -f "env/composer.env" ] && [ -f "env/composer.env.sample" ]; then
-    cp env/composer.env.sample env/composer.env
+if [ ! -f "docker/env/composer.env" ] && [ -f "docker/env/composer.env.sample" ]; then
+    cp docker/env/composer.env.sample docker/env/composer.env
 fi
 
-. ./bin/deps/utils.sh
+. ./docker/bin/deps/utils.sh
 
 # Check if Smile network is reachable
 check_intranet_reachable () {
@@ -181,21 +181,21 @@ print_summary () {
 # Step 1 - Validate pre-requisites
 ########
 
-./bin/check-requirements
+./docker/bin/check-requirements
 
 ########
-# Step 2 - Set up composer credentials (env/composer.env)
+# Step 2 - Set up composer credentials (docker/env/composer.env)
 ########
 
-./bin/setup-composer-auth
+./docker/bin/setup-composer-auth
 
 ########
 # Step 3 - Read env files
 ########
 
 . ./.env
-. ./env/composer.env
-. ./env/magento.env
+. ./docker/env/composer.env
+. ./docker/env/magento.env
 
 ########
 # Step 4 - Init default values
@@ -255,30 +255,30 @@ if [ "$COMPOSER_JSON" = "n" ]; then
     sed -i "s/^PHP_VERSION=.*/PHP_VERSION=${PHP_VERSION}/g" .env
     echo && echo "${GREEN}✓ The PHP version was saved saved in the .env file.${RESET}"
 
-    sed -i "s/^MAGENTO_EDITION=.*/MAGENTO_EDITION=$MAGENTO_EDITION/g" env/magento.env
-    echo "${GREEN}✓ The Magento edition was saved in the env/magento.env file.${RESET}"
+    sed -i "s/^MAGENTO_EDITION=.*/MAGENTO_EDITION=$MAGENTO_EDITION/g" docker/env/magento.env
+    echo "${GREEN}✓ The Magento edition was saved in the docker/env/magento.env file.${RESET}"
 
-    sed -i "s/^MAGENTO_VERSION=.*/MAGENTO_VERSION=$MAGENTO_VERSION/g" env/magento.env
-    echo "${GREEN}✓ The Magento version was saved in the env/magento.env file.${RESET}"
+    sed -i "s/^MAGENTO_VERSION=.*/MAGENTO_VERSION=$MAGENTO_VERSION/g" docker/env/magento.env
+    echo "${GREEN}✓ The Magento version was saved in the docker/env/magento.env file.${RESET}"
 
-    sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/g" env/magento.env
-    echo "${GREEN}✓ The Magento version was saved in the env/magento.env file.${RESET}"
+    sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/g" docker/env/magento.env
+    echo "${GREEN}✓ The Magento version was saved in the docker/env/magento.env file.${RESET}"
 
-    sed -i "s/^COMPOSER_GITHUB_TOKEN=.*/COMPOSER_GITHUB_TOKEN=$COMPOSER_GITHUB_TOKEN/g" env/composer.env
-    echo "${GREEN}✓ The GitHub token was saved in the env/composer.env file.${RESET}"
+    sed -i "s/^COMPOSER_GITHUB_TOKEN=.*/COMPOSER_GITHUB_TOKEN=$COMPOSER_GITHUB_TOKEN/g" docker/env/composer.env
+    echo "${GREEN}✓ The GitHub token was saved in the docker/env/composer.env file.${RESET}"
 
     if [ "$SMILE_PACKAGIST" = "public" ]; then
-        sed -i "s/^COMPOSER_MAGENTO_USERNAME=.*/COMPOSER_MAGENTO_USERNAME=$COMPOSER_MAGENTO_USERNAME/g" env/composer.env
-        echo "${GREEN}✓ The Magento packagist user was saved in the env/composer.env file.${RESET}"
+        sed -i "s/^COMPOSER_MAGENTO_USERNAME=.*/COMPOSER_MAGENTO_USERNAME=$COMPOSER_MAGENTO_USERNAME/g" docker/env/composer.env
+        echo "${GREEN}✓ The Magento packagist user was saved in the docker/env/composer.env file.${RESET}"
 
-        sed -i "s/^COMPOSER_MAGENTO_PASSWORD=.*/COMPOSER_MAGENTO_PASSWORD=$COMPOSER_MAGENTO_PASSWORD/g" env/composer.env
-        echo "${GREEN}✓ The Magento packagist password was saved in the env/composer.env file.${RESET}"
+        sed -i "s/^COMPOSER_MAGENTO_PASSWORD=.*/COMPOSER_MAGENTO_PASSWORD=$COMPOSER_MAGENTO_PASSWORD/g" docker/env/composer.env
+        echo "${GREEN}✓ The Magento packagist password was saved in the docker/env/composer.env file.${RESET}"
 
-        sed -i "s/^COMPOSER_SMILE_USERNAME=.*/COMPOSER_SMILE_USERNAME=$COMPOSER_SMILE_USERNAME/g" env/composer.env
-        echo "${GREEN}✓ The Smile packagist user was saved in the env/composer.env file.${RESET}"
+        sed -i "s/^COMPOSER_SMILE_USERNAME=.*/COMPOSER_SMILE_USERNAME=$COMPOSER_SMILE_USERNAME/g" docker/env/composer.env
+        echo "${GREEN}✓ The Smile packagist user was saved in the docker/env/composer.env file.${RESET}"
 
-        sed -i "s/^COMPOSER_SMILE_PASSWORD=.*/COMPOSER_SMILE_PASSWORD=$COMPOSER_SMILE_PASSWORD/g" env/composer.env
-        echo "${GREEN}✓ The Smile packagist password was saved in the env/composer.env file.${RESET}"
+        sed -i "s/^COMPOSER_SMILE_PASSWORD=.*/COMPOSER_SMILE_PASSWORD=$COMPOSER_SMILE_PASSWORD/g" docker/env/composer.env
+        echo "${GREEN}✓ The Smile packagist password was saved in the docker/env/composer.env file.${RESET}"
     fi
 
     # Check if Smile network is reachable

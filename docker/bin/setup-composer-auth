@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+# Initializes the composer.env file.
+
+set -e
+
+cd "$( dirname "${BASH_SOURCE:-$0}}" )"
+cd ../..
+
+. ./docker/bin/deps/utils.sh
+
+########
+# Step 1 - Create docker/env/composer.env if it does not already exist
+########
+
+if [ ! -f "docker/env/composer.env" ]; then
+    if [ ! -f "docker/env/composer.env.sample" ]; then
+        echo "${RED}The file docker/env/composer.env cannot be created because the template file composer.env.sample doesn't exist.${RESET}"
+        exit 1
+    fi
+
+    cp "docker/env/composer.env.sample" "docker/env/composer.env"
+    echo "${GREEN}✓ Created file docker/env/composer.env.${RESET}"
+else
+    . ./docker/env/composer.env
+fi
+
+########
+# Step 2 - Fetch composer github token from host
+########
+
+if [ -z "$COMPOSER_GITHUB_TOKEN" ]; then
+    COMPOSER_GITHUB_PATH="github-oauth.github.com"
+
+    if command -v composer > /dev/null; then
+        COMPOSER_GITHUB_TOKEN="$(composer config --global $COMPOSER_GITHUB_PATH 2>/dev/null)"
+
+        if [ -n "$COMPOSER_GITHUB_TOKEN" ]; then
+            sed -i "s/^COMPOSER_GITHUB_TOKEN=.*/COMPOSER_GITHUB_TOKEN=${COMPOSER_GITHUB_TOKEN}/g" docker/env/composer.env
+            echo "${GREEN}✓ The GitHub token \"$COMPOSER_GITHUB_TOKEN\" was saved saved in the docker/env/composer.env file.${RESET}"
+        else
+            echo "No GitHub token found on the host."
+        fi
+    fi
+fi
+

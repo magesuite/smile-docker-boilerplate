@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+# Checks if project requirements are met.
+
+set -e
+
+cd "$( dirname "${BASH_SOURCE:-$0}}" )"
+cd ../..
+
+. ./docker/bin/deps/utils.sh
+
+STATUS=0
+
+echo "${YELLOW}Checking project requirements...${RESET}"
+
+# Check if Docker is installed
+if command -v "docker" > /dev/null; then
+    echo "${GREEN}✓ Docker is installed.${RESET}"
+
+    # Check if Docker Compose is installed as a plugin
+    if docker compose > /dev/null 2>&1; then
+        echo "${GREEN}✓ Docker Compose plugin is installed.${RESET}"
+    else
+        echo "${RED}Please install Compose as a Docker plugin (see the documentation for installation instructions).${RESET}"
+        STATUS=1
+    fi
+else
+    echo "${RED}Please install Docker, as well as the docker compose plugin (see the documentation for installation instructions).${RESET}"
+    STATUS=1
+fi
+
+# Check if curl is installed
+if command -v "curl" > /dev/null && command -v "sed" > /dev/null; then
+    echo "${GREEN}✓ curl and sed commands are available.${RESET}"
+else
+    echo "${RED}Please install the command \"curl\".${RESET}"
+    exit 1
+fi
+
+if [ "$STATUS" -gt 0 ]; then
+    exit $STATUS
+fi

@@ -17,7 +17,7 @@ services:
             - 443
             - 8080
         env_file:
-            - env/config.env
+            - docker/env/config.env
         depends_on:
             - fpm
         volumes:
@@ -28,7 +28,7 @@ services:
         ports:
             - 9000
         env_file:
-            - env/config.env
+            - docker/env/config.env
         depends_on:
             - db
             - elasticsearch
@@ -41,8 +41,8 @@ services:
     cli:
         image: registry.smile.fr/magento2/php:$PHP_CLI_TAG
         env_file:
-            - env/composer.env
-            - env/config.env
+            - docker/env/composer.env
+            - docker/env/config.env
             - .env
         depends_on:
             - db
@@ -58,7 +58,7 @@ services:
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
         env_file:
-            - env/config.env
+            - docker/env/config.env
             - .env
         depends_on:
             - db
@@ -73,7 +73,7 @@ services:
         ports:
             - 3306
         env_file:
-            - env/config.env
+            - docker/env/config.env
         healthcheck:
             test: 'mysqladmin ping -h localhost -pmagento2'
             interval: 30s
@@ -123,7 +123,7 @@ services:
         volumes:
             - rabbitmqdata:/var/lib/rabbitmq
         env_file:
-            - env/config.env
+            - docker/env/config.env
 
     maildev:
         image: maildev/maildev:$MAILDEV_TAG

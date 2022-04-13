@@ -10,10 +10,10 @@ help:
 
 ## Setup
 install: ## Runs composer install (or compose create-project if this is the first time the command was run).
-	@./bin/setup
+	@./docker/bin/setup
 
 check-requirements: ## Checks if all required tools are installed (docker, docker compose, curl...).
-	@./bin/check-requirements
+	@./docker/bin/check-requirements
 
 ## Docker
 up: ## Build and start all containers.
