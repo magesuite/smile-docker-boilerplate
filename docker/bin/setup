@@ -9,7 +9,7 @@ cd ../..
 
 . ./docker/bin/deps/utils.sh
 
-# Check if Smile network is reachable
+# Check if Smile network is reachable.
 check_intranet_reachable () {
     if [ "$SMILE_PACKAGIST" = "internal" ]; then
         if curl --output /dev/null --head --silent --fail "$SMILE_PACKAGIST_URL"; then
@@ -22,7 +22,7 @@ check_intranet_reachable () {
     fi
 }
 
-# Get PHP version from Magento version
+# Get PHP version from Magento version.
 init_php_version () {
     if [ $(version_compare "$1" "2.4.2") = "<" ]; then
         echo "${RED}The version must be greater or equal to 2.4.2.${RESET}"
@@ -37,7 +37,7 @@ init_php_version () {
     fi
 }
 
-# Get packagist URLs
+# Get packagist URLs.
 init_packagist_urls () {
     MAGENTO_PACKAGIST_URL="https://repo.magento.com/"
     if [ "$1" = "internal" ]; then
@@ -99,7 +99,7 @@ get_composer_cloud_update_cmd () {
     echo $COMMAND
 }
 
-# Ask the user to provide the project information (interactive mode)
+# Ask the user to provide the project information (interactive mode).
 get_project_information () {
     # Choice: Magento version
     while

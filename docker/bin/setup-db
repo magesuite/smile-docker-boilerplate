@@ -9,7 +9,7 @@ cd ../..
 
 . ./docker/bin/deps/utils.sh
 
-# Print and run a command
+# Print and run a command.
 print_and_run () {
     echo "Running ${BLUE}$@${RESET}"
     eval "$@"

@@ -2,7 +2,7 @@
 
 # Do not run this script directly.
 
-# Ask user for an input value
+# Ask user for an input value.
 ask_input () {
     unset RESULT
     QUESTION=$2
@@ -27,7 +27,7 @@ ask_input () {
     eval "$1='$RESULT'"
 }
 
-# Ask user to choose between yes and no
+# Ask user to choose between yes and no.
 ask_yes_no () {
     unset RESULT
     QUESTION=$2
@@ -53,7 +53,7 @@ ask_yes_no () {
     eval "$1='$RESULT'"
 }
 
-# Compare two versions, returns "=", "<" or ">"
+# Compare two versions, returns "=", "<" or ">".
 version_compare () {
     if [[ $1 == $2 ]]; then
         echo "="
