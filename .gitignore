@@ -29,7 +29,9 @@
 !/package.json
 
 # Docker
-/env/composer.env
+!/docker-compose.yml
+!/docker-compose.*.yml
+!/Makefile
 
 # Generic
 /.DS_Store
@@ -44,7 +46,7 @@
 !/.smileanalyser.yaml
 !/.spbuilder.yaml
 !/magepack.config.js
-!/phpcs.xml
-!/phpmd.xml
-!/phpstan.neon
-!/phpunit.xml
+!/phpcs.xml.dist
+!/phpmd.xml.dist
+!/phpstan.neon.dist
+!/phpunit.xml.dist

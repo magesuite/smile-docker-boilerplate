@@ -9,14 +9,18 @@ cd ../..
 
 . ./docker/bin/deps/utils.sh
 
+# Print and run a command
+print_and_run () {
+    echo "Running ${BLUE}$@${RESET}"
+    eval "$@"
+}
+
 ########
 # Step 1 - Validate pre-requisites
 ########
 
-./docker/bin/check-requirements
-
 if [ ! -d "vendor" ]; then
-    echo && echo "${RED}Please setup the project before running this command.${RESET}"
+    echo && echo "${RED}Please set up the project before running this command.${RESET}"
     exit 1
 fi
 

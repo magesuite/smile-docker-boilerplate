@@ -39,7 +39,6 @@ services:
     cli:
         image: registry.smile.fr/magento2/php:$PHP_CLI_TAG
         env_file:
-            - docker/env/composer.env
             - docker/env/config.env
             - .env
         depends_on:

@@ -2,12 +2,6 @@
 
 # Do not run this script directly.
 
-# Print and run a command
-print_and_run () {
-    echo "Running ${BLUE}$@${RESET}"
-    eval "$@"
-}
-
 # Ask user for an input value
 ask_input () {
     unset RESULT
