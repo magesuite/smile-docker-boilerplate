@@ -108,10 +108,10 @@ services:
         ports:
             - 15672
             - 5672
-        volumes:
-            - rabbitmqdata:/var/lib/rabbitmq
         env_file:
             - docker/env/rabbitmq.env
+        volumes:
+            - rabbitmqdata:/var/lib/rabbitmq
 
     maildev:
         image: ${MAILDEV_IMAGE?$MAILDEV_IMAGE must be set.}
