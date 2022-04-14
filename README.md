@@ -1,9 +1,11 @@
-# Using Docker with Magento
+# Magento Docker Boilerplate
+
+**/!\ This is a work in progress, there is no official release yet.**
 
 ## Description
 
-This repository provides a skeleton that allows to set up a Magento project using Docker Compose.
-It is the recommended skeleton to use for Smile projects.
+This repository provides a boilerplate that allows to set up a Magento project using Docker Compose.
+It is the recommended boilerplate to use for Magento projects.
 
 It is compatible with Magento >= 2.4.2.
 For older Magento versions, use the [ansible skeleton](https://git.smile.fr/magento2/architecture-skeleton).
@@ -17,46 +19,47 @@ This skeleton requires the following tools to be installed on your computer:
 
 - git
 - curl
-- Docker
-- [Docker Compose V2](https://docs.docker.com/compose/cli-command/#install-on-linux) (installed as a docker plugin)
-- Optional: [Traefik Proxy](https://git.smile.fr/docker/traefik) (to work on multiple projects at the same time)
+- [Docker](https://docs.docker.com/engine/install/)
+- [Docker Compose V2](https://docs.docker.com/compose/cli-command/#installing-compose-v2) (installed as a docker plugin)
+- [Traefik Proxy](https://git.smile.fr/docker/traefik) (to work on multiple projects at the same time)
 
-To install Docker (Linux):
+You don't need to install PHP or composer on your workstation.
 
-```
-sudo apt-get install docker
-sudo groupadd docker
-sudo usermod -aG docker $USER
-```
+## Installation
 
-To install Docker Compose V2 (Linux):
+### Setting Up a New Project
 
-```
-DOCKER_CONFIG=${DOCKER_CONFIG:-$HOME/.docker}
-mkdir -p $DOCKER_CONFIG/cli-plugins
-curl -SL https://github.com/docker/compose/releases/download/v2.4.1/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
-chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
-```
-
-To install Traefik, check the [README](https://git.smile.fr/docker/traefik/-/blob/master/README.md) on the gitlab repository.
-
-## Setting Up the Project
-
-To set up a new Magento project with this skeleton:
+To set up a **new** Magento project with this skeleton:
 
 1. First, create a new directory that will host your project:
+
     ```
-    git clone --depth=1 git@git.smile.fr:guvra/magento-docker myproject \
+    git clone --depth=1 git@git.smile.fr:docker/magento/boilerplate myproject \
     && cd "$_" \
     && rm -rf .git
     ```
+
 2. Then, run the following script in this new directory:
+
     ```
     make install
     ```
-    This script will prompt for the project information (Magento edition, version...).
+
+    This script will prompt for the project information (project name, Magento edition, version...).
     It will initialize Magento with composer (you don't need to install composer, it runs within a container).
-3. Commit your project:
+
+3. Launch all services with the following command:
+
+    ```
+    make up
+    ```
+
+4. Check if Magento is available at the following URLs:
+    - https://{project_name}.docker.localhost
+    - https://{project_name}.docker.localhost/admin (user: "admin", password: "magent0")
+
+5. Commit your project:
+
     ```
     git init
     git remote add origin <your_repo_url>
@@ -65,15 +68,38 @@ To set up a new Magento project with this skeleton:
     git push origin master
     ```
 
-## Installing Magento
+### Setting up an Existing Project
 
-To initialize the Magento database, run the following scripts at the root of the project:
+To set up a project that was already initialized with the boilerplate:
 
-```
-./docker/bin/setup-db
-```
+1. Clone the project repository.
 
-## Interacting with the containers
+2. Then, run the following script in this new directory:
+
+    ```
+    make install
+    ```
+
+3. Launch all services with the following command:
+
+    ```
+    make up
+    ```
+
+4. Check if Magento is available at the following URLs:
+    - https://{project_name}.docker.localhost
+    - https://{project_name}.docker.localhost/admin (user: "admin", password: "magent0")
+
+## Makefile
+
+This boilerplate is bundled with a Makefile that provides multiples that will help you using docker and Magento.
+
+The list of available commands can be listed by running `make` at the root of your project.
+
+Some commands accept arguments.
+For example, `make sh` will open a shell to the php cli container, and `make sh service=fpm` will open a shell on the php fpm container.
+
+### Docker
 
 The makefile provides multiple commands that interact with containers:
 
@@ -93,7 +119,7 @@ You can also quickly access any container with the following commands:
   Example: `make sh service=fpm`
 - **make db**: connects to the Magento database.
 
-## Running command-line tools
+### Command-line tools
 
 The makefile provides multiple commands that interact with command-line tools:
 
@@ -103,7 +129,6 @@ The makefile provides multiple commands that interact with command-line tools:
   Example: `bin/composer cmd=update`
 - **make phpcs**: runs phpcs.
 - **make phpmd**: runs phpmd.
-  Example: `make phpmd cmd="app/code xml phpmd.xml"`
 - **make phpunit**: runs phpunit.
 - **make phpstan**: runs phpstan.
 - **make php-cs-fixer**: runs php-cs-fixer.
@@ -111,20 +136,4 @@ The makefile provides multiple commands that interact with command-line tools:
 
 ## Kubernetes Integration
 
-TODO
-
-## Script Automation
-
-The initialization script provides command-line options that allow to automate a project creation.
-
-You can get the list of these options by running the following command:
-
-```
-bash <(git archive --remote=git@git.smile.fr:guvra/magento-docker HEAD setup | tar -xO) --help
-```
-
-Example usage:
-
-```
-bash <(git archive --remote=git@git.smile.fr:guvra/magento-docker HEAD setup | tar -xO) my-project --magento-edition enterprise --no-interaction
-```
+Work in progress.
