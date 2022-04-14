@@ -41,8 +41,9 @@ fi
 ########
 
 . ./.env # necessary because $PROJECT_NAME might be reused in other env files
-. ./docker/env/config.env
+. ./docker/env/db.env
 . ./docker/env/magento.env
+. ./docker/env/rabbitmq.env
 
 ########
 # Step 4 - Install Magento
@@ -136,7 +137,7 @@ fi
 if [ "$MAGENTO_RUN_MODE" = "production" ]; then
     echo && print_and_run "$MAGENTO_COMMAND setup:di:compile"
     echo && print_and_run "$MAGENTO_COMMAND cache:clean"
-    echo && print_and_run "$MAGENTO_COMMAND setup:static-content:deploy -f en_US ${LANGUAGE}"
+    echo && print_and_run "$MAGENTO_COMMAND setup:static-content:deploy -f en_US $LANGUAGE"
 fi
 
 ########

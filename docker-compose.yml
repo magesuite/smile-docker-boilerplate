@@ -2,31 +2,29 @@ version: '3.4'
 
 services:
     varnish:
-        image: registry.smile.fr/magento2/varnish:$VARNISH_TAG
+        image: ${VARNISH_IMAGE?$VARNISH_IMAGE must be set.}
         ports:
             - 80
         depends_on:
             - web
 
     web:
-        image: registry.smile.fr/magento2/nginx:$NGINX_TAG
+        image: ${NGINX_IMAGE?$NGINX_IMAGE must be set.}
         ports:
             - 80
             - 443
             - 8080
-        env_file:
-            - docker/env/config.env
         depends_on:
             - fpm
         volumes:
             - appdata:/var/www/html
 
     fpm:
-        image: registry.smile.fr/magento2/php:$PHP_FPM_TAG
+        image: ${PHP_FPM_IMAGE?$PHP_FPM_IMAGE must be set.}
         ports:
             - 9000
         env_file:
-            - docker/env/config.env
+            - docker/env/php.env
         depends_on:
             - db
             - elasticsearch
@@ -37,10 +35,9 @@ services:
             - appdata:/var/www/html
 
     cli:
-        image: registry.smile.fr/magento2/php:$PHP_CLI_TAG
+        image: ${PHP_CLI_IMAGE?$PHP_CLI_IMAGE must be set.}
         env_file:
-            - docker/env/config.env
-            - .env
+            - docker/env/php.env
         depends_on:
             - db
             - elasticsearch
@@ -50,13 +47,12 @@ services:
             - appdata:/var/www/html
 
     cron:
-        image: registry.smile.fr/magento2/php:$PHP_CLI_TAG
+        image: ${PHP_CLI_IMAGE?$PHP_CLI_IMAGE must be set.}
         command: run-cron
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
         env_file:
-            - docker/env/config.env
-            - .env
+            - docker/env/php.env
         depends_on:
             - db
             - elasticsearch
@@ -66,11 +62,11 @@ services:
             - appdata:/var/www/html
 
     db:
-        image: mariadb:$MARIADB_TAG
+        image: ${MARIADB_IMAGE?$MARIADB_IMAGE must be set.}
         ports:
             - 3306
         env_file:
-            - docker/env/config.env
+            - docker/env/db.env
         healthcheck:
             test: 'mysqladmin ping -h localhost -pmagento2'
             interval: 30s
@@ -80,16 +76,16 @@ services:
             - dbdata:/var/lib/mysql
 
     elasticsearch:
-        image: registry.smile.fr/magento2/elasticsearch:$ELASTICSEARCH_TAG
+        image: ${ELASTICSEARCH_IMAGE?$ELASTICSEARCH_IMAGE must be set.}
         ports:
             - 9200
         env_file:
-            - docker/env/config.env
+            - docker/env/elasticsearch.env
         volumes:
             - esdata:/usr/share/elasticsearch/data
 
     redis:
-        image: redis:$REDIS_TAG
+        image: ${REDIS_IMAGE?$REDIS_IMAGE must be set.}
         ports:
             - 6379
         healthcheck:
@@ -101,17 +97,17 @@ services:
             - redisdata:/data
 
     rabbitmq:
-        image: rabbitmq:$RABBITMQ_TAG
+        image: ${RABBITMQ_IMAGE?$RABBITMQ_IMAGE must be set.}
         ports:
             - 15672
             - 5672
         volumes:
             - rabbitmqdata:/var/lib/rabbitmq
         env_file:
-            - docker/env/config.env
+            - docker/env/rabbitmq.env
 
     maildev:
-        image: maildev/maildev:$MAILDEV_TAG
+        image: ${MAILDEV_IMAGE?$MAILDEV_IMAGE must be set.}
         ports:
             - 1025
             - 1080

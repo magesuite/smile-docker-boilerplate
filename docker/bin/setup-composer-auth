@@ -8,7 +8,6 @@ cd "$( dirname "${BASH_SOURCE:-$0}}" )"
 cd ../..
 
 . ./docker/bin/deps/utils.sh
-. ./docker/env/magento.env # $SMILE_PACKAGIST
 
 ########
 # Step 1 - Validate pre-requisites
@@ -27,6 +26,9 @@ fi
 ########
 # Step 2 - Read credentials from user input
 ########
+
+# Get $SMILE_PACKAGIST value from magento.env
+. ./docker/env/magento.env
 
 echo "${YELLOW}No auth.json file at the project root, this setup will now ask for the missing composer credentials.${RESET}"
 
