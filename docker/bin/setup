@@ -156,6 +156,11 @@ print_summary () {
 # Step 2 - Read env files
 ########
 
+if [ ! -f ".env" ]; then
+    cp .env.sample .env
+    echo "${GREEN}✓ Copied .env.sample to .env.${RESET}"
+fi
+
 . ./.env
 . ./docker/env/magento.env
 
@@ -165,12 +170,12 @@ print_summary () {
 
 if [ -z "$DOCKER_UID" ] || [ "$DOCKER_UID" != "$(id -u)" ]; then
     sed -i "s/^DOCKER_UID=.*/DOCKER_UID=$(id -u)/g" .env
-    echo "${GREEN}✓ The user id was saved saved in the .env file.${RESET}"
+    echo "${GREEN}✓ The user id was saved saved in .env.${RESET}"
 fi
 
 if [ -z "$DOCKER_GID" ] || [ "$DOCKER_GID" != "$(id -g)" ]; then
     sed -i "s/^DOCKER_GID=.*/DOCKER_GID=$(id -g)/g" .env
-    echo "${GREEN}✓ The group id was saved saved in the .env file.${RESET}"
+    echo "${GREEN}✓ The group id was saved saved in .env.${RESET}"
 fi
 
 ########
@@ -184,7 +189,8 @@ if [ -z "$PROJECT_NAME" ]; then
     do true; done
 
     sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env
-    echo && echo "${GREEN}✓ The project name was saved in the .env file.${RESET}"
+    sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env.sample
+    echo && echo "${GREEN}✓ The project name was saved in .env and .env.sample.${RESET}"
 fi
 
 ########
@@ -224,7 +230,8 @@ if [ ! -f "composer.json" ]; then
 
     # Update env files
     sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/g" .env
-    echo && echo "${GREEN}✓ Updated \$PHP_VERSION to \"$PHP_VERSION\" in .env.${RESET}"
+    sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/g" .env.sample
+    echo && echo "${GREEN}✓ Updated \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.sample.${RESET}"
     sed -i "s/^MAGENTO_EDITION=.*/MAGENTO_EDITION=$MAGENTO_EDITION/g" docker/env/magento.env
     sed -i "s/^MAGENTO_VERSION=.*/MAGENTO_VERSION=$MAGENTO_VERSION/g" docker/env/magento.env
     sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/g" docker/env/magento.env

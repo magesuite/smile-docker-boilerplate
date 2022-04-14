@@ -29,6 +29,7 @@
 !/package.json
 
 # Docker
+!/.env.sample
 !/docker-compose.yml
 !/docker-compose.*.yml
 !/Makefile

@@ -8,14 +8,13 @@ cd "$( dirname "${BASH_SOURCE:-$0}}" )"
 cd ../..
 
 . ./docker/bin/deps/utils.sh
-. ./.env # $PROJECT_NAME
 . ./docker/env/magento.env # $SMILE_PACKAGIST
 
 ########
 # Step 1 - Validate pre-requisites
 ########
 
-if [ -z "$PROJECT_NAME" ]; then
+if [ ! -f ".env" ] || . ./.env && [ -z "$PROJECT_NAME" ]; then
     echo "${RED}Please set up the project before running this command.${RESET}"
     exit 1
 fi
