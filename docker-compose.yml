@@ -1,7 +1,5 @@
 version: '3.4'
 
-# TODO: upload the images to the registry and use them instead of building them dynamically
-
 services:
     varnish:
         image: registry.smile.fr/magento2/varnish:$VARNISH_TAG
