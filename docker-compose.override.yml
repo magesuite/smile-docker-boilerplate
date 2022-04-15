@@ -35,6 +35,8 @@ services:
 
     cron:
         image: ${PHP_CLI_DEV_IMAGE?$PHP_CLI_DEV_IMAGE must be set.}
+        env_file:
+            - .env # to synchronize www-data and host uid/gid
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
