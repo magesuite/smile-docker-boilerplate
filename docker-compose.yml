@@ -62,7 +62,7 @@ services:
             - appdata:/var/www/html
 
     db:
-        image: ${MARIADB_IMAGE?$MARIADB_IMAGE must be set.}
+        image: ${MYSQL_IMAGE?$MYSQL_IMAGE must be set.}
         ports:
             - 3306
         env_file:
