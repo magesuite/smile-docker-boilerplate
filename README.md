@@ -39,19 +39,19 @@ To set up a **new** Magento project with this skeleton:
     && rm -rf .git
     ```
 
-2. Then, run the following script in this new directory:
+2. Run the following script in this new directory:
 
     ```
-    make install
+    make setup-project
     ```
 
     This script will prompt for the project information (project name, Magento edition, version...).
     It will initialize Magento with composer (you don't need to install composer, it runs within a container).
 
-3. Launch all services with the following command:
+3. Install the database:
 
     ```
-    make up
+    make up setup-install
     ```
 
 4. Check if Magento is available at the following URLs:
@@ -74,16 +74,16 @@ To set up a project that was already initialized with the boilerplate:
 
 1. Clone the project repository.
 
-2. Then, run the following script in this new directory:
+2. Initialize the vendor directory with the following command:
 
     ```
-    make install
+    make composer-install
     ```
 
-3. Launch all services with the following command:
+3. Install the database:
 
     ```
-    make up
+    make up setup-install
     ```
 
 4. Check if Magento is available at the following URLs:
@@ -92,7 +92,7 @@ To set up a project that was already initialized with the boilerplate:
 
 ## Makefile
 
-This boilerplate is bundled with a Makefile that provides multiples that will help you using docker and Magento.
+This boilerplate is bundled with a Makefile that provides multiple commands that will help you use docker and Magento.
 
 The list of available commands can be listed by running `make` at the root of your project.
 

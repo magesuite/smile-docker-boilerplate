@@ -9,6 +9,31 @@ cd ../..
 
 . ./docker/bin/deps/utils.sh
 
+# Check requirements specific to this setup
+check_setup_requirements () {
+    STATUS=0
+
+    # Requirements specific to this setup
+    if ! command -v "curl"> /dev/null; then
+        echo "${RED}Please install the command \"curl\".${RESET}"
+        STATUS=1
+    fi
+
+    if ! command -v "sed" > /dev/null; then
+        echo "${RED}Please install the command \"sed\".${RESET}"
+        STATUS=1
+    fi
+
+    if ! command -v "grep" > /dev/null; then
+        echo "${RED}Please install the command \"grep\".${RESET}"
+        STATUS=1
+    fi
+
+    if [ "$STATUS" -gt 0 ]; then
+        exit $STATUS
+    fi
+}
+
 # Check if Smile network is reachable.
 check_intranet_reachable () {
     if [ "$SMILE_PACKAGIST" = "internal" ]; then
@@ -38,8 +63,7 @@ init_php_version () {
 }
 
 # Get packagist URLs.
-init_packagist_urls () {
-    MAGENTO_PACKAGIST_URL="https://repo.magento.com/"
+init_smile_packagist_url () {
     if [ "$1" = "internal" ]; then
         SMILE_PACKAGIST_URL="https://packagist.galaxy.intranet"
     else
@@ -47,245 +71,271 @@ init_packagist_urls () {
     fi
 }
 
-# Get the composer install command.
-get_composer_install_cmd () {
-    echo "cp .gitignore /tmp && composer install && mv /tmp/.gitignore ."
+# Read project name from user input
+read_project_name () {
+    while
+        ask_input PROJECT_NAME "Please enter your project name.\n${RESET}Allowed characters: [a-z0-9-]. Do not use capitalized letters, underscores, dots, etc." $PROJECT_NAME
+        [ ! "$(echo "$PROJECT_NAME" | tr -d 'a-z0-9-')" = "" ] && echo "${RED}This project name is not valid. Use only lowercase letters, numbers, and hyphens.${RESET}"
+    do true; done
 }
 
-# Get the composer update command.
-get_composer_update_cmd () {
-    echo ="cp .gitignore /tmp && composer install && mv /tmp/.gitignore ."
+# Read Magento version from user input
+read_magento_version () {
+    [ "$CREATE_PROJECT" = "y" ] && QUESTION="Magento version:" || QUESTION="What is your current Magento version?"
+    while
+        ask_input RESULT "$QUESTION" "$MAGENTO_VERSION"
+        ! [[ "$RESULT" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]] && echo "${RED}\"$RESULT\" is not a valid version number.${RESET}"
+    do true; done
+    MAGENTO_VERSION="$RESULT"
+}
+
+# Read Magento edition from user input
+read_magento_edition () {
+    while
+        ask_input RESULT "Magento edition (${BLUE}community${GREEN} or ${BLUE}enterprise${GREEN})${RESET}." "$MAGENTO_EDITION"
+        [ "$RESULT" != "community" ] && [ "$RESULT" != "enterprise" ] && echo "${RED}The magento edition \"$RESULT\" is not valid.${RESET}"
+    do true; done
+    MAGENTO_EDITION="$RESULT"
+}
+
+# Read Smile packagist repository from user input
+read_smile_packagist () {
+    QUESTION="Smile packagist repository (${BLUE}internal${GREEN} for https://packagist.galaxy.intranet, or ${BLUE}public${GREEN} for https://packagist.smile.fr).${RESET}"
+    if [ "$CREATE_PROJECT" = "n" ]; then
+        QUESTION="$QUESTION\nIf this is a Magento cloud project, use the public repository."
+    fi
+
+    while
+        ask_input RESULT "$QUESTION" "$SMILE_PACKAGIST"
+        [ "$RESULT" != "internal" ] && [ "$RESULT" != "public" ] && echo "${RED}The repository type \"$RESULT\" is not valid.${RESET}"
+    do true; done
+    SMILE_PACKAGIST="$RESULT"
+
+    if [ "$SMILE_PACKAGIST" = "public" ]; then
+        echo && echo "${YELLOW}Warning:${RESET} The public packagist https://packagist.smile.fr requires an authenticated user account."
+        echo "If you don't already have one, please ask dirtech@smile.fr to create a packagist account for your project."
+    fi
+}
+
+# Read whether to install Smile modules from user input
+read_smile_modules () {
+    ask_yes_no RESULT "Please choose whether to install Smile tools (module-debug-toolbar, module-patch, module-reconfigure, module-varnish, smileanalyser)." "$SMILE_MODULES"
+    SMILE_MODULES="$RESULT"
+}
+
+# Prints a summary of the project information.
+print_project_summary () {
+    echo && echo "${YELLOW}Project summary:${RESET}"
+    echo "- Project name: ${BLUE}$PROJECT_NAME${RESET}"
+    echo "- PHP version: ${BLUE}$PHP_VERSION${RESET}"
+    echo "- Magento version: ${BLUE}$MAGENTO_VERSION${RESET}"
+
+    if [ "$CREATE_PROJECT" = "y" ]; then
+        echo "- Magento edition: ${BLUE}$MAGENTO_EDITION${RESET}"
+    fi
+
+    echo "- Smile repository URL: ${BLUE}$SMILE_PACKAGIST_URL${RESET}"
+    echo "- Install Smile modules: ${BLUE}$SMILE_MODULES${RESET}"
 }
 
 # Get the composer create-project command.
 get_composer_create_project_cmd () {
     TEMP_DIR="/tmp/magento-project"
 
-    [ -n "$1" ] && COMMAND="$1 && " || COMMAND=""
-
     # Temporarily move auth.json to $COMPOSER_HOME in order to run composer create-project
-    COMMAND="${COMMAND}cp -f auth.json \$COMPOSER_HOME/ && \
+    COMMAND="cp -f auth.json \$COMPOSER_HOME/ && \
         composer create-project --no-interaction --no-install --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_DIR && \
-        rm -f \$COMPOSER_HOME/auth.json && mv $TEMP_DIR/* . && rm -rf $TEMP_DIR && \
-        composer config repositories.smile_libraries composer $SMILE_PACKAGIST_URL/libraries/ && \
-        composer config repositories.smile_magento2 composer $SMILE_PACKAGIST_URL/magento2/ && \
-        composer config allow-plugins.magento/* true && \
-        composer config allow-plugins.laminas/* true && \
-        composer config allow-plugins.cweagans/composer-patches true && \
-        composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true"
+        composer -d $TEMP_DIR config repositories.smile_libraries composer $SMILE_PACKAGIST_URL/libraries/ && \
+        composer -d $TEMP_DIR config repositories.smile_magento2 composer $SMILE_PACKAGIST_URL/magento2/ && \
+        composer -d $TEMP_DIR config allow-plugins.magento/* true && \
+        composer -d $TEMP_DIR config allow-plugins.laminas/* true && \
+        composer -d $TEMP_DIR config allow-plugins.cweagans/composer-patches true && \
+        composer -d $TEMP_DIR config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true"
 
     if [ "$SMILE_MODULES" = "y" ]; then
         COMMAND="$COMMAND && \
-            composer require --no-update smile/module-cron smile/module-indexer smile/module-reconfigure smile/module-setup smile/module-varnish && \
-            composer require --dev --no-update smile/module-debug-toolbar"
+            composer -d $TEMP_DIR require --no-update smile/module-reconfigure smile/module-patch smile/module-varnish && \
+            composer -d $TEMP_DIR require --dev --no-update smile/module-debug-toolbar smile-sa/smileanalyser"
     fi
 
-    COMMAND="$COMMAND && $(get_composer_install_cmd)"
+    # Delete global auth file, copy composer.json file to the project directory, and run composer install
+    COMMAND="$COMMAND && \
+        rm -f \$COMPOSER_HOME/auth.json && \
+        mv $TEMP_DIR/* . && rm -rf $TEMP_DIR && \
+        cp -f .gitignore /tmp && composer install && mv /tmp/.gitignore ."
+
+    if [ "$SMILE_MODULES" = "y" ] && [ ! -f ".smileanalyser.yaml" ]; then
+        COMMAND="$COMMAND && vendor/bin/SmileAnalyser init --type Magento2"
+    fi
+
     echo $COMMAND
 }
 
 # Get the composer command that updates a cloud project.
-get_composer_cloud_update_cmd () {
-    COMMAND="composer config repositories.smile_libraries composer $SMILE_PACKAGIST_URL/libraries/ && \
+get_composer_update_command () {
+    COMMAND="cp -f .gitignore /tmp"
+
+    if [ "$ADD_SMILE_PACKAGIST" = "y" ]; then
+        COMMAND="$COMMAND && \
+            composer config repositories.smile_libraries composer $SMILE_PACKAGIST_URL/libraries/ && \
             composer config repositories.smile_magento2 composer $SMILE_PACKAGIST_URL/magento2/"
+    fi
 
     if [ "$SMILE_MODULES" = "y" ]; then
-        COMMAND="$COMMAND && \
-            composer require --no-update smile/module-cron smile/module-indexer smile/module-reconfigure smile/module-setup smile/module-varnish && \
-            composer require --dev --no-update smile/module-debug-toolbar"
+        COMMAND="$COMMAND &&
+            composer require --no-update smile/module-reconfigure smile/module-patch smile/module-varnish && \
+            composer require --dev --no-update smile/module-debug-toolbar smile-sa/smileanalyser"
     fi
 
-    COMMAND="$COMMAND && $(get_composer_update_cmd)"
+    COMMAND="$COMMAND && composer update && mv /tmp/.gitignore ."
+
+    if [ "$SMILE_MODULES" = "y" ] && [ ! -f ".smileanalyser.yaml" ]; then
+        COMMAND="$COMMAND && vendor/bin/SmileAnalyser init --type Magento2"
+    fi
+
     echo $COMMAND
-}
-
-# Ask the user to provide the project information (interactive mode).
-get_project_information () {
-    # Choice: Magento version
-    while
-        ask_input RESULT "Magento version:" "$MAGENTO_VERSION"
-        ! [[ "$RESULT" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]] && echo "${RED}\"$RESULT\" is not a valid version number.${RESET}"
-    do true; done
-    MAGENTO_VERSION=$RESULT
-
-    # Choice: Magento edition
-    while
-        ask_input RESULT "Magento edition (${BLUE}community${GREEN}, ${BLUE}enterprise${GREEN} or ${BLUE}cloud${GREEN})." "$MAGENTO_EDITION"
-        [ "$RESULT" != "community" ] && [ "$RESULT" != "enterprise" ] && [ "$RESULT" != "cloud" ] && echo "${RED}The magento edition \"$RESULT\" is not valid.${RESET}"
-    do true; done
-    MAGENTO_EDITION=$RESULT
-
-    if [ "$MAGENTO_EDITION" = "cloud" ]; then
-        echo && echo "${RED}Warning:${RESET} Magento cloud projects must use the public packagist https://packagist.smile.fr, which requires an authenticated user account."
-        echo "If you don't already have one, please ask dirtech@smile.fr to create an account for your project."
-        SMILE_PACKAGIST=public
-    else
-        # Choice: Magento package repository
-        while
-            ask_input RESULT "Please choose the Smile packagist repository to use (${BLUE}internal${GREEN} or ${BLUE}public${GREEN})." "$SMILE_PACKAGIST"
-            [ "$RESULT" != "internal" ] && [ "$RESULT" != "public" ] && echo "${RED}The magento repository \"$RESULT\" is not valid.${RESET}"
-        do true; done
-        SMILE_PACKAGIST=$RESULT
-    fi
-
-    # Choice: Smile modules
-    ask_yes_no RESULT "Please choose whether to install smile modules: cron, indexer, patch, reconfigure, varnish." "$SMILE_MODULES"
-    SMILE_MODULES=$RESULT
-
-    # Update variables that store the PHP version and packagist URLs
-    init_packagist_urls "$SMILE_PACKAGIST"
-    init_php_version "$MAGENTO_VERSION"
-}
-
-# Prints a summary of the project information.
-print_summary () {
-    echo && echo "${YELLOW}Project summary:${RESET}"
-    echo "- Magento edition: ${BLUE}$MAGENTO_EDITION${RESET}"
-    echo "- Magento version: ${BLUE}$MAGENTO_VERSION${RESET}"
-    echo "- Smile repository URL: ${BLUE}$SMILE_PACKAGIST_URL${RESET}"
-    echo "- Install Smile modules: ${BLUE}$SMILE_MODULES${RESET}"
 }
 
 ########
 # Step 1 - Validate pre-requisites
 ########
 
+# Check project requirements
 ./docker/bin/check-requirements
 
-########
-# Step 2 - Read env files
-########
+# Check requirements specific to this setup
+check_setup_requirements
 
-if [ ! -f ".env" ]; then
-    cp .env.sample .env
-    echo "${GREEN}✓ Copied .env.sample to .env.${RESET}"
-fi
+########
+# Step 2 - Read environment files
+########
 
 . ./.env
 . ./docker/env/magento.env
 
-########
-# Step 3 - Update .env file with user id and group id
-########
-
-if [ -z "$DOCKER_UID" ] || [ "$DOCKER_UID" != "$(id -u)" ]; then
-    sed -i "s/^DOCKER_UID=.*/DOCKER_UID=$(id -u)/g" .env
-    echo "${GREEN}✓ The user id was saved saved in .env.${RESET}"
-fi
-
-if [ -z "$DOCKER_GID" ] || [ "$DOCKER_GID" != "$(id -g)" ]; then
-    sed -i "s/^DOCKER_GID=.*/DOCKER_GID=$(id -g)/g" .env
-    echo "${GREEN}✓ The group id was saved saved in .env.${RESET}"
-fi
-
-########
-# Step 4 - Project name
-########
-
-if [ -z "$PROJECT_NAME" ]; then
-    while
-        ask_input PROJECT_NAME "Please enter your project name.\n${RESET}Allowed characters: [a-z0-9-]. Do not use capitalized letters, underscores, dots, etc."
-        [ ! "$(echo "$PROJECT_NAME" | tr -d 'a-z0-9-')" = "" ] && echo "${RED}This project name is not valid. Use only lowercase letters, numbers, and hyphens.${RESET}"
-    do true; done
-
-    sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env
-    sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env.sample
-    echo && echo "${GREEN}✓ The project name was saved in .env and .env.sample.${RESET}"
-fi
-
-########
-# Step 5 - Init default values
-########
-
-# These values can be overridden with environment variables
+# Set default values for variables that are not present in magento.env
 MAGENTO_EDITION=${MAGENTO_EDITION:-"community"}
-MAGENTO_VERSION=${MAGENTO_VERSION:-"2.4.3-p1"}
-SMILE_PACKAGIST=${SMILE_PACKAGIST:-"internal"}
 SMILE_MODULES=${SMILE_MODULES:-"y"}
-RESULT=""
-init_packagist_urls "$SMILE_PACKAGIST"
-init_php_version "$MAGENTO_VERSION"
+
+# Packagist URLs
+MAGENTO_PACKAGIST_URL="https://repo.magento.com/"
+init_smile_packagist_url "$SMILE_PACKAGIST"
+
+# Installation mode is based on the presence of composer.json file
+[ ! -f "composer.json" ] && CREATE_PROJECT=y || CREATE_PROJECT=n
 
 ########
-# Step 6 - Composer
+# Step 3 - Interactive mode
 ########
 
-# Create the composer project/install vendor dir (depending on whether a composer.json file was found)
-if [ ! -f "composer.json" ]; then
-    # Display project information (Magento version, edition...)
-    print_summary
+if [ "$CREATE_PROJECT" = "y" ]; then
+    echo "No composer.json file found. This setup will initialize a new Magento project for you."
+    echo "${YELLOW}WARNING${RESET}: if you want to set up a Magento cloud project, you must add the docker boilerplate to your existing Magento project, then relaunch this setup.${RESET}"
+else
+    echo "composer.json file found."
+    echo "Please answer the following questions. The docker env files will be updated with the provided information."
+fi
 
-    ask_yes_no RESULT "Do you want to proceed with this configuration? Answer ${BLUE}n${GREEN} if you want to use another configuration."
-    if [ "$RESULT" = "n" ]; then
-        # Launch interactive mode
-        get_project_information
+RUN_COMPOSER=n
 
-        # Show project information again now that the user has changed some values
-        print_summary
+if [ "$CREATE_PROJECT" = "y" ]; then
+    # New Magento project: ask for full project information
+    read_project_name
+    read_magento_version
+    read_magento_edition
+    read_smile_packagist
+    read_smile_modules
+    init_smile_packagist_url "$SMILE_PACKAGIST"
+    init_php_version "$MAGENTO_VERSION"
+    print_project_summary
+    RUN_COMPOSER=y
 
-        # Ask for confirmation before executing the composer create-project command
-        ask_yes_no RESULT "Proceed?" y
-        [ "$RESULT" != "y" ] && echo "${RED}Aborted by user.${RESET}" && exit
+    ask_yes_no RESULT "Run composer create-project with the above information?"
+else
+    # Existing project: ask only for information required to update env files and composer.json/composer.auth files
+    read_project_name
+    read_magento_version
+    ADD_SMILE_PACKAGIST=n
+    RUN_COMPOSER=n
+
+    if grep -F -e packagist.galaxy.intranet composer.json > /dev/null; then
+        echo && echo "${GREEN}✓ Smile packagist repository is aleady defined in composer.json.${RESET}"
+        SMILE_PACKAGIST=internal
+    elif grep -F -e packagist.smile.fr composer.json > /dev/null; then
+        echo && echo "${GREEN}✓ Smile packagist repository is already defined in composer.json.${RESET}"
+        SMILE_PACKAGIST=public
+    else
+        echo && echo "${YELLOW}Smile packagist repository is not set in composer.json.${RESET}"
+        read_smile_packagist
+        RUN_COMPOSER=y
+        ADD_SMILE_PACKAGIST=y
     fi
 
-    # Update env files
-    sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/g" .env
-    sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/g" .env.sample
-    echo && echo "${GREEN}✓ Updated \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.sample.${RESET}"
-    sed -i "s/^MAGENTO_EDITION=.*/MAGENTO_EDITION=$MAGENTO_EDITION/g" docker/env/magento.env
-    sed -i "s/^MAGENTO_VERSION=.*/MAGENTO_VERSION=$MAGENTO_VERSION/g" docker/env/magento.env
-    sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/g" docker/env/magento.env
-    echo "${GREEN}✓ Updated \$MAGENTO_EDITION to \"$MAGENTO_EDITION\", \$MAGENTO_VERSION to \"$MAGENTO_VERSION\" and \$SMILE_PACKAGIST to \"$SMILE_PACKAGIST\" in docker/env/magento.env.${RESET}"
+    if grep -F -e smile/module-debug-toolbar -e smile/module-patch -e smile/module-reconfigure -e smile/module-varnish -e smile-sa/smileanalyser composer.json > /dev/null; then
+        echo && echo "${GREEN}✓ Smile modules are already defined in composer.json.${RESET}"
+        SMILE_MODULES=n
+    else
+        echo && echo "${YELLOW}Smile modules are not set in composer.json.${RESET}"
+        read_smile_modules
+        [ "$SMILE_MODULES" = "y" ] && RUN_COMPOSER=y
+    fi
 
+    init_smile_packagist_url "$SMILE_PACKAGIST"
+    init_php_version "$MAGENTO_VERSION"
+    print_project_summary
+
+    if [ "$RUN_COMPOSER" = "y" ]; then
+        ask_yes_no RESULT "Proceed to update docker env file and update composer.json with the above information?"
+    else
+        ask_yes_no RESULT "Proceed to update docker env file with the above information?"
+    fi
+fi
+
+# Ask for confirmation before executing the composer create-project command
+[ "$RESULT" != "y" ] && echo "${RED}Aborted by user.${RESET}" && exit
+
+########
+# Step 4 - Update environment files
+########
+
+# Update env files
+sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env
+sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env.sample
+sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/g" .env
+sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/g" .env.sample
+echo && echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\" and \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.sample.${RESET}"
+sed -i "s/^MAGENTO_VERSION=.*/MAGENTO_VERSION=$MAGENTO_VERSION/g" docker/env/magento.env
+sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/g" docker/env/magento.env
+echo "${GREEN}✓ Updated \$MAGENTO_VERSION to \"$MAGENTO_VERSION\" and \$SMILE_PACKAGIST to \"$SMILE_PACKAGIST\" in docker/env/magento.env.${RESET}"
+
+########
+# Step 5 - Set up composer credentials
+########
+
+./docker/bin/setup-composer-auth
+
+########
+# Step 6 - Run composer
+########
+
+if [ "$RUN_COMPOSER" = "y" ]; then
     # Check if Smile network is reachable
     check_intranet_reachable
 
-    # Ask for packagist ACLs
-    ./docker/bin/setup-composer-auth
-
-    # Initialize Magento
-    if [ "$MAGENTO_EDITION" != "cloud" ]; then
-        COMMAND="${COMMAND}$(get_composer_create_project_cmd)"
-    else
-        COMMAND="${COMMAND}$(get_composer_cloud_update_cmd)"
-    fi
+    # Execute the composer command on the container
+    [ "$CREATE_PROJECT" = "y" ] && COMMAND="$(get_composer_create_project_cmd)" || COMMAND="$(get_composer_update_command)"
 
     echo && echo "${YELLOW}Magento will now be initialized with composer.${RESET}"
     echo
 
     if ! $DOCKER_COMMAND sh -c "$COMMAND"; then
         echo "${RED}Failed to initialize the project, aborting.${RESET}"
-        rm -f composer.json
+        # Always remove auth.json on project creation error, because the user might select other packagist settings the next time
+        [ "$CREATE_PROJECT" = "y" ] && rm -f auth.json
+        # Remove composer.json on project creation error only if Magento files were not generated
+        [ "$CREATE_PROJECT" = "y" ] && [ ! -f "composer.lock" ] && [ ! -d "vendor" ] && rm -f composer.json
         exit 1
     fi
-
-    echo && echo "${GREEN}✓ The project was successfully initialized.${RESET}"
-else
-    # Check if Smile network is reachable
-    check_intranet_reachable
-
-    # Ask for packagist ACLs
-    ./docker/bin/setup-composer-auth
-
-    [ -d "vendor" ] && ask_yes_no RESULT "Run composer install?" y
-
-    if [ "$RESULT" = "y" ]; then
-        if ! $DOCKER_COMMAND sh -c "$(get_composer_install_cmd)"; then
-            echo && echo "${RED}Failed to run composer install, aborting.${RESET}"
-            exit 1
-        fi
-
-        echo && echo "${GREEN}✓ The project was successfully initialized.${RESET}"
-    fi
 fi
 
-########
-# Step 7 - Database
-########
-
-if [ -d "vendor" ] && [ ! -f "app/etc/env.php" ]; then
-    ask_yes_no RESULT "Initialize Magento database?" y
-    if [ "$RESULT" = "y" ]; then
-        ./docker/bin/setup-db
-    fi
-fi
+echo && echo "${GREEN}The project was successfully initialized.${RESET}"

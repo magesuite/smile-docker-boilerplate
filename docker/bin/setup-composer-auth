@@ -43,13 +43,13 @@ if [ -z "$COMPOSER_GITHUB_TOKEN" ]; then
 fi
 
 # Always ask for Magento credentials (they are specified to each project)
-ask_input COMPOSER_MAGENTO_USERNAME "Please specify a Magento packagist ACL username (https://repo.magento.com)."
-ask_input COMPOSER_MAGENTO_PASSWORD "Please specify a Magento packagist ACL password (https://repo.magento.com)."
+ask_input COMPOSER_MAGENTO_USERNAME "Please specify the Magento packagist username (https://repo.magento.com)."
+ask_input COMPOSER_MAGENTO_PASSWORD "Please specify the Magento packagist password (https://repo.magento.com)."
 
 # Ask for Smile credentials only when using the public packagist
 if [ "$SMILE_PACKAGIST" = "public" ]; then
-    ask_input COMPOSER_SMILE_USERNAME "Please specify a Smile packagist ACL username (https://packagist.smile.fr).\nIf you dont have one, you need to ask the technical direction (${BLUE}dirtech@smile.fr${GREEN}) to create an ACL for your project."
-    ask_input COMPOSER_SMILE_PASSWORD "Please specify a Smile packagist ACL password (https://packagist.smile.fr)."
+    ask_input COMPOSER_SMILE_USERNAME "Please specify the Smile packagist username (https://packagist.smile.fr).\nIf you dont have one, you need to ask the technical direction (${BLUE}dirtech@smile.fr${GREEN}) to create an ACL for your project."
+    ask_input COMPOSER_SMILE_PASSWORD "Please specify the Smile packagist password (https://packagist.smile.fr)."
 fi
 
 ########
