@@ -29,7 +29,7 @@ fi
 ########
 
 if [ -f "app/etc/env.php" ]; then
-    ask_yes_no RESULT "${YELLOW}This setup will run the setup:install command. This will reinitialize the database!\nProceed?${RESET}"
+    ask_yes_no RESULT "${YELLOW}This setup will run the setup:install command. Proceed?${RESET}"
     if [ "$RESULT" = "n" ]; then
         echo "${RED}Aborted by user.${RESET}"
         exit
@@ -121,6 +121,9 @@ fi
 
 # Install Magento
 print_and_run $INSTALL_COMMAND
+
+# Set run mode
+echo && print_and_run "$MAGENTO_COMMAND deploy:mode:set $MAGENTO_RUN_MODE"
 
 # Disable two-factor authentication when developer mode is enabled
 if [ "$MAGENTO_RUN_MODE" = "developer" ]; then
