@@ -32,7 +32,8 @@ down: $(VALIDATE_TARGET) ## Stop and remove all containers.
 
 .PHONY: ps
 ps: $(VALIDATE_TARGET) ## List active containers.
-	@docker compose ps
+	@$(eval service ?=)
+	@docker compose ps $(service)
 
 .PHONY: logs
 logs: $(VALIDATE_TARGET) ## Show Docker logs. Pass the parameter "service=" to get logs of a given service. Example: make logs service=elasticsearch
@@ -46,11 +47,13 @@ top: $(VALIDATE_TARGET) ## Shows all running processes. Pass the parameter "serv
 
 .PHONY: images
 images: $(VALIDATE_TARGET) ## List images used by containers.
-	@docker compose images
+	@$(eval service ?=)
+	@docker compose images $(service)
 
 .PHONY: build
 build: $(VALIDATE_TARGET) ## Build all images. Only useful if you project uses custom Dockerfiles.
-	@docker compose build
+	@$(eval service ?=)
+	@docker compose build $(service)
 
 ## Services
 .PHONY: sh
