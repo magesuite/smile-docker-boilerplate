@@ -299,13 +299,13 @@ fi
 ########
 
 # Update env files
-sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env
-sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/g" .env.sample
-sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/g" .env
-sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/g" .env.sample
+sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env
+sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env.sample
+sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
+sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env.sample
 echo && echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\" and \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.sample.${RESET}"
-sed -i "s/^MAGENTO_VERSION=.*/MAGENTO_VERSION=$MAGENTO_VERSION/g" docker/env/magento.env
-sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/g" docker/env/magento.env
+sed -i "s/^MAGENTO_VERSION=.*/MAGENTO_VERSION=$MAGENTO_VERSION/" docker/env/magento.env
+sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/" docker/env/magento.env
 echo "${GREEN}✓ Updated \$MAGENTO_VERSION to \"$MAGENTO_VERSION\" and \$SMILE_PACKAGIST to \"$SMILE_PACKAGIST\" in docker/env/magento.env.${RESET}"
 
 ########
