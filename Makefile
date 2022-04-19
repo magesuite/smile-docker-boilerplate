@@ -30,6 +30,11 @@ up: $(VALIDATE_TARGET) ## Build and start all containers.
 down: $(VALIDATE_TARGET) ## Stop and remove all containers.
 	@docker compose down --remove-orphans
 
+PHONY: restart
+restart: $(VALIDATE_TARGET) ## Restart all containers. Pass the parameter "service=" to restart a specific container. Example: make restart service=varnish
+	@$(eval service ?=)
+	@docker compose restart $(service)
+
 .PHONY: ps
 ps: $(VALIDATE_TARGET) ## List active containers.
 	@$(eval service ?=)
