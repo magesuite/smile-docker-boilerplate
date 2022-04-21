@@ -142,7 +142,7 @@ print_project_summary () {
 get_composer_create_project_cmd () {
     TEMP_DIR="/tmp/magento-project"
 
-    COMMAND="composer create-project --no-interaction --no-install --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_DIR && \
+    COMMAND="composer create-project --no-install --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_DIR && \
         composer -d $TEMP_DIR config repositories.smile_libraries composer $SMILE_PACKAGIST_URL/libraries/ && \
         composer -d $TEMP_DIR config repositories.smile_magento2 composer $SMILE_PACKAGIST_URL/magento2/ && \
         composer -d $TEMP_DIR config allow-plugins.magento/* true && \
