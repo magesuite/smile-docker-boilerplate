@@ -1,0 +1,14 @@
+parameters:
+    level: 6
+    checkMissingIterableValueType: false
+    paths:
+        - app/code
+
+services:
+    - class: Magento\PhpStan\Reflection\Php\DataObjectClassReflectionExtension
+      tags: {phpstan.broker.methodsClassReflectionExtension: {priority: 100}}
+
+    errorFormatter.filtered:
+        class: Magento\PhpStan\Formatters\FilteredErrorFormatter
+        arguments:
+            tableErrorFormatter: @errorFormatter.table
