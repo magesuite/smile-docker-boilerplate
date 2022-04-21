@@ -19,8 +19,6 @@ services:
     php:
         image: ${PHP_FPM_DEV_IMAGE?PHP_FPM_DEV_IMAGE must be set.}
         user: ${DOCKER_UID?DOCKER_UID must be set.}:${DOCKER_GID?DOCKER_GID must be set.}
-        environment:
-            COMPOSER_AUTH: '{"github-oauth":{"github.com":"$COMPOSER_GITHUB_TOKEN"}}'
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
