@@ -52,9 +52,6 @@ fi
 
 MAGENTO_COMMAND="$DOCKER_COMMAND bin/magento"
 
-# Remove env.php and config.php files if it exists, otherwise the installation would fail
-rm -f app/etc/env.php app/etc/config.php
-
 # Prepare the install command
 INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
     --db-host=$MYSQL_HOST \
