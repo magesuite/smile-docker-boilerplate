@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# Toggles xdebug on/off.
+
+set -e
+
+cd "$( dirname "${BASH_SOURCE[0]}" )"
+cd ../..
+
+. ./docker/bin/deps/utils.sh
+. ./docker/env/php.env
+
+XDEBUG_DEFAULT=develop,debug
+
+if [ -n "$1" ]; then
+    if [ "$1" = "1" ]; then
+        VALUE="$XDEBUG_DEFAULT"
+    elif [ "$1" = "0" ]; then
+        VALUE=off
+    else
+        VALUE="$1"
+    fi
+
+    if [ "$VALUE" = "$XDEBUG_MODE" ]; then
+        echo "${YELLOW}XDEBUG_MODE is already set to \"$VALUE\"."
+        exit 1
+    fi
+else
+    if [ "$XDEBUG_MODE" = "off" ]; then
+        VALUE="$XDEBUG_DEFAULT"
+    else
+        VALUE=off
+    fi
+fi
+
+sed -i "s/^XDEBUG_MODE=.*/XDEBUG_MODE=$VALUE/" docker/env/php.env
+echo "${GREEN}XDEBUG_MODE was set to \"$VALUE\".${RESET}"

@@ -81,6 +81,12 @@ db-import: check-requirements ## Import a database dump. Pass the parameter "fil
 	@if [ -z "$(filename)" ]; then echo "Please provide a filename."; echo "Example: make db-import filename=dump.sql"; exit 1; fi
 	$(DOCKER_COMPOSE) exec -T $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
 
+.PHONY: xdebug
+xdebug: check-requirements ## Toggles xdebug. Pass the parameter "value=" to force a specific value for XDEBUG_MODE.
+	@$(eval value ?=)
+	./docker/bin/xdebug $(value)
+	$(DOCKER_COMPOSE) up -d --no-deps $(PHP_CONTAINER)
+
 ## Composer
 .PHONY: composer
 composer: check-requirements ## Run composer. Example: make composer cmd="config --list"
