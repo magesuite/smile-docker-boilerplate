@@ -16,26 +16,20 @@ services:
         volumes:
             - ./:/var/www/html:rw,cached
 
-    fpm:
+    php:
         image: ${PHP_FPM_DEV_IMAGE?PHP_FPM_DEV_IMAGE must be set.}
         user: ${DOCKER_UID?DOCKER_UID must be set.}:${DOCKER_GID?DOCKER_GID must be set.}
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
-        volumes:
-            - ./:/var/www/html:rw,cached
-
-    cli:
-        image: ${PHP_CLI_DEV_IMAGE?PHP_CLI_DEV_IMAGE must be set.}
-        command: php -a
-        user: ${DOCKER_UID?DOCKER_UID must be set.}:${DOCKER_GID?DOCKER_GID must be set.}
+        environment:
+            COMPOSER_AUTH: '{"github-oauth":{"github.com":"$COMPOSER_GITHUB_TOKEN"}}'
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
             - ./:/var/www/html:rw,cached
             - composer-cache:/tmp/composer
+            - npm-cache:/tmp/npm
 
     cron:
-        image: ${PHP_CLI_DEV_IMAGE?PHP_CLI_DEV_IMAGE must be set.}
+        image: ${PHP_FPM_DEV_IMAGE?PHP_FPM_DEV_IMAGE must be set.}
         env_file:
             - .env # to synchronize www-data and host uid/gid
         extra_hosts:
@@ -69,3 +63,4 @@ services:
 
 volumes:
     composer-cache:
+    npm-cache:

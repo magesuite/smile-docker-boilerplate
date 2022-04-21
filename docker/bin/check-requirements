@@ -38,20 +38,36 @@ fi
 if [ ! -f ".env" ]; then
     cp .env.sample .env
     echo "${GREEN}✓ Copied .env.sample to .env.${RESET}"
-fi
 
-. ./.env
+    . ./.env
 
-########
-# Step 3 - Update .env file with user id and group id
-########
+    # Update .env file with user id and group id
+    if [ -z "$DOCKER_UID" ] || [ "$DOCKER_UID" != "$(id -u)" ]; then
+        sed -i "s/^DOCKER_UID=.*/DOCKER_UID=$(id -u)/g" .env
+        echo "${GREEN}✓ Your user id was saved in .env.${RESET}"
+    fi
 
-if [ -z "$DOCKER_UID" ] || [ "$DOCKER_UID" != "$(id -u)" ]; then
-    sed -i "s/^DOCKER_UID=.*/DOCKER_UID=$(id -u)/g" .env
-    echo "${GREEN}✓ Your user id was saved in .env.${RESET}"
-fi
+    if [ -z "$DOCKER_GID" ] || [ "$DOCKER_GID" != "$(id -g)" ]; then
+        sed -i "s/^DOCKER_GID=.*/DOCKER_GID=$(id -g)/g" .env
+        echo "${GREEN}✓ Your group id was saved in .env.${RESET}"
+    fi
 
-if [ -z "$DOCKER_GID" ] || [ "$DOCKER_GID" != "$(id -g)" ]; then
-    sed -i "s/^DOCKER_GID=.*/DOCKER_GID=$(id -g)/g" .env
-    echo "${GREEN}✓ Your group id was saved in .env.${RESET}"
+    # Fetch GitHub token from host
+    if [ -z "$COMPOSER_AUTH" ] && command -v composer > /dev/null; then
+        # `|| true` avoids returning an error status, which would stop the script because of set -e
+        COMPOSER_GITHUB_TOKEN="$(composer config --global github-oauth.github.com 2>/dev/null || true)"
+
+        if [ -z "$COMPOSER_GITHUB_TOKEN" ]; then
+            ask_yes_no RESULT "Do you want to provide a composer GitHub token?\nIf you don't provide one, you might be rate limited by GitHub when using composer."
+            if [ "$RESULT" = "y" ]; then
+                ask_input COMPOSER_GITHUB_TOKEN "Please enter your GitHub token.\nIf you don't already have one, you can create it at ${BLUE}https://github.com/settings/tokens${RESET}."
+            fi
+        fi
+
+        if [ -n "$COMPOSER_GITHUB_TOKEN" ]; then
+            sed -i "s/^COMPOSER_GITHUB_TOKEN=.*/COMPOSER_GITHUB_TOKEN=$COMPOSER_GITHUB_TOKEN/g" .env
+            echo "${GREEN}✓ Your composer GitHub token was saved in .env.${RESET}"
+            echo
+        fi
+    fi
 fi

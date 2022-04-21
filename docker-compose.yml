@@ -17,11 +17,11 @@ services:
             - 443
             - 8080
         depends_on:
-            - fpm
+            - php
         volumes:
             - appdata:/var/www/html
 
-    fpm:
+    php:
         image: ${PHP_FPM_IMAGE?PHP_FPM_IMAGE must be set.}
         ports:
             - 9000
@@ -36,21 +36,8 @@ services:
         volumes:
             - appdata:/var/www/html
 
-    cli:
-        image: ${PHP_CLI_IMAGE?PHP_CLI_IMAGE must be set.}
-        env_file:
-            - docker/env/php.env
-        depends_on:
-            - db
-            - elasticsearch
-            - maildev
-            - rabbitmq
-            - redis
-        volumes:
-            - appdata:/var/www/html
-
     cron:
-        image: ${PHP_CLI_IMAGE?PHP_CLI_IMAGE must be set.}
+        image: ${PHP_FPM_IMAGE?PHP_FPM_IMAGE must be set.}
         command: run-cron
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
@@ -96,7 +83,7 @@ services:
             - esdata:/usr/share/elasticsearch/data
 
     redis:
-        image: ${REDIS_IMAGE?$REDIS_IMAGE must be set.}
+        image: ${REDIS_IMAGE?REDIS_IMAGE must be set.}
         ports:
             - 6379
         healthcheck:

@@ -142,9 +142,7 @@ print_project_summary () {
 get_composer_create_project_cmd () {
     TEMP_DIR="/tmp/magento-project"
 
-    # Temporarily move auth.json to $COMPOSER_HOME in order to run composer create-project
-    COMMAND="cp -f auth.json \$COMPOSER_HOME/ && \
-        composer create-project --no-interaction --no-install --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_DIR && \
+    COMMAND="composer create-project --no-interaction --no-install --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_DIR && \
         composer -d $TEMP_DIR config repositories.smile_libraries composer $SMILE_PACKAGIST_URL/libraries/ && \
         composer -d $TEMP_DIR config repositories.smile_magento2 composer $SMILE_PACKAGIST_URL/magento2/ && \
         composer -d $TEMP_DIR config allow-plugins.magento/* true && \
@@ -160,7 +158,6 @@ get_composer_create_project_cmd () {
 
     # Delete global auth file, copy composer.json file to the project directory, and run composer install
     COMMAND="$COMMAND && \
-        rm -f \$COMPOSER_HOME/auth.json && \
         mv $TEMP_DIR/* . && rm -rf $TEMP_DIR && \
         cp -f .gitignore /tmp && composer install && mv /tmp/.gitignore ."
 
@@ -309,13 +306,7 @@ sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/" docker/env/mage
 echo "${GREEN}✓ Updated \$MAGENTO_VERSION to \"$MAGENTO_VERSION\" and \$SMILE_PACKAGIST to \"$SMILE_PACKAGIST\" in docker/env/magento.env.${RESET}"
 
 ########
-# Step 5 - Set up composer credentials
-########
-
-./docker/bin/setup-composer-auth
-
-########
-# Step 6 - Run composer
+# Step 5 - Run composer
 ########
 
 if [ "$RUN_COMPOSER" = "y" ]; then
@@ -330,8 +321,6 @@ if [ "$RUN_COMPOSER" = "y" ]; then
 
     if ! $DOCKER_COMMAND sh -c "$COMMAND"; then
         echo "${RED}Failed to initialize the project, aborting.${RESET}"
-        # Always remove auth.json on project creation error, because the user might select other packagist settings the next time
-        [ "$CREATE_PROJECT" = "y" ] && rm -f auth.json
         # Remove composer.json on project creation error only if Magento files were not generated
         [ "$CREATE_PROJECT" = "y" ] && [ ! -f "composer.lock" ] && [ ! -d "vendor" ] && rm -f composer.json
         exit 1

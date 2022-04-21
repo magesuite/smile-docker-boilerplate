@@ -81,4 +81,4 @@ YELLOW="$(tput setaf 3)"
 BLUE="$(tput setaf 4)"
 
 # Magento
-DOCKER_COMMAND="docker compose run --rm cli"
+DOCKER_COMMAND="docker compose run --rm php"

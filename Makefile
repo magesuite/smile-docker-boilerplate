@@ -2,7 +2,7 @@
 
 DOCKER_COMPOSE := docker compose
 DB_CONTAINER := db
-PHP_CONTAINER := cli
+PHP_CONTAINER := php
 PHP_CLI := $(DOCKER_COMPOSE) run --rm $(PHP_CONTAINER)
 VENDOR_BIN := $(PHP_CLI) vendor/bin
 DB_CONNECTION := --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE
