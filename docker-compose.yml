@@ -102,8 +102,6 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
-        volumes:
-            - redisdata:/data
 
     rabbitmq:
         image: ${RABBITMQ_IMAGE?RABBITMQ_IMAGE must be set.}
@@ -126,4 +124,3 @@ volumes:
     dbdata:
     esdata:
     rabbitmqdata:
-    redisdata:
