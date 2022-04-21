@@ -43,6 +43,7 @@ services:
         depends_on:
             - db
             - elasticsearch
+            - maildev
             - rabbitmq
             - redis
         volumes:
@@ -58,6 +59,7 @@ services:
         depends_on:
             - db
             - elasticsearch
+            - maildev
             - rabbitmq
             - redis
         volumes:
