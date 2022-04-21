@@ -99,6 +99,8 @@ services:
             - 5672
         env_file:
             - docker/env/rabbitmq.env
+        healthcheck:
+            test: 'rabbitmq-diagnostics -q ping'
         volumes:
             - rabbitmqdata:/var/lib/rabbitmq
 
