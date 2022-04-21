@@ -1,7 +1,9 @@
 # To list all available targets, type "make"
 
 DOCKER_COMPOSE := docker compose
-PHP_CLI := $(DOCKER_COMPOSE) run --rm cli
+DB_CONTAINER := db
+PHP_CONTAINER := cli
+PHP_CLI := $(DOCKER_COMPOSE) run --rm $(PHP_CONTAINER)
 VENDOR_BIN := $(PHP_CLI) vendor/bin
 DB_CONNECTION := --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE
 
@@ -67,17 +69,17 @@ sh: check-requirements ## Open a shell on the php container. Pass the parameter 
 
 .PHONY: db
 db: check-requirements ## Connect to the Magento database.
-	$(DOCKER_COMPOSE) exec db sh -c 'mysql $(DB_CONNECTION)'
+	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)'
 
 .PHONY: db-dump
 db-dump: check-requirements ## Dump the database. Pass the parameter "filename=" to customize the filename (default: dump.sql).
 	$(eval filename ?= 'dump.sql')
-	$(DOCKER_COMPOSE) exec db sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
+	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
 
 .PHONY: db-import
 db-import: check-requirements ## Import a database dump. Pass the parameter "filename=" to customize the filename (default: dump.sql).
-	@if [ -z "$(filename)" ]; then echo "Please provide a filename."; echo "Example: make db-import filename=dump.sql"; fi
-	$(DOCKER_COMPOSE) exec -T db sh -c 'mysql $(DB_CONNECTION)' < $(filename)
+	@if [ -z "$(filename)" ]; then echo "Please provide a filename."; echo "Example: make db-import filename=dump.sql"; exit 1; fi
+	$(DOCKER_COMPOSE) exec -T $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
 
 ## Composer
 .PHONY: composer
@@ -143,8 +145,7 @@ phpcs: check-requirements ## Run phpcs. Example: make phpcs
 phpmd: check-requirements ## Run phpmd. Example: make phpmd cmd="app/code xml phpmd.xml.dist"
 	@$(eval sources ?= app/code)
 	@$(eval format ?= ansi)
-	@$(eval ruleset ?= phpmd.xml.dist)
-	$(VENDOR_BIN)/phpmd $(sources) $(format) $(ruleset)
+	$(VENDOR_BIN)/phpmd $(sources) $(format) phpmd.xml.dist
 
 .PHONY: phpstan
 phpstan: check-requirements ## Run phpstan. Example: make phpstan
