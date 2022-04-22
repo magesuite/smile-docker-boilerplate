@@ -36,6 +36,16 @@ Magento projects have the following requirements:
 - Generate a [GitHub token](https://getcomposer.org/doc/articles/authentication-for-private-packages.md#github-oauth) if you don't already have one.
 - Get [Magento access keys](https://devdocs.magento.com/guides/v2.4/install-gde/prereq/connect-auth.html).
 
+### Smile Images
+
+This boilerplate uses images hosted on https://registry.smile.fr.
+
+In order to use these images, generate a CLI secret on https://registry.smile.fr (in your user settings), then run the following command:
+
+```
+docker login -u <youruser> -p <your_secret> registry.smile.fr
+```
+
 ## Installation
 
 ### Initial Setup
