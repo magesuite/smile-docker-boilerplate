@@ -387,7 +387,7 @@ if [ "$RUN_COMPOSER" = "y" ]; then
     echo && echo "${YELLOW}Magento will now be initialized with composer.${RESET}"
     echo
 
-    if ! $DOCKER_COMMAND sh -c "$COMMAND"; then
+    if ! docker compose run --rm --no-deps $PHP_CONTAINER sh -c "$COMMAND"; then
         echo "${RED}Failed to initialize the project, aborting.${RESET}"
         # Remove composer.json on project creation error only if Magento files were not generated
         [ "$CREATE_PROJECT" = "y" ] && [ ! -f "$MAGENTO_DIR/composer.lock" ] && [ ! -d "$MAGENTO_DIR/vendor" ] && rm -f "$MAGENTO_DIR/composer.json"

@@ -50,7 +50,7 @@ fi
 # Step 4 - Install Magento.
 ########
 
-MAGENTO_COMMAND="$DOCKER_COMMAND bin/magento"
+MAGENTO_COMMAND="docker compose run --rm $PHP_CONTAINER bin/magento"
 
 # Prepare the install command
 INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
