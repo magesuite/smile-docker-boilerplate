@@ -9,6 +9,7 @@
 /dev/tools/*.*
 /dev/tools/grunt
 /dev/tools/Magento
+/dev/tools/UpgradeScripts
 /generated
 /lib/.htaccess
 /lib/internal/GnuFreeFont
