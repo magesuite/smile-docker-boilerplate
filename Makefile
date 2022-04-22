@@ -4,7 +4,7 @@ DOCKER_COMPOSE := docker compose
 DB_CONTAINER := db
 PHP_CONTAINER := php
 PHP_CLI := $(DOCKER_COMPOSE) run --rm $(PHP_CONTAINER)
-VENDOR_BIN := $(PHP_CLI) vendor/bin
+VENDOR_BIN := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_CONTAINER) vendor/bin
 DB_CONNECTION := --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE
 
 .DEFAULT_GOAL := help
@@ -91,7 +91,7 @@ xdebug: check-requirements ## Toggles xdebug. Pass the parameter "value=" to for
 .PHONY: composer
 composer: check-requirements ## Run composer. Example: make composer cmd="config --list"
 	@$(eval cmd ?=)
-	$(PHP_CLI) composer $(cmd)
+	$(DOCKER_COMPOSE) run --rm --no-deps $(PHP_CONTAINER) composer $(cmd)
 
 .PHONY: composer-install
 composer-install: ## Run "composer install"

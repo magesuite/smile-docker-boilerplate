@@ -10,7 +10,7 @@ cd ../..
 . ./docker/bin/deps/utils.sh
 
 ########
-# Step 1 - Check system requirements
+# Step 1 - Check system requirements.
 ########
 
 STATUS=0
@@ -32,7 +32,7 @@ if [ "$STATUS" -gt 0 ]; then
 fi
 
 ########
-# Step 2 - Check env file
+# Step 2 - Check env file.
 ########
 
 if [ ! -f ".env" ]; then

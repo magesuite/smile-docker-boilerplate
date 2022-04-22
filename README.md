@@ -4,39 +4,56 @@
 
 ## Description
 
-This repository provides a boilerplate that allows to set up a Magento project using Docker Compose.
-It is the recommended boilerplate to use for Magento projects.
+This repository provides a boilerplate that allows to set up Magento projects with Docker Compose.
 
-It is compatible with Magento >= 2.4.2.
+It is compatible with Magento >= 2.4.0.
 For older Magento versions, use the [ansible skeleton](https://git.smile.fr/magento2/architecture-skeleton).
 
-/!\ It has never been tested with Mac/Windows.
-Consider yourself a beta tester if you don't use it on Linux.
+The documentation is not available yet, but this README explains how to set up a project.
 
-## Pre-requisites
+## Requirements
 
-This skeleton requires the following tools to be installed on your computer:
+### System Requirements
 
-- git
-- curl
+This boilerplate is currently only compatible with Linux.
+It requires the following tools to be installed:
+
+- Git
+- Bash (with basic utilities, such as curl, grep or sed)
 - [Docker](https://docs.docker.com/engine/install/)
 - [Docker Compose V2](https://docs.docker.com/compose/cli-command/#installing-compose-v2) (installed as a docker plugin)
 - [Traefik Proxy](https://git.smile.fr/docker/traefik) (to work on multiple projects at the same time)
 
-You don't need to install PHP or composer on your workstation.
+The Traefik proxy is optional, but strongly recommended.
+
+You don't need to install PHP on your workstation.
+
+### Composer Requirements
+
+This boilerplate uses composer to install Magento.
+Magento projects have the following requirements:
+
+- Generate a [GitHub token](https://getcomposer.org/doc/articles/authentication-for-private-packages.md#github-oauth) if you don't already have one.
+- Get [Magento access keys](https://devdocs.magento.com/guides/v2.4/install-gde/prereq/connect-auth.html).
 
 ## Installation
 
-### Setting Up a New Project
+### Initial Setup
 
-To set up a **new** Magento project with this skeleton:
+To set up a Magento project with this boilerplate:
 
-1. First, create a new directory that will host your project:
+1. Clone the boilerplate files in a directory:
 
     ```
     git clone --depth=1 git@git.smile.fr:docker/magento/boilerplate myproject \
     && cd "$_" \
     && rm -rf .git
+    ```
+
+    If you want to use this boilerplate with an existing Magento installation (e.g. Magento cloud), copy your Magento files to the "magento" directory:
+
+    ```
+    mv ~/path/to/magento magento
     ```
 
 2. Run the following script in this new directory:
@@ -45,34 +62,64 @@ To set up a **new** Magento project with this skeleton:
     make setup-project
     ```
 
-    This script will prompt for the project information (project name, Magento edition, version...).
-    It will initialize Magento with composer (you don't need to install composer, it runs within a container).
+    The script will behave differently depending on whether Magento files were found:
 
-3. Install the database:
+    - No Magento files found: the script will prompt you for the project information (project name, Magento files location, version, edition...), then initialize Magento with composer.
+    - Magento files found: the script will update the docker env files, and check if there is anything to add in composer.json (e.g. Smile modules or repositories).
+
+    By default, the script searches for the Magento files in the folder "magento".
+    The script allows you to change this location.
+    If you want to install Magento in the root directory, when the script prompts you for the folder location, choose "./".
+
+3. Launch all containers:
 
     ```
-    make up setup-install
+    make up
+    ```
+   
+   Then, make sure that they are running and healthy with the following command:
+
+   ```
+   make ps
+   ```
+   
+   If some containers are still starting, wait a bit until they are all running before proceeding to the next step.
+
+4. Install the database:
+
+    ```
+    make setup-install
     ```
 
-4. Check if Magento is available at the following URLs:
+5. Check if Magento is available at the following URLs:
     - https://{project_name}.docker.localhost
     - https://{project_name}.docker.localhost/admin (user: "admin", password: "magent0")
 
-5. Commit your project:
+6. Commit your project.
+   We recommend storing docker and Magento files in two separate repositories (e.g. with a git submodule).
 
-    ```
-    git init
-    git remote add origin <your_repo_url>
-    git add .
-    git commit -m "Initial commit"
-    git push origin master
-    ```
+   For example:
 
-### Setting up an Existing Project
+   ```
+   cd magento/
+   git init
+   git remote add origin git@git.smile.fr:myproject/magento.git
+   git add .
+   git commit -m "Initial commit"
+   git push origin master
 
-To set up a project that was already initialized with the boilerplate:
+   cd ..
+   git init
+   git remote add origin git@git.smile.fr:myproject/docker.git
+   git submodule add ./magento/ magento/
+   git add .
+   git commit -m "Initial commit"
+   git push origin master
+   ```
 
-1. Clone the project repository.
+### Installing an Existing Boilerplate
+
+1. Clone the project repository. If it was set up with git submodules, use `git clone --recurse-submodules`.
 
 2. Initialize the vendor directory with the following command:
 
@@ -80,11 +127,21 @@ To set up a project that was already initialized with the boilerplate:
     make composer-install
     ```
 
-3. Install the database:
+    It might ask you to provide a composer GitHub token.
+
+3. Launch all containers:
 
     ```
-    make up setup-install
+    make up
     ```
+   
+   Then, make sure that they are running and healthy with the following command:
+
+   ```
+   make ps
+   ```
+   
+   If some containers are still starting, wait a bit until they are all running before proceeding to the next step.
 
 4. Check if Magento is available at the following URLs:
     - https://{project_name}.docker.localhost

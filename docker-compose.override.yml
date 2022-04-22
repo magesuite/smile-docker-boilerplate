@@ -14,7 +14,7 @@ services:
 
     web:
         volumes:
-            - ./:/var/www/html:rw,cached
+            - ${MAGENTO_DIR?MAGENTO_DIR must be set.}:/var/www/html:rw,cached
 
     php:
         image: ${PHP_FPM_DEV_IMAGE?PHP_FPM_DEV_IMAGE must be set.}
@@ -22,7 +22,7 @@ services:
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
-            - ./:/var/www/html:rw,cached
+            - ${MAGENTO_DIR?MAGENTO_DIR must be set.}:/var/www/html:rw,cached
             - composer-cache:/tmp/composer
             - npm-cache:/tmp/npm
 
@@ -33,7 +33,7 @@ services:
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
-            - ./:/var/www/html:rw,cached
+            - ${MAGENTO_DIR?MAGENTO_DIR must be set.}:/var/www/html:rw,cached
 
     elasticsearch:
         labels:
