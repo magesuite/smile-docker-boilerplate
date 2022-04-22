@@ -16,6 +16,8 @@ services:
             - 80
             - 443
             - 8080
+        env_file:
+            - docker/env/nginx.env
         depends_on:
             - php
         volumes:
