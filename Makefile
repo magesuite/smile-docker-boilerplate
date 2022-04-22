@@ -84,8 +84,11 @@ db-import: check-requirements ## Import a database dump. Pass the parameter "fil
 .PHONY: xdebug
 xdebug: check-requirements ## Toggles xdebug. Pass the parameter "value=" to force a specific value for XDEBUG_MODE.
 	@$(eval value ?=)
-	./docker/bin/xdebug $(value)
-	$(DOCKER_COMPOSE) up -d --no-deps $(PHP_CONTAINER)
+	./docker/bin/toggle-xdebug $(value)
+
+.PHONY: cron
+cron: check-requirements ## Toggles the cron container.
+	./docker/bin/toggle-cron
 
 ## Composer
 .PHONY: composer

@@ -81,4 +81,6 @@ YELLOW="$(tput setaf 3)"
 BLUE="$(tput setaf 4)"
 
 # Docker
+DOCKER_COMPOSE="docker compose"
 PHP_CONTAINER="php"
+CRON_CONTAINER="cron"

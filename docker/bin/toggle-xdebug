@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Toggles xdebug on/off.
+# Toggles xdebug.
 
 set -e
 
@@ -35,3 +35,5 @@ fi
 
 sed -i "s/^XDEBUG_MODE=.*/XDEBUG_MODE=$VALUE/" docker/env/php.env
 echo "${GREEN}XDEBUG_MODE was set to \"$VALUE\".${RESET}"
+
+$($DOCKER_COMPOSE up -d --no-deps "$PHP_CONTAINER")
