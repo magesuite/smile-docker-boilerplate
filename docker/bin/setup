@@ -47,10 +47,17 @@ check_intranet_reachable () {
     fi
 }
 
+# Initialize Smile packagist URLs, PHP version, composer version and module versions.
+init_vars () {
+    init_smile_packagist_url "$SMILE_PACKAGIST"
+    init_php_version "$MAGENTO_VERSION"
+    init_composer_version "$MAGENTO_VERSION"
+}
+
 # Get PHP version from Magento version.
 init_php_version () {
-    if [ $(version_compare "$1" "2.4.2") = "<" ]; then
-        echo "${RED}The version must be greater or equal to 2.4.2.${RESET}"
+    if [ $(version_compare "$1" "2.4.0") = "<" ]; then
+        echo "${RED}The version must be greater or equal to 2.4.0.${RESET}"
         exit 1
     elif [ $(version_compare "$1" "2.4.4") = "<" ]; then
         PHP_VERSION="7.4"
@@ -59,6 +66,15 @@ init_php_version () {
     else
         echo "${RED}The Magento version \"$1\" is not managed yet by this script.${RESET}"
         exit 1
+    fi
+}
+
+# Get composer version from Magento version.
+init_composer_version () {
+    if [ $(version_compare "$1" "2.4.2") = "<" ]; then
+        COMPOSER_VERSION="1"
+    else
+        COMPOSER_VERSION="2"
     fi
 }
 
@@ -83,19 +99,17 @@ read_project_name () {
 read_magento_version () {
     [ "$CREATE_PROJECT" = "y" ] && QUESTION="Magento version:" || QUESTION="What is your current Magento version?"
     while
-        ask_input RESULT "$QUESTION" "$MAGENTO_VERSION"
-        ! [[ "$RESULT" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]] && echo "${RED}\"$RESULT\" is not a valid version number.${RESET}"
+        ask_input MAGENTO_VERSION "$QUESTION" "$DEFAULT_MAGENTO_VERSION"
+        ! [[ "$MAGENTO_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]] && echo "${RED}\"$MAGENTO_VERSION\" is not a valid version number.${RESET}"
     do true; done
-    MAGENTO_VERSION="$RESULT"
 }
 
 # Read Magento edition from user input
 read_magento_edition () {
     while
-        ask_input RESULT "Magento edition (${BLUE}community${GREEN} or ${BLUE}enterprise${GREEN})${RESET}." "$MAGENTO_EDITION"
-        [ "$RESULT" != "community" ] && [ "$RESULT" != "enterprise" ] && echo "${RED}The magento edition \"$RESULT\" is not valid.${RESET}"
+        ask_input MAGENTO_EDITION "Magento edition (${BLUE}community${GREEN} or ${BLUE}enterprise${GREEN})${RESET}." "$DEFAULT_MAGENTO_EDITION"
+        [ "$MAGENTO_EDITION" != "community" ] && [ "$MAGENTO_EDITION" != "enterprise" ] && echo "${RED}The magento edition \"$MAGENTO_EDITION\" is not valid.${RESET}"
     do true; done
-    MAGENTO_EDITION="$RESULT"
 }
 
 # Read Smile packagist repository from user input
@@ -106,10 +120,9 @@ read_smile_packagist () {
     fi
 
     while
-        ask_input RESULT "$QUESTION" "$SMILE_PACKAGIST"
-        [ "$RESULT" != "internal" ] && [ "$RESULT" != "public" ] && echo "${RED}The repository type \"$RESULT\" is not valid.${RESET}"
+        ask_input SMILE_PACKAGIST "$QUESTION" "$DEFAULT_SMILE_PACKAGIST"
+        [ "$SMILE_PACKAGIST" != "internal" ] && [ "$SMILE_PACKAGIST" != "public" ] && echo "${RED}The repository type \"$SMILE_PACKAGIST\" is not valid.${RESET}"
     do true; done
-    SMILE_PACKAGIST="$RESULT"
 
     if [ "$SMILE_PACKAGIST" = "public" ]; then
         echo && echo "${YELLOW}Warning:${RESET} The public packagist https://packagist.smile.fr requires an authenticated user account."
@@ -118,9 +131,8 @@ read_smile_packagist () {
 }
 
 # Read whether to install Smile modules from user input
-read_smile_modules () {
-    ask_yes_no RESULT "Please choose whether to install Smile tools (module-debug-toolbar, module-patch, module-reconfigure, module-varnish, smileanalyser)." "$SMILE_MODULES"
-    SMILE_MODULES="$RESULT"
+read_add_smile_modules () {
+    ask_yes_no ADD_SMILE_MODULES "Please choose whether to install Smile tools (module-debug-toolbar, module-patch, module-reconfigure, module-varnish, smileanalyser)." "$DEFAULT_ADD_SMILE_MODULES"
 }
 
 # Prints a summary of the project information.
@@ -128,14 +140,19 @@ print_project_summary () {
     echo && echo "${YELLOW}Project summary:${RESET}"
     echo "- Project name: ${BLUE}$PROJECT_NAME${RESET}"
     echo "- PHP version: ${BLUE}$PHP_VERSION${RESET}"
-    echo "- Magento version: ${BLUE}$MAGENTO_VERSION${RESET}"
 
     if [ "$CREATE_PROJECT" = "y" ]; then
+        echo "- Magento version: ${BLUE}$MAGENTO_VERSION${RESET}"
         echo "- Magento edition: ${BLUE}$MAGENTO_EDITION${RESET}"
     fi
 
-    echo "- Smile repository URL: ${BLUE}$SMILE_PACKAGIST_URL${RESET}"
-    echo "- Install Smile modules: ${BLUE}$SMILE_MODULES${RESET}"
+    if [ "$CREATE_PROJECT" = "y" ] || [ "$ADD_SMILE_PACKAGIST" = "y" ]; then
+        echo "- Smile repository URL: ${BLUE}$SMILE_PACKAGIST_URL${RESET}"
+    fi
+
+    if [ "$CREATE_PROJECT" = "y" ] || [ "$ADD_SMILE_MODULES" = "y" ]; then
+        echo "- Install Smile modules: ${BLUE}$ADD_SMILE_MODULES${RESET}"
+    fi
 }
 
 # Get the composer create-project command.
@@ -143,21 +160,21 @@ get_composer_create_project_cmd () {
     TEMP_DIR="/tmp/magento-project"
 
     COMMAND="composer create-project --no-install --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_DIR && \
-        composer -d $TEMP_DIR config repositories.smile_libraries composer $SMILE_PACKAGIST_URL/libraries/ && \
-        composer -d $TEMP_DIR config repositories.smile_magento2 composer $SMILE_PACKAGIST_URL/magento2/"
+        composer config -d $TEMP_DIR repositories.smile_libraries composer $SMILE_PACKAGIST_URL/libraries/ && \
+        composer config -d $TEMP_DIR repositories.smile_magento2 composer $SMILE_PACKAGIST_URL/magento2/"
 
-    if [ "$SMILE_MODULES" = "y" ]; then
+    if [ "$ADD_SMILE_MODULES" = "y" ]; then
         COMMAND="$COMMAND && \
-            composer -d $TEMP_DIR require --no-update smile/module-reconfigure smile/module-patch smile/module-varnish && \
-            composer -d $TEMP_DIR require --dev --no-update smile/module-debug-toolbar smile-sa/smileanalyser"
+            composer require -d $TEMP_DIR --no-update $SMILE_MODULES && \
+            composer require -d $TEMP_DIR --dev --no-update $SMILE_DEV_MODULES"
     fi
 
-    # Delete global auth file, copy composer.json file to the project directory, and run composer install
+    # Copy composer.json file to the project directory and run composer install
     COMMAND="$COMMAND && \
-        mv $TEMP_DIR/* . && rm -rf $TEMP_DIR && \
+        mv $TEMP_DIR/composer.json . && rm -rf $TEMP_DIR && \
         cp -f .gitignore /tmp && composer install && mv /tmp/.gitignore ."
 
-    if [ "$SMILE_MODULES" = "y" ] && [ ! -f ".smileanalyser.yaml" ]; then
+    if [ "$ADD_SMILE_MODULES" = "y" ] && [ ! -f ".smileanalyser.yaml" ]; then
         COMMAND="$COMMAND && vendor/bin/SmileAnalyser init --type Magento2"
     fi
 
@@ -174,7 +191,7 @@ get_composer_update_command () {
             composer config repositories.smile_magento2 composer $SMILE_PACKAGIST_URL/magento2/"
     fi
 
-    if [ "$SMILE_MODULES" = "y" ]; then
+    if [ "$ADD_SMILE_MODULES" = "y" ]; then
         COMMAND="$COMMAND &&
             composer require --no-update smile/module-reconfigure smile/module-patch smile/module-varnish && \
             composer require --dev --no-update smile/module-debug-toolbar smile-sa/smileanalyser"
@@ -182,7 +199,7 @@ get_composer_update_command () {
 
     COMMAND="$COMMAND && composer update && mv /tmp/.gitignore ."
 
-    if [ "$SMILE_MODULES" = "y" ] && [ ! -f ".smileanalyser.yaml" ]; then
+    if [ "$ADD_SMILE_MODULES" = "y" ] && [ ! -f ".smileanalyser.yaml" ]; then
         COMMAND="$COMMAND && vendor/bin/SmileAnalyser init --type Magento2"
     fi
 
@@ -204,15 +221,20 @@ check_setup_requirements
 ########
 
 . ./.env
-. ./docker/env/magento.env
 
-# Set default values for variables that are not present in magento.env
-MAGENTO_EDITION=${MAGENTO_EDITION:-"community"}
-SMILE_MODULES=${SMILE_MODULES:-"y"}
+# Default values
+DEFAULT_MAGENTO_VERSION=2.4.4
+DEFAULT_MAGENTO_EDITION=community
+DEFAULT_SMILE_PACKAGIST=internal
+DEFAULT_ADD_SMILE_MODULES=y
 
 # Packagist URLs
 MAGENTO_PACKAGIST_URL="https://repo.magento.com/"
 init_smile_packagist_url "$SMILE_PACKAGIST"
+
+# Modules list
+SMILE_MODULES="smile/module-patch=^1.0 smile/module-reconfigure=^5.0 smile/module-varnish=^4.0"
+SMILE_DEV_MODULES="smile/module-debug-toolbar=^5.0 smile-sa/smileanalyser=^8.0"
 
 # Installation mode is based on the presence of composer.json file
 [ ! -f "composer.json" ] && CREATE_PROJECT=y || CREATE_PROJECT=n
@@ -237,19 +259,19 @@ if [ "$CREATE_PROJECT" = "y" ]; then
     read_magento_version
     read_magento_edition
     read_smile_packagist
-    read_smile_modules
-    init_smile_packagist_url "$SMILE_PACKAGIST"
-    init_php_version "$MAGENTO_VERSION"
+    read_add_smile_modules
+    init_vars
     print_project_summary
     RUN_COMPOSER=y
 
     ask_yes_no RESULT "Run composer create-project with the above information?"
 else
     # Existing project: ask only for information required to update env files and composer.json/composer.auth files
+    DEFAULT_MAGENTO_VERSION=
     read_project_name
     read_magento_version
     ADD_SMILE_PACKAGIST=n
-    RUN_COMPOSER=n
+    [ -d "vendor" ] && RUN_COMPOSER=y || RUN_COMPOSER=n
 
     if grep -F -e packagist.galaxy.intranet composer.json > /dev/null; then
         echo && echo "${GREEN}✓ Smile packagist repository is aleady defined in composer.json.${RESET}"
@@ -258,23 +280,27 @@ else
         echo && echo "${GREEN}✓ Smile packagist repository is already defined in composer.json.${RESET}"
         SMILE_PACKAGIST=public
     else
-        echo && echo "${YELLOW}Smile packagist repository is not set in composer.json.${RESET}"
-        read_smile_packagist
-        RUN_COMPOSER=y
-        ADD_SMILE_PACKAGIST=y
+        ask_yes_no RESULT "${YELLOW}Smile packagist repository is not set in composer.json. Do you want to add it?${RESET}"
+        if [ "$RESULT" = "y" ]; then
+            read_smile_packagist
+            RUN_COMPOSER=y
+            ADD_SMILE_PACKAGIST=y
+        fi
     fi
 
     if grep -F -e smile/module-debug-toolbar -e smile/module-patch -e smile/module-reconfigure -e smile/module-varnish -e smile-sa/smileanalyser composer.json > /dev/null; then
         echo && echo "${GREEN}✓ Smile modules are already defined in composer.json.${RESET}"
-        SMILE_MODULES=n
+        ADD_SMILE_MODULES=n
     else
-        echo && echo "${YELLOW}Smile modules are not set in composer.json.${RESET}"
-        read_smile_modules
-        [ "$SMILE_MODULES" = "y" ] && RUN_COMPOSER=y
+        ask_yes_no RESULT "${YELLOW}Smile modules are not set in composer.json. Do you want to add them?${RESET}"
+        if [ "$RESULT" = "y" ]; then
+            read_add_smile_modules
+            [ "$ADD_SMILE_MODULES" = "y" ] && RUN_COMPOSER=y
+        fi
     fi
 
-    init_smile_packagist_url "$SMILE_PACKAGIST"
-    init_php_version "$MAGENTO_VERSION"
+    init_vars
+    init_magento_settings "$MAGENTO_VERSION"
     print_project_summary
 
     if [ "$RUN_COMPOSER" = "y" ]; then
@@ -297,9 +323,8 @@ sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env.sample
 sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
 sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env.sample
 echo && echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\" and \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.sample.${RESET}"
-sed -i "s/^MAGENTO_VERSION=.*/MAGENTO_VERSION=$MAGENTO_VERSION/" docker/env/magento.env
-sed -i "s/^SMILE_PACKAGIST=.*/SMILE_PACKAGIST=$SMILE_PACKAGIST/" docker/env/magento.env
-echo "${GREEN}✓ Updated \$MAGENTO_VERSION to \"$MAGENTO_VERSION\" and \$SMILE_PACKAGIST to \"$SMILE_PACKAGIST\" in docker/env/magento.env.${RESET}"
+sed -i "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" docker/env/php.env
+echo "${GREEN}✓ Updated \$COMPOSER_VERSION to \"$COMPOSER_VERSION\" in docker/env/php.env.${RESET}"
 
 ########
 # Step 5 - Run composer
