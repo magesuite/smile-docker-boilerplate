@@ -9,7 +9,7 @@ cd ../..
 
 . ./docker/bin/deps/utils.sh
 
-# Check requirements specific to this setup
+# Check requirements specific to this setup.
 check_setup_requirements () {
     STATUS=0
 
@@ -92,7 +92,7 @@ validate_magento_dir () {
     [ "${1:0:2}" = "./" ] && [ "$(echo "$1" | tr -d 'a-z0-9-')" = "./" ]
 }
 
-# Read Magento root directory from user input
+# Read Magento root directory from user input.
 read_magento_dir () {
     while
         ask_input MAGENTO_DIR "Please enter the directory where the Magento files are or will be installed." "$DEFAULT_MAGENTO_DIR"
@@ -100,7 +100,7 @@ read_magento_dir () {
     do true; done
 }
 
-# Read project name from user input
+# Read project name from user input.
 read_project_name () {
     while
         ask_input PROJECT_NAME "Please enter your project name.\n${RESET}Allowed characters: [a-z0-9-]. Do not use capitalized letters, underscores, dots, etc." $PROJECT_NAME
@@ -108,7 +108,7 @@ read_project_name () {
     do true; done
 }
 
-# Read Magento version from user input
+# Read Magento version from user input.
 read_magento_version () {
     [ "$CREATE_PROJECT" = "y" ] && QUESTION="Magento version:" || QUESTION="What is your current Magento version?"
     while
@@ -117,7 +117,7 @@ read_magento_version () {
     do true; done
 }
 
-# Read Magento edition from user input
+# Read Magento edition from user input.
 read_magento_edition () {
     while
         ask_input MAGENTO_EDITION "Magento edition (${BLUE}community${GREEN} or ${BLUE}enterprise${GREEN})${RESET}." "$DEFAULT_MAGENTO_EDITION"
@@ -125,7 +125,7 @@ read_magento_edition () {
     do true; done
 }
 
-# Read Smile packagist repository from user input
+# Read Smile packagist repository from user input.
 read_smile_packagist () {
     QUESTION="Smile packagist repository (${BLUE}internal${GREEN} for https://packagist.galaxy.intranet, or ${BLUE}public${GREEN} for https://packagist.smile.fr).${RESET}"
     if [ "$CREATE_PROJECT" = "n" ]; then
@@ -143,7 +143,7 @@ read_smile_packagist () {
     fi
 }
 
-# Read whether to install Smile modules from user input
+# Read whether to install Smile modules from user input.
 read_add_smile_modules () {
     ask_yes_no ADD_SMILE_MODULES "Please choose whether to install Smile tools (module-debug-toolbar, module-patch, module-reconfigure, module-varnish, smileanalyser)." "$DEFAULT_ADD_SMILE_MODULES"
 }
