@@ -55,7 +55,7 @@ To set up a Magento project with this boilerplate:
 1. Clone the boilerplate files in a directory:
 
     ```
-    git clone --depth=1 git@git.smile.fr:docker/magento/boilerplate myproject \
+    git clone --depth=1 git@git.smile.fr:magento2/docker-boilerplate myproject \
     && cd "$_" \
     && rm -rf .git
     ```
