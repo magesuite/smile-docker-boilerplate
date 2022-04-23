@@ -82,12 +82,12 @@ db-import: check-requirements ## Import a database dump. Pass the parameter "fil
 	$(DOCKER_COMPOSE) exec -T $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
 
 .PHONY: xdebug
-xdebug: check-requirements ## Toggles xdebug. Pass the parameter "value=" to force a specific value for XDEBUG_MODE.
+xdebug: check-requirements ## Toggle xdebug. Pass the parameter "value=" to force a specific value for XDEBUG_MODE.
 	@$(eval value ?=)
 	./docker/bin/toggle-xdebug $(value)
 
 .PHONY: cron
-cron: check-requirements ## Toggles the cron container.
+cron: check-requirements ## Toggle the cron container.
 	./docker/bin/toggle-cron
 
 ## Composer
@@ -97,12 +97,12 @@ composer: check-requirements ## Run composer. Example: make composer cmd="config
 	$(DOCKER_COMPOSE) run --rm --no-deps $(PHP_CONTAINER) composer $(cmd)
 
 .PHONY: composer-install
-composer-install: ## Run "composer install"
+composer-install: ## Run "composer install".
 composer-install: cmd=install
 composer-install: composer
 
 .PHONY: composer-update
-composer-update: ## Run "composer update"
+composer-update: ## Run "composer update".
 composer-update: cmd=update
 composer-update: composer
 
