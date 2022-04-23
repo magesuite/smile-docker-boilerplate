@@ -106,26 +106,38 @@ To set up a Magento project with this boilerplate:
     - https://{project_name}.docker.localhost/admin (user: "admin", password: "magent0")
 
 6. Commit your project.
-   We recommend storing docker and Magento files in two separate repositories (e.g. with a git submodule).
 
-   For example:
+    - If you opted to create Magento in a sub directory (default behavior), we recommend storing docker and Magento files in two separate repositories (e.g. with a git submodule).
+      For example:
 
-   ```
-   cd magento/
-   git init
-   git remote add origin git@git.smile.fr:myproject/magento.git
-   git add .
-   git commit -m "Initial commit"
-   git push origin master
+      ```
+      cd magento/
+      git init
+      git remote add origin git@git.smile.fr:myproject/magento.git
+      git add .
+      git commit -m "Initial commit"
+      git push origin master
 
-   cd ..
-   git init
-   git remote add origin git@git.smile.fr:myproject/docker.git
-   git submodule add ./magento/ magento/
-   git add .
-   git commit -m "Initial commit"
-   git push origin master
-   ```
+      cd ..
+      git init
+      git remote add origin git@git.smile.fr:myproject/docker.git
+      git submodule add ./magento/ magento/
+      git add .
+      git commit -m "Initial commit"
+      git push origin master
+      ```
+
+      Another option is to add the magento directory to the .gitignore file, and do the same as above but without adding a sub module.
+
+    - If you opted to create Magento in the root directory, just commit everything in the same repository:
+
+      ```
+      git init
+      git remote add origin git@git.smile.fr:myproject/magento.git
+      git add .
+      git commit -m "Initial commit"
+      git push origin master
+      ```
 
 ### Installing an Existing Boilerplate
 
