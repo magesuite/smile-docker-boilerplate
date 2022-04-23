@@ -354,11 +354,6 @@ echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$MAGENTO_DIR to 
 sed -i "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" docker/env/php.env
 echo "${GREEN}✓ Updated \$COMPOSER_VERSION to \"$COMPOSER_VERSION\" in docker/env/php.env.${RESET}"
 
-if [ "$MAGENTO_DIR" != "./" ] && [ "$MAGENTO_DIR" != "$DEFAULT_MAGENTO_DIR" ]; then
-    sed -i "s/^${DEFAULT_MAGENTO_DIR//\//\\/}/${MAGENTO_DIR//\//\\/}/" .gitignore
-    echo "${GREEN}✓ Updated Magento root directory to \"$MAGENTO_DIR\" in .gitignore.${RESET}"
-fi
-
 if [ "$CREATE_PROJECT" = "n" ]; then
     ask_yes_no RESULT "Move files in docker/conf/magento to the Magento root directory?" y
     if [ "$RESULT" = "y" ]; then
