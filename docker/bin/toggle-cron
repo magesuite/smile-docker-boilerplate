@@ -17,7 +17,7 @@ fi
 . ./.env
 
 if [ "$CRON_COMMAND" = "true" ]; then
-    VALUE="run-command"
+    VALUE="run-cron"
     STATUS="enabled"
 else
     VALUE="true"
