@@ -74,12 +74,11 @@ To set up a Magento project with this boilerplate:
 
     The script will behave differently depending on whether Magento files were found:
 
-    - No Magento files found: the script will prompt you for the project information (project name, Magento files location, version, edition...), then initialize Magento with composer.
+    - No Magento files found: the script will prompt you for the project information (project name, version, edition...), then initialize Magento with composer.
     - Magento files found: the script will update the docker env files, and check if there is anything to add in composer.json (e.g. Smile modules or repositories).
 
     By default, the script searches for the Magento files in the folder "magento".
-    The script allows you to change this location.
-    If you want to install Magento in the root directory, when the script prompts you for the folder location, choose "./".
+    If you want to install Magento in the root directory, set $MAGENTO_DIR to "./" in .env.sample before running the script.
 
 3. Launch all containers:
 

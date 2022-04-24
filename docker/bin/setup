@@ -87,19 +87,6 @@ init_smile_packagist_url () {
     fi
 }
 
-# Validate the Magento directory name (e.g. "./magento").
-validate_magento_dir () {
-    [ "${1:0:2}" = "./" ] && [ "$(echo "$1" | tr -d 'a-z0-9-')" = "./" ]
-}
-
-# Read Magento root directory from user input.
-read_magento_dir () {
-    while
-        ask_input MAGENTO_DIR "Please enter the directory where the Magento files are or will be installed." "$DEFAULT_MAGENTO_DIR"
-        ! validate_magento_dir "$MAGENTO_DIR" && echo "${RED}The directory name must begin with \"./\". Use only lowercase letters, numbers, and hyphens.${RESET}"
-    do true; done
-}
-
 # Read project name from user input.
 read_project_name () {
     while
@@ -260,15 +247,10 @@ SMILE_MODULES="smile/module-patch=^1.0 smile/module-reconfigure=^5.0 smile/modul
 SMILE_DEV_MODULES="smile/module-debug-toolbar=^5.0 smile-sa/smileanalyser=^8.0"
 
 ########
-# Step 3 - Find Magento directory.
+# Step 3 - Find Magento sources.
 ########
 
-if [ -f "$MAGENTO_DIR/composer.json" ]; then
-    CREATE_PROJECT=n
-else
-    read_magento_dir
-    [ -f "$MAGENTO_DIR/composer.json" ] && CREATE_PROJECT=n || CREATE_PROJECT=y
-fi
+[ -f "$MAGENTO_DIR/composer.json" ] && CREATE_PROJECT=n || CREATE_PROJECT=y
 
 if [ "$CREATE_PROJECT" = "y" ]; then
     echo && echo "No composer.json file found in $MAGENTO_DIR directory. This setup will initialize a new Magento project for you."
