@@ -13,6 +13,8 @@ services:
             - traefik.http.routers.$PROJECT_NAME-magento-https.tls=true
 
     web:
+        image: nginx-self-signed:alpine-1.21
+        build: ./docker/images/nginx
         volumes:
             - ${MAGENTO_DIR?MAGENTO_DIR must be set.}:/var/www/html:rw,cached
 
