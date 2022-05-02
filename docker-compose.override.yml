@@ -13,7 +13,7 @@ services:
             - traefik.http.routers.$PROJECT_NAME-magento-https.tls=true
 
     web:
-        image: nginx-self-signed:alpine-1.21
+        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_web
         build: ./docker/images/nginx
         volumes:
             - ${MAGENTO_DIR?MAGENTO_DIR must be set.}:/var/www/html:rw,cached
@@ -21,7 +21,6 @@ services:
     php:
         image: ${PHP_FPM_DEV_IMAGE?PHP_FPM_DEV_IMAGE must be set.}
         user: ${DOCKER_UID?DOCKER_UID must be set.}:${DOCKER_GID?DOCKER_GID must be set.}
-
         environment:
             COMPOSER_AUTH: ${COMPOSER_AUTH:-}
             XDEBUG_MODE: ${XDEBUG_MODE:-off}
