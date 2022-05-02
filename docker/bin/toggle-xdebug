@@ -8,7 +8,13 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 cd ../..
 
 . ./docker/bin/deps/utils.sh
-. ./docker/env/php.env
+
+if [ ! -f ".env" ]; then
+    echo "${RED}The file .env does not exist.${RESET}"
+    exit 1
+fi
+
+. ./.env
 
 XDEBUG_DEFAULT=develop,debug
 
@@ -33,7 +39,7 @@ else
     fi
 fi
 
-sed -i "s/^XDEBUG_MODE=.*/XDEBUG_MODE=$VALUE/" docker/env/php.env
+sed -i "s/^XDEBUG_MODE=.*/XDEBUG_MODE=$VALUE/" .env
 echo "${GREEN}XDEBUG_MODE was set to \"$VALUE\".${RESET}"
 
 $($DOCKER_COMPOSE up -d --no-deps "$PHP_CONTAINER")

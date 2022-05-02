@@ -65,7 +65,7 @@ if [ ! -f ".env" ]; then
         fi
 
         if [ -n "$COMPOSER_GITHUB_TOKEN" ]; then
-            sed -i "s/^COMPOSER_GITHUB_TOKEN=.*/COMPOSER_GITHUB_TOKEN=$COMPOSER_GITHUB_TOKEN/g" .env
+            sed -i "s/^#COMPOSER_AUTH=.*/COMPOSER_AUTH={\"github-oauth\":{\"github.com\":\"$COMPOSER_GITHUB_TOKEN\"}}/g" .env
             echo "${GREEN}✓ Your composer GitHub token was saved in .env.${RESET}"
             echo
         fi

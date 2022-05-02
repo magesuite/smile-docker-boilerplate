@@ -21,6 +21,10 @@ services:
     php:
         image: ${PHP_FPM_DEV_IMAGE?PHP_FPM_DEV_IMAGE must be set.}
         user: ${DOCKER_UID?DOCKER_UID must be set.}:${DOCKER_GID?DOCKER_GID must be set.}
+
+        environment:
+            COMPOSER_AUTH: ${COMPOSER_AUTH:-}
+            XDEBUG_MODE: ${XDEBUG_MODE:-off}
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
