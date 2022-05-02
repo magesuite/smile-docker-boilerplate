@@ -164,7 +164,13 @@ To set up a Magento project with this boilerplate:
    
    If some containers are still starting, wait a bit until they are all running before proceeding to the next step.
 
-4. Check if Magento is available at the following URLs:
+4. Install the database:
+
+    ```
+    make setup-install
+    ```
+
+5. Check if Magento is available at the following URLs:
     - https://{project_name}.docker.localhost
     - https://{project_name}.docker.localhost/admin (user: "admin", password: "magent0")
 
