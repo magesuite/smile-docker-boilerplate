@@ -100,9 +100,18 @@ db-export: ## Dump the database. Pass the parameter "filename=" to set the filen
 	$(eval filename ?= 'dump.sql')
 	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
 
-.PHONY: cron
-cron: check-requirements ## Toggle the cron container.
-	./docker/bin/toggle-cron
+.PHONY: toggle-cron
+toggle-cron: ## Enable/disable the cron container.
+ifeq ($(CRON_COMMAND), true)
+	$(eval VALUE := run-cron)
+	$(eval STATUS := enabled)
+else
+	$(eval VALUE := true)
+	$(eval STATUS := disabled)
+endif
+	@$(SEDI) -e "s/^CRON_COMMAND=.*/CRON_COMMAND=$(VALUE)/" .env
+	@echo "CRON_COMMAND was set to \"$(VALUE)\" in .env file ($(STATUS))."
+	$(DOCKER_COMPOSE) up -d --no-deps cron
 
 ## Composer
 .PHONY: composer
