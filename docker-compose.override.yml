@@ -19,11 +19,15 @@ services:
             - ${MAGENTO_DIR?MAGENTO_DIR must be set.}:/var/www/html:rw,cached
 
     php:
-        image: ${PHP_FPM_DEV_IMAGE?PHP_FPM_DEV_IMAGE must be set.}
+        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
+        build:
+            context: ./docker/images/php
+            args:
+                PHP_VERSION: ${PHP_VERSION?PHP_VERSION must be set.}
+                COMPOSER_VERSION: ${COMPOSER_VERSION?COMPOSER_VERSION must be set.}
         user: ${DOCKER_UID?DOCKER_UID must be set.}:${DOCKER_GID?DOCKER_GID must be set.}
         environment:
             COMPOSER_AUTH: ${COMPOSER_AUTH:-}
-            XDEBUG_MODE: ${XDEBUG_MODE:-off}
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
@@ -32,9 +36,15 @@ services:
             - npm-cache:/tmp/npm
 
     cron:
-        image: ${PHP_FPM_DEV_IMAGE?PHP_FPM_DEV_IMAGE must be set.}
-        env_file:
-            - .env # to synchronize www-data and host uid/gid
+        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_cron
+        build:
+            context: ./docker/images/php
+            args:
+                PHP_VERSION: ${PHP_VERSION?PHP_VERSION must be set.}
+                COMPOSER_VERSION: ${COMPOSER_VERSION?COMPOSER_VERSION must be set.}
+        environment:
+            DOCKER_UID: ${DOCKER_UID?DOCKER_UID must be set.}
+            DOCKER_GID: ${DOCKER_GID?DOCKER_GID must be set.}
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:

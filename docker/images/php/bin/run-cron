@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+
+if [ $(id -u) -ne 0 ]; then
+    echo "The script run-cron must be run as root."
+    exit 1
+fi
+
+if [ -z "$CRONTAB" ]; then
+    echo "You must specify a crontab with the environment variable \$CRONTAB."
+    exit 1
+fi
+
+# Update UID and GID of www-data user
+if [ -n "$DOCKER_UID" ] && [ "$DOCKER_UID" != $(id -u www-data) ]; then
+    usermod --uid $DOCKER_UID www-data
+fi
+
+if [ -n "$DOCKER_GID" ] && [ "$DOCKER_GID" != $(id -g www-data) ]; then
+    groupmod --gid $DOCKER_GID www-data
+fi
+
+echo "$CRONTAB" > /tmp/crontab
+crontab -u www-data /tmp/crontab
+rm -f /tmp/crontab
+crond -f
