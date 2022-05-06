@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
     varnish:
-        image: ${VARNISH_IMAGE?VARNISH_IMAGE must be set.}
+        image: ${VARNISH_IMAGE}
         ports:
             - 80
         depends_on:
@@ -11,7 +11,7 @@ services:
             - ./docker/conf/varnish/default.vcl:/etc/varnish/default.vcl
 
     web:
-        image: ${NGINX_IMAGE?NGINX_IMAGE must be set.}
+        image: ${NGINX_IMAGE}
         ports:
             - 80
             - 443
@@ -23,7 +23,7 @@ services:
             - ./docker/conf/nginx/default.conf:/etc/nginx/conf.d/default.conf
 
     php:
-        image: ${PHP_FPM_IMAGE?PHP_FPM_IMAGE must be set.}
+        image: ${PHP_FPM_IMAGE}
         ports:
             - 9000
         depends_on:
@@ -36,8 +36,8 @@ services:
             - appdata:/var/www/html
 
     cron:
-        image: ${PHP_FPM_IMAGE?PHP_FPM_IMAGE must be set.}
-        command: ${CRON_COMMAND?CRON_COMMAND must be set.}
+        image: ${PHP_FPM_IMAGE}
+        command: ${CRON_COMMAND:?CRON_COMMAND must be set.}
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
         depends_on:
@@ -50,7 +50,7 @@ services:
             - appdata:/var/www/html
 
     db:
-        image: ${MYSQL_IMAGE?MYSQL_IMAGE must be set.}
+        image: ${MYSQL_IMAGE}
         ports:
             - 3306
         env_file:
@@ -64,7 +64,7 @@ services:
             - dbdata:/var/lib/mysql
 
     elasticsearch:
-        image: ${ELASTICSEARCH_IMAGE?ELASTICSEARCH_IMAGE must be set.}
+        image: ${ELASTICSEARCH_IMAGE}
         ports:
             - 9200
         ulimits:
@@ -80,7 +80,7 @@ services:
             - esdata:/usr/share/elasticsearch/data
 
     redis:
-        image: ${REDIS_IMAGE?REDIS_IMAGE must be set.}
+        image: ${REDIS_IMAGE}
         ports:
             - 6379
         healthcheck:
@@ -90,7 +90,7 @@ services:
             retries: 3
 
     rabbitmq:
-        image: ${RABBITMQ_IMAGE?RABBITMQ_IMAGE must be set.}
+        image: ${RABBITMQ_IMAGE}
         ports:
             - 15672
             - 5672
@@ -102,7 +102,7 @@ services:
             - rabbitmqdata:/var/lib/rabbitmq
 
     maildev:
-        image: ${MAILDEV_IMAGE?MAILDEV_IMAGE must be set.}
+        image: ${MAILDEV_IMAGE}
         ports:
             - 1025
             - 1080
