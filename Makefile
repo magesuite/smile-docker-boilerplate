@@ -1,9 +1,9 @@
 ifneq ($(shell command -v docker > /dev/null; echo $$?), 0)
-	$(error Docker must be installed)
+    $(error Docker must be installed)
 endif
 
 ifneq ($(shell docker compose > /dev/null 2>&1; echo $$?), 0)
-	$(error Docker Compose plugin must be installed)
+    $(error Docker Compose plugin must be installed)
 endif
 
 include .env
@@ -142,7 +142,7 @@ reindex: magento
 
 .PHONY: setup-install
 setup-install: $(VENDOR_DIR) ## Run "bin/magento setup:install". You will need to execute this if you make a change in the magento.env file.
-	@$(eval sleep = 6)
+	@$(eval sleep = 0)
 	@$(eval reset_db = 0)
 ifneq ($(reset_db),$(filter $(reset_db),0 1))
 	$(error The parameter "reset_db" must be equal to 0 or 1)
