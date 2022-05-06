@@ -2,6 +2,17 @@
 
 # Do not run this script directly.
 
+# Portable sed -i
+sed_in_place () {
+    SEDI="sed -i"
+
+    if [[ $(uname) == "Darwin" ]]; then
+        SEDI="$SEDI ''" # Needed for portability with sed
+    fi
+
+    $($SEDI -e "$1" "$2")
+}
+
 # Ask user for an input value.
 ask_input () {
     unset RESULT

@@ -8,7 +8,6 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 cd ../..
 
 . ./docker/bin/deps/utils.sh
-. ./.env
 
 # Print and run a command.
 print_and_run () {
@@ -20,6 +19,13 @@ print_and_run () {
 # Step 1 - Validate pre-requisites.
 ########
 
+if [ ! -f ".env" ]; then
+    echo "${RED}The file .env does not exist.${RESET}"
+    exit 1
+fi
+
+. ./.env
+
 if [ ! -d "$MAGENTO_DIR/vendor" ]; then
     echo && echo "${RED}Please set up the project before running this command.${RESET}"
     exit 1
@@ -29,8 +35,8 @@ fi
 # Step 2 - User confirmation.
 ########
 
-if [ -f "$MAGENTO_DIR/app/etc/env.php" ]; then
-    ask_yes_no RESULT "${YELLOW}This setup will run the setup:install command. Proceed?${RESET}"
+if [ -n "$RESET_DB" ] && [ "$RESET_DB" = "1" ] && [ -f "$MAGENTO_DIR/app/etc/env.php" ]; then
+    ask_yes_no RESULT "${YELLOW}Proceed with running bin/magento setup:install? This will reset the database.${RESET}"
     if [ "$RESULT" = "n" ]; then
         echo "${RED}Aborted by user.${RESET}"
         exit
@@ -50,7 +56,7 @@ fi
 # Step 4 - Install Magento.
 ########
 
-MAGENTO_COMMAND="docker compose run --rm $PHP_CONTAINER bin/magento"
+MAGENTO_COMMAND="$DOCKER_COMPOSE run --rm $PHP_CONTAINER bin/magento"
 
 # Prepare the install command
 INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
@@ -73,6 +79,11 @@ INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
     --language=$LANGUAGE \
     --currency=$CURRENCY \
     --magento-init-params=\"MAGE_MODE=$MAGENTO_RUN_MODE\""
+
+if [ -n "$RESET_DB" ] && [ "$RESET_DB" = "1" ]; then
+    INSTALL_COMMAND="$INSTALL_COMMAND \
+        --cleanup-database"
+fi
 
 if [ -n "$ENCRYPTION_KEY" ]; then
     INSTALL_COMMAND="$INSTALL_COMMAND \

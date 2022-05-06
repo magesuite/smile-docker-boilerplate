@@ -151,12 +151,11 @@ reindex: magento
 
 .PHONY: setup-install
 setup-install: $(VENDOR_DIR) ## Run "bin/magento setup:install". You will need to execute this if you make a change in the magento.env file.
-	@$(eval sleep = 0)
 	@$(eval reset_db = 0)
 ifneq ($(reset_db),$(filter $(reset_db),0 1))
 	$(error The parameter "reset_db" must be equal to 0 or 1)
 endif
-	SLEEP=$(sleep) RESET_DB=$(reset_db) ./docker/bin/setup-db
+	RESET_DB=$(reset_db) ./docker/bin/setup-db
 
 .PHONY: setup-upgrade
 setup-upgrade: $(MAGENTO_ENV) ## Run "bin/magento setup:upgrade".
