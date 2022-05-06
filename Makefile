@@ -1,85 +1,104 @@
-# To list all available targets, type "make"
+ifneq ($(shell command -v docker > /dev/null; echo $$?), 0)
+	$(error Docker must be installed)
+endif
 
+ifneq ($(shell docker compose > /dev/null 2>&1; echo $$?), 0)
+	$(error Docker Compose plugin must be installed)
+endif
+
+include .env
+
+UNAME := $(shell uname)
+ifeq ($(UNAME), Darwin)
+    SEDI := sed -i ''
+else
+    SEDI := sed -i
+endif
+
+# Docker
 DOCKER_COMPOSE := docker compose
+PHP_CLI := $(DOCKER_COMPOSE) run --rm php
+COMPOSER := $(DOCKER_COMPOSE) run --rm --no-deps php composer
+VENDOR_BIN := $(PHP_CLI) vendor/bin
 DB_CONTAINER := db
-PHP_CONTAINER := php
-PHP_CLI := $(DOCKER_COMPOSE) run --rm $(PHP_CONTAINER)
-VENDOR_BIN := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_CONTAINER) vendor/bin
 DB_CONNECTION := --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE
+
+# Target dependencies
+COMPOSER_FILE := $(MAGENTO_DIR)/composer.json
+VENDOR_DIR := $(MAGENTO_DIR)/vendor
+MAGENTO_ENV := $(MAGENTO_DIR)/app/etc/env.php
 
 .DEFAULT_GOAL := help
 
 help:
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##)|(^##)' $(firstword $(MAKEFILE_LIST)) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /\n[33m/'
 
-.PHONY: check-requirements
-check-requirements:
-	@./docker/bin/check-requirements
-
-.PHONY: setup-project
-setup-project:
+.PHONY: init-project
+init-project:
 	@./docker/bin/setup
 
-## Docker
+## Docker containers.
 .PHONY: up
-up: check-requirements ## Build and start all containers.
-	$(DOCKER_COMPOSE) up -d --remove-orphans
+up: ## Build and start containers. Pass the parameter "service=" to target a specific container. Example: make up service=php
+	@$(eval service ?=)
+	$(DOCKER_COMPOSE) up -d --remove-orphans $(service)
 
 .PHONY: down
-down: check-requirements ## Stop and remove all containers.
+down: ## Stop and remove all containers.
 	$(DOCKER_COMPOSE) down --remove-orphans
 
 PHONY: restart
-restart: check-requirements ## Restart all containers. Pass the parameter "service=" to restart a specific container. Example: make restart service=varnish
+restart: ## Restart containers. Pass the parameter "service=" to target a specific container.
 	@$(eval service ?=)
 	$(DOCKER_COMPOSE) restart $(service)
 
 .PHONY: ps
-ps: check-requirements ## List active containers.
+ps: ## List active containers. Pass the parameter "service=" to target a specific container.
 	@$(eval service ?=)
 	$(DOCKER_COMPOSE) ps $(service)
 
 .PHONY: logs
-logs: check-requirements ## Show Docker logs. Pass the parameter "service=" to get logs of a given service. Example: make logs service=elasticsearch
+logs: ## Show Docker logs. Pass the parameter "service=" to target a specific container.
 	@$(eval service ?=)
 	$(DOCKER_COMPOSE) logs --tail=0 --follow $(service)
 
 .PHONY: top
-top: check-requirements ## Shows all running processes. Pass the parameter "service=" to display the processes of a specific container. Eample: make top service=fpm
+top: ## Shows running processes. Pass the parameter "service=" to target a specific container.
 	@$(eval service ?=)
 	$(DOCKER_COMPOSE) top $(service)
 
 .PHONY: images
-images: check-requirements ## List images used by containers.
+images: ## List images used by containers. Pass the parameter "service=" to target a specific container.
 	@$(eval service ?=)
 	$(DOCKER_COMPOSE) images $(service)
 
 .PHONY: build
-build: check-requirements ## Build all images. Only useful if you project uses custom Dockerfiles.
+build: ## Build images. Pass the parameter "service=" to target a specific container.
 	@$(eval service ?=)
 	$(DOCKER_COMPOSE) build $(service)
 
 ## Services
 .PHONY: sh
-sh: check-requirements ## Open a shell on the php container. Pass the parameter "service=" to connect to another service. Example: make sh service=redis
+sh: ## Open a shell on the php container. Pass the parameter "service=" to connect to another service. Example: make sh service=redis
 	@$(eval service ?= php)
-	@$(eval cmd ?= sh)
-	@if [ "$(service)" = "php" ]; then echo "$(PHP_CLI) $(cmd)"; $(PHP_CLI) $(cmd); \
-	else echo "$(DOCKER_COMPOSE) exec $(service) $(cmd)"; $(DOCKER_COMPOSE) exec $(service) $(cmd); fi
+	@$(eval c ?= sh)
+	@if [ "$(service)" = "php" ]; then echo "$(PHP_CLI) $(c)"; $(PHP_CLI) $(c); \
+	else echo "$(DOCKER_COMPOSE) exec $(service) $(c)"; $(DOCKER_COMPOSE) exec $(service) $(c); fi
 
 .PHONY: db
-db: check-requirements ## Connect to the Magento database.
+db: ## Connect to the Magento database.
 	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)'
 
+.PHONY: db-import
+db-import: ## Import a database dump. Pass the parameter "filename=" to set the filename (mandatory).
+	@if [ -z "$(filename)" ]; then echo "Please provide a filename."; echo "Example: make db-import filename=dump.sql"; exit 1; fi
+	@if [ ! -f "$(filename)" ]; then echo "File not found."; exit 1; fi
+	$(DOCKER_COMPOSE) exec -T $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
+
 .PHONY: db-dump
-db-dump: check-requirements ## Dump the database. Pass the parameter "filename=" to customize the filename (default: dump.sql).
+db-export: ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql).
 	$(eval filename ?= 'dump.sql')
 	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
-
-.PHONY: db-import
-db-import: check-requirements ## Import a database dump. Pass the parameter "filename=" to customize the filename (default: dump.sql).
-	@if [ -z "$(filename)" ]; then echo "Please provide a filename."; echo "Example: make db-import filename=dump.sql"; exit 1; fi
-	$(DOCKER_COMPOSE) exec -T $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
 
 .PHONY: xdebug
 xdebug: check-requirements ## Toggle xdebug. Pass the parameter "value=" to force a specific value for XDEBUG_MODE.
@@ -92,91 +111,109 @@ cron: check-requirements ## Toggle the cron container.
 
 ## Composer
 .PHONY: composer
-composer: check-requirements ## Run composer. Example: make composer cmd="config --list"
-	@$(eval cmd ?=)
-	$(DOCKER_COMPOSE) run --rm --no-deps $(PHP_CONTAINER) composer $(cmd)
-
-.PHONY: composer-install
-composer-install: ## Run "composer install".
-composer-install: cmd=install
-composer-install: composer
-
-.PHONY: composer-update
-composer-update: ## Run "composer update".
-composer-update: cmd=update
-composer-update: composer
+composer: $(COMPOSER_FILE) ## Run composer. Example: make composer c="require vendor/package:^1.0"
+	@$(eval c ?=)
+	$(COMPOSER) $(c)
 
 ## Magento
 .PHONY: magento
-magento: check-requirements ## Run bin/magento. Example: make magento cmd=indexer:reindex
-	@$(eval cmd ?=)
-	$(PHP_CLI) bin/magento $(cmd)
+magento: $(VENDOR_DIR) ## Run "bin/magento". Example: make magento c=indexer:reindex
+	@$(eval c ?=)
+	$(PHP_CLI) bin/magento $(c)
 
 .PHONY: cache-clean
-cache-clean: ## Run "bin/magento cache:clean". Example: make cache-clean type="config layout"
+cache-clean: $(MAGENTO_ENV) ## Run "bin/magento cache:clean". Example: make cache-clean type="config layout"
 cache-clean: type ?=
-cache-clean: cmd=cache:clean $(type)
+cache-clean: c=cache:clean $(type)
 cache-clean: magento
 cc: cache-clean
 
 .PHONY: generate-di
 generate-di: ## Run "bin/magento setup:di:compile".
-generate-di: cmd=setup:di:compile
+generate-di: c=setup:di:compile
 generate-di: magento
 
 .PHONY: reconfigure
-reconfigure: ## Run "bin/magento smilereconfigure:apply-conf".
+reconfigure: $(MAGENTO_ENV) ## Run "bin/magento smilereconfigure:apply-conf". Example: make reconfigure env=dev
 reconfigure: env ?= dev
-reconfigure: cmd=smilereconfigure:apply-conf $(env)
+reconfigure: c=smilereconfigure:apply-conf $(env)
 reconfigure: magento
 
 .PHONY: reindex
-reindex:## Run "bin/magento indexer:reindex". Example: make reindex type="catalog_product"
+reindex: $(MAGENTO_ENV) ## Run "bin/magento indexer:reindex". Example: make reindex type="catalog_product"
 reindex: type ?=
-reindex: cmd=indexer:reindex $(type)
+reindex: c=indexer:reindex $(type)
 reindex: magento
 
 .PHONY: setup-install
-setup-install: check-requirements ## (Re)install the Magento database. You will be prompted for confirmation if the database is already installed.
-	./docker/bin/setup-db
+setup-install: $(VENDOR_DIR) ## Run "bin/magento setup:install". You will need to execute this if you make a change in the magento.env file.
+	@$(eval sleep = 6)
+	@$(eval reset_db = 0)
+ifneq ($(reset_db),$(filter $(reset_db),0 1))
+	$(error The parameter "reset_db" must be equal to 0 or 1)
+endif
+	SLEEP=$(sleep) RESET_DB=$(reset_db) ./docker/bin/setup-db
 
 .PHONY: setup-upgrade
-setup-upgrade: ## Run "bin/magento setup:upgrade".
-setup-upgrade: cmd=setup:upgrade
+setup-upgrade: $(MAGENTO_ENV) ## Run "bin/magento setup:upgrade".
+setup-upgrade: c=setup:upgrade
 setup-upgrade: magento
 
 ## Static Code Analysis
 .PHONY: phpcs
-phpcs: check-requirements ## Run phpcs. Example: make phpcs
-	@$(eval cmd ?=)
-	$(VENDOR_BIN)/phpcs $(cmd)
+phpcs: $(VENDOR_DIR) ## Run phpcs. Example: make phpcs
+	@$(eval c ?=)
+	$(VENDOR_BIN)/phpcs $(c)
 
-phpmd: check-requirements ## Run phpmd. Example: make phpmd cmd="app/code xml phpmd.xml.dist"
+phpmd: $(VENDOR_DIR) ## Run phpmd. Example: make phpmd c="app/code xml phpmd.xml.dist"
 	@$(eval sources ?= app/code)
 	@$(eval format ?= ansi)
 	$(VENDOR_BIN)/phpmd $(sources) $(format) phpmd.xml.dist
 
 .PHONY: phpstan
-phpstan: check-requirements ## Run phpstan. Example: make phpstan
-	@$(eval cmd ?=)
-	$(VENDOR_BIN)/phpstan $(cmd)
+phpstan: $(VENDOR_DIR) ## Run phpstan. Example: make phpstan
+	@$(eval c ?=)
+	$(VENDOR_BIN)/phpstan $(c)
 
 .PHONY: phpunit
-phpunit: check-requirements ## Run phpunit. Example: make phpunit
-	@$(eval cmd ?=)
-	$(VENDOR_BIN)/phpunit $(cmd)
+phpunit: $(VENDOR_DIR) ## Run phpunit. Example: make phpunit
+	@$(eval c ?=)
+	$(VENDOR_BIN)/phpunit $(c)
 
 .PHONY: phpcbf
-phpcbf: check-requirements ## Run phpcbf. Example: make phpcbf
-	@$(eval cmd ?=)
-	$(VENDOR_BIN)/phpcbf $(cmd)
+phpcbf: $(VENDOR_DIR) ## Run phpcbf. Example: make phpcbf
+	@$(eval c ?=)
+	$(VENDOR_BIN)/phpcbf $(c)
 
 .PHONY: php-cs-fixer
-php-cs-fixer: check-requirements ## Run php-cs-fixer. Example: make php-cs-fixer cmd="fix --config=.php-cs-fixer.dist.php"
-	@$(eval cmd ?=)
-	$(VENDOR_BIN)/php-cs-fixer $(cmd)
+php-cs-fixer: $(VENDOR_DIR) ## Run php-cs-fixer. Example: make php-cs-fixer c="fix --config=.php-cs-fixer.dist.php"
+	@$(eval c ?=)
+	$(VENDOR_BIN)/php-cs-fixer $(c)
 
 .PHONY: smileanalyser
-smileanalyser: check-requirements ## Run smileanalyser.
+smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
 	@$(eval profile ?=magento2/*)
 	$(VENDOR_BIN)/SmileAnalyser launch --profile $(profile)
+
+.env: | .env.dist
+	@cp .env.dist .env
+	@echo ".env file was automatically created."
+ifeq ($(UNAME), Linux)
+	@sed -i -e "s/^DOCKER_UID=.*/DOCKER_UID=$$(id -u)/" -e "s/^DOCKER_GID=.*/DOCKER_GID=$$(id -g)/" .env
+endif
+	@if [ -z "$$COMPOSER_AUTH" ] && command -v composer > /dev/null; then \
+		COMPOSER_GITHUB_TOKEN="$$(composer config --global github-oauth.github.com 2>/dev/null || true)"; \
+		if [ -n "$$COMPOSER_GITHUB_TOKEN" ]; then \
+			$(SEDI) -e "s/^#COMPOSER_AUTH=.*/COMPOSER_AUTH={\"github-oauth\":{\"github.com\":\"$$COMPOSER_GITHUB_TOKEN\"}}/g" .env; \
+			echo "Your composer GitHub token was saved in .env file."; \
+		fi; \
+	fi
+
+$(MAGENTO_ENV): | $(VENDOR_DIR)
+	$(error Please run `make setup-install` to initialize the database)
+
+$(VENDOR_DIR): | $(COMPOSER_FILE)
+	$(COMPOSER) install
+
+$(COMPOSER_FILE):
+	$(error Please run `make init-project` to initialize the project)
