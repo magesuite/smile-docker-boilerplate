@@ -63,7 +63,7 @@ To set up a Magento project with this boilerplate:
    If you want to use this boilerplate with an existing Magento installation (e.g. Magento cloud), copy your Magento files to the "magento" directory:
 
    ```
-   mv ~/path/to/magento/* ~/path/to/magento/.* magento/
+   mv ~/path/to/magento/ magento/
    ```
 
 2. Run the following script in this new directory:
@@ -189,7 +189,7 @@ The makefile provides multiple commands that interact with containers:
   Example: `make logs service=php`
 - **make top**: shows running processes (on all containers by default).
   Example: `make top service=php`
-- **make build**: build images
+- **make build**: build images.
 
 You can also quickly access any container with the following commands:
 
@@ -204,13 +204,13 @@ The makefile provides multiple commands that interact with command-line tools:
 - **make magento**: runs the Magento CLI.
   Example: `make magento c=indexer:reindex`
 - **make composer**: runs composer.
-  Example: `bin/composer c=update`
+  Example: `make composer c=update`
 - **make phpcs**: runs phpcs.
 - **make phpmd**: runs phpmd.
 - **make phpunit**: runs phpunit.
 - **make phpstan**: runs phpstan.
 - **make php-cs-fixer**: runs php-cs-fixer.
-  Example: `make php-cs-fixer c="fix --config=.php-cs-fixer.dist.php"`
+- **make smileanalyser**: runs smileanalyser.
 
 ## Kubernetes Integration
 
