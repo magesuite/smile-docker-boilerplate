@@ -36,8 +36,8 @@ fi
 ########
 
 if [ ! -f ".env" ]; then
-    cp .env.sample .env
-    echo "${GREEN}✓ Copied .env.sample to .env.${RESET}"
+    cp .env.dist .env
+    echo "${GREEN}✓ Copied .env.dist to .env.${RESET}"
 
     . ./.env
 

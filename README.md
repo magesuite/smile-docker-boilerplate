@@ -78,7 +78,7 @@ To set up a Magento project with this boilerplate:
     - Magento files found: the script will update the docker env files, and check if there is anything to add in composer.json (e.g. Smile modules or repositories).
 
     By default, the script searches for the Magento files in the folder "magento".
-    If you want to install Magento in the root directory, set $MAGENTO_DIR to "./" in .env.sample before running the script.
+    If you want to install Magento in the root directory, set $MAGENTO_DIR to "./" in .env.dist before running the script.
 
 3. Launch all containers:
 

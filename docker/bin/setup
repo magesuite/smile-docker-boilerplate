@@ -321,12 +321,12 @@ fi
 ########
 
 sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env
-sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env.sample
+sed -i "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env.dist
 sed -i "s/^MAGENTO_DIR=.*/MAGENTO_DIR=${MAGENTO_DIR//\//\\/}/" .env
-sed -i "s/^MAGENTO_DIR=.*/MAGENTO_DIR=${MAGENTO_DIR//\//\\/}/" .env.sample
+sed -i "s/^MAGENTO_DIR=.*/MAGENTO_DIR=${MAGENTO_DIR//\//\\/}/" .env.dist
 sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
-sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env.sample
-echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$MAGENTO_DIR to \"$MAGENTO_DIR\" and \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.sample.${RESET}"
+sed -i "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env.dist
+echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$MAGENTO_DIR to \"$MAGENTO_DIR\" and \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.dist.${RESET}"
 sed -i "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" docker/env/php.env
 echo "${GREEN}✓ Updated \$COMPOSER_VERSION to \"$COMPOSER_VERSION\" in docker/env/php.env.${RESET}"
 

@@ -39,7 +39,7 @@
 !/README*.md
 
 # Docker (when installed in the same directory as Magento)
-!/.env.sample
+!/.env.dist
 !/docker-compose.yml
 !/docker-compose.*.yml
 !/Makefile
