@@ -100,11 +100,6 @@ db-export: ## Dump the database. Pass the parameter "filename=" to set the filen
 	$(eval filename ?= 'dump.sql')
 	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
 
-.PHONY: xdebug
-xdebug: check-requirements ## Toggle xdebug. Pass the parameter "value=" to force a specific value for XDEBUG_MODE.
-	@$(eval value ?=)
-	./docker/bin/toggle-xdebug $(value)
-
 .PHONY: cron
 cron: check-requirements ## Toggle the cron container.
 	./docker/bin/toggle-cron

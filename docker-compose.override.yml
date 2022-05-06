@@ -15,6 +15,8 @@ services:
     web:
         image: ${PROJECT_NAME?PROJECT_NAME must be set.}_web
         build: ./docker/images/nginx
+        depends_on:
+            - php_xdebug
         volumes:
             - ${MAGENTO_DIR?MAGENTO_DIR must be set.}:/var/www/html:rw,cached
 
@@ -22,6 +24,7 @@ services:
         image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
         build:
             context: ./docker/images/php
+            target: dev
             args:
                 PHP_VERSION: ${PHP_VERSION?PHP_VERSION must be set.}
                 COMPOSER_VERSION: ${COMPOSER_VERSION?COMPOSER_VERSION must be set.}
@@ -35,10 +38,26 @@ services:
             - composer-cache:/tmp/composer
             - npm-cache:/tmp/npm
 
+    php_xdebug:
+        build:
+            context: ./docker/images/php
+            target: xdebug
+            args:
+                PHP_VERSION: ${PHP_VERSION?PHP_VERSION must be set.}
+                COMPOSER_VERSION: ${COMPOSER_VERSION?COMPOSER_VERSION must be set.}
+        user: ${DOCKER_UID?DOCKER_UID must be set.}:${DOCKER_GID?DOCKER_GID must be set.}
+        environment:
+            PHP_IDE_CONFIG: serverName=_
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        volumes:
+            - ${MAGENTO_DIR?MAGENTO_DIR must be set.}:/var/www/html:rw,cached
+
     cron:
         image: ${PROJECT_NAME?PROJECT_NAME must be set.}_cron
         build:
             context: ./docker/images/php
+            target: base
             args:
                 PHP_VERSION: ${PHP_VERSION?PHP_VERSION must be set.}
                 COMPOSER_VERSION: ${COMPOSER_VERSION?COMPOSER_VERSION must be set.}
