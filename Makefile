@@ -204,7 +204,7 @@ smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
 ifeq ($(UNAME), Linux)
 	@sed -i -e "s/^DOCKER_UID=.*/DOCKER_UID=$$(id -u)/" -e "s/^DOCKER_GID=.*/DOCKER_GID=$$(id -g)/" .env
 endif
-	@if [ -z "$$COMPOSER_AUTH" ] && command -v composer > /dev/null; then \
+	@if [ -z "$(COMPOSER_AUTH)" ] && command -v composer > /dev/null; then \
 		COMPOSER_GITHUB_TOKEN="$$(composer config --global github-oauth.github.com 2>/dev/null || true)"; \
 		if [ -n "$$COMPOSER_GITHUB_TOKEN" ]; then \
 			$(SEDI) -e "s/^#COMPOSER_AUTH=.*/COMPOSER_AUTH={\"github-oauth\":{\"github.com\":\"$$COMPOSER_GITHUB_TOKEN\"}}/g" .env; \
