@@ -17,10 +17,11 @@ endif
 
 # Docker
 DOCKER_COMPOSE := docker compose
-PHP_CLI := $(DOCKER_COMPOSE) run --rm php
-COMPOSER := $(DOCKER_COMPOSE) run --rm --no-deps php composer
-VENDOR_BIN := $(PHP_CLI) vendor/bin
-DB_CONTAINER := db
+PHP_SERVICE := php
+DB_SERVICE := db
+PHP_CLI := $(DOCKER_COMPOSE) run --rm $(PHP_SERVICE)
+COMPOSER := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE) composer
+VENDOR_BIN := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE) vendor/bin
 DB_CONNECTION := --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE
 
 # Target dependencies
@@ -31,74 +32,71 @@ MAGENTO_ENV := $(MAGENTO_DIR)/app/etc/env.php
 .DEFAULT_GOAL := help
 
 help:
-	@grep -E '(^[a-zA-Z0-9_-]+:.*?##)|(^##)' $(firstword $(MAKEFILE_LIST)) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /\n[33m/'
+	@grep -E '(^[a-zA-Z0-9_-]+:.*?##)|(^##)' $(firstword $(MAKEFILE_LIST)) | awk 'BEGIN {FS = ":.*?## "; printf "Usage: make \033[32m<target>\033[0m\n"}{printf "\033[32m%-20s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /\n[33m/'
 
 .PHONY: init-project
 init-project:
 	@./docker/bin/setup
 
-## Docker containers.
+## Docker
 .PHONY: up
-up: ## Build and start containers. Pass the parameter "service=" to target a specific container. Example: make up service=php
-	@$(eval service ?=)
+up: ## Build and start containers. Pass the parameter "service=" to filter which containers to start. Example: make up service=php
 	$(DOCKER_COMPOSE) up -d --remove-orphans $(service)
 
 .PHONY: down
-down: ## Stop and remove all containers.
+down: ## Stop and remove containers.
 	$(DOCKER_COMPOSE) down --remove-orphans
 
 PHONY: restart
-restart: ## Restart containers. Pass the parameter "service=" to target a specific container.
-	@$(eval service ?=)
+restart: ## Restart containers. Pass the parameter "service=" to filter which containers to restart.
 	$(DOCKER_COMPOSE) restart $(service)
 
 .PHONY: ps
-ps: ## List active containers. Pass the parameter "service=" to target a specific container.
-	@$(eval service ?=)
+ps: ## List active containers. Pass the parameter "service=" to filter which containers to list.
 	$(DOCKER_COMPOSE) ps $(service)
 
 .PHONY: logs
-logs: ## Show Docker logs. Pass the parameter "service=" to target a specific container.
-	@$(eval service ?=)
+logs: ## Show container logs. Pass the parameter "service=" to filter which containers to watch.
 	$(DOCKER_COMPOSE) logs --tail=0 --follow $(service)
 
 .PHONY: top
-top: ## Shows running processes. Pass the parameter "service=" to target a specific container.
-	@$(eval service ?=)
+top: ## Show running processes. Pass the parameter "service=" to filter which containers to list.
 	$(DOCKER_COMPOSE) top $(service)
 
 .PHONY: images
-images: ## List images used by containers. Pass the parameter "service=" to target a specific container.
-	@$(eval service ?=)
+images: ## List images used by containers. Pass the parameter "service=" to filter which images to list.
 	$(DOCKER_COMPOSE) images $(service)
 
 .PHONY: build
-build: ## Build images. Pass the parameter "service=" to target a specific container.
-	@$(eval service ?=)
+build: ## Build images. Pass the parameter "service=" to filter which images to build.
 	$(DOCKER_COMPOSE) build $(service)
 
 ## Services
+.PHONY: composer
+composer: $(COMPOSER_FILE) ## Run composer. Example: make composer c="require vendor/package:^1.0"
+	$(COMPOSER) $(c)
+
 .PHONY: sh
-sh: ## Open a shell on the php container. Pass the parameter "service=" to connect to another service. Example: make sh service=redis
+sh: ## Open a shell on the php container. Pass the parameter "service=" to connect to another container. Example: make sh service=redis
 	@$(eval service ?= php)
 	@$(eval c ?= sh)
-	@if [ "$(service)" = "php" ]; then echo "$(PHP_CLI) $(c)"; $(PHP_CLI) $(c); \
+	@if [ "$(service)" = "$(PHP_SERVICE)" ]; then echo "$(PHP_CLI) $(c)"; $(PHP_CLI) $(c); \
 	else echo "$(DOCKER_COMPOSE) exec $(service) $(c)"; $(DOCKER_COMPOSE) exec $(service) $(c); fi
 
 .PHONY: db
 db: ## Connect to the Magento database.
-	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)'
+	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysql $(DB_CONNECTION)'
 
 .PHONY: db-import
 db-import: ## Import a database dump. Pass the parameter "filename=" to set the filename (mandatory).
 	@if [ -z "$(filename)" ]; then echo "Please provide a filename."; echo "Example: make db-import filename=dump.sql"; exit 1; fi
 	@if [ ! -f "$(filename)" ]; then echo "File not found."; exit 1; fi
-	$(DOCKER_COMPOSE) exec -T $(DB_CONTAINER) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
+	$(DOCKER_COMPOSE) exec -T $(DB_SERVICE) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
 
 .PHONY: db-dump
 db-export: ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql).
 	$(eval filename ?= 'dump.sql')
-	$(DOCKER_COMPOSE) exec $(DB_CONTAINER) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
+	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
 
 .PHONY: toggle-cron
 toggle-cron: ## Enable/disable the cron container.
@@ -113,21 +111,13 @@ endif
 	@echo "CRON_COMMAND was set to \"$(VALUE)\" in .env file ($(STATUS))."
 	$(DOCKER_COMPOSE) up -d --no-deps cron
 
-## Composer
-.PHONY: composer
-composer: $(COMPOSER_FILE) ## Run composer. Example: make composer c="require vendor/package:^1.0"
-	@$(eval c ?=)
-	$(COMPOSER) $(c)
-
 ## Magento
 .PHONY: magento
 magento: $(VENDOR_DIR) ## Run "bin/magento". Example: make magento c=indexer:reindex
-	@$(eval c ?=)
 	$(PHP_CLI) bin/magento $(c)
 
 .PHONY: cache-clean
 cache-clean: $(MAGENTO_ENV) ## Run "bin/magento cache:clean". Example: make cache-clean type="config layout"
-cache-clean: type ?=
 cache-clean: c=cache:clean $(type)
 cache-clean: magento
 cc: cache-clean
@@ -145,12 +135,11 @@ reconfigure: magento
 
 .PHONY: reindex
 reindex: $(MAGENTO_ENV) ## Run "bin/magento indexer:reindex". Example: make reindex type="catalog_product"
-reindex: type ?=
 reindex: c=indexer:reindex $(type)
 reindex: magento
 
 .PHONY: setup-install
-setup-install: $(VENDOR_DIR) ## Run "bin/magento setup:install". You will need to execute this if you make a change in the magento.env file.
+setup-install: $(VENDOR_DIR) ## Run "bin/magento setup:install". If you change a value in magento.env, you must re-execute this to apply the change. Pass the parameter "reset_db=1" to reset the database.
 	@$(eval reset_db = 0)
 ifneq ($(reset_db),$(filter $(reset_db),0 1))
 	$(error The parameter "reset_db" must be equal to 0 or 1)
@@ -162,41 +151,36 @@ setup-upgrade: $(MAGENTO_ENV) ## Run "bin/magento setup:upgrade".
 setup-upgrade: c=setup:upgrade
 setup-upgrade: magento
 
-## Static Code Analysis
+## Code Quality
 .PHONY: phpcs
-phpcs: $(VENDOR_DIR) ## Run phpcs. Example: make phpcs
-	@$(eval c ?=)
+phpcs: $(VENDOR_DIR) ## Run phpcs.
 	$(VENDOR_BIN)/phpcs $(c)
 
-phpmd: $(VENDOR_DIR) ## Run phpmd. Example: make phpmd c="app/code xml phpmd.xml.dist"
-	@$(eval sources ?= app/code)
-	@$(eval format ?= ansi)
-	$(VENDOR_BIN)/phpmd $(sources) $(format) phpmd.xml.dist
+phpmd: $(VENDOR_DIR) ## Run phpmd.
+	$(eval c ?= app/code ansi phpmd.xml.dist)
+	$(VENDOR_BIN)/phpmd $(c)
 
 .PHONY: phpstan
-phpstan: $(VENDOR_DIR) ## Run phpstan. Example: make phpstan
-	@$(eval c ?=)
+phpstan: $(VENDOR_DIR) ## Run phpstan.
 	$(VENDOR_BIN)/phpstan $(c)
 
 .PHONY: phpunit
-phpunit: $(VENDOR_DIR) ## Run phpunit. Example: make phpunit
-	@$(eval c ?=)
+phpunit: $(VENDOR_DIR) ## Run phpunit.
 	$(VENDOR_BIN)/phpunit $(c)
 
 .PHONY: phpcbf
-phpcbf: $(VENDOR_DIR) ## Run phpcbf. Example: make phpcbf
-	@$(eval c ?=)
+phpcbf: $(VENDOR_DIR) ## Run phpcbf.
 	$(VENDOR_BIN)/phpcbf $(c)
 
 .PHONY: php-cs-fixer
-php-cs-fixer: $(VENDOR_DIR) ## Run php-cs-fixer. Example: make php-cs-fixer c="fix --config=.php-cs-fixer.dist.php"
-	@$(eval c ?=)
+php-cs-fixer: $(VENDOR_DIR) ## Run php-cs-fixer.
+	$(eval c ?= fix --config=.php-cs-fixer.dist.php)
 	$(VENDOR_BIN)/php-cs-fixer $(c)
 
 .PHONY: smileanalyser
 smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
-	@$(eval profile ?=magento2/*)
-	$(VENDOR_BIN)/SmileAnalyser launch --profile $(profile)
+	@$(eval c ?= launch --profile magento2/*)
+	$(VENDOR_BIN)/SmileAnalyser $(c)
 
 .env: | .env.dist
 	@cp .env.dist .env
