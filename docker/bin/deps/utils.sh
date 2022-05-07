@@ -3,10 +3,10 @@
 # Do not run this script directly.
 
 # Portable sed -i
-sed_in_place () {
+sedi () {
     SEDI="sed -i"
 
-    if [[ $(uname) == "Darwin" ]]; then
+    if [ $(uname) = "Darwin" ]; then
         SEDI="$SEDI ''" # Needed for portability with sed
     fi
 
