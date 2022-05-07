@@ -290,8 +290,7 @@ sedi "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" .env
 echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$PHP_VERSION to \"$PHP_VERSION\" and \$COMPOSER_VERSION to \"$COMPOSER_VERSION\" in .env and .env.dist.${RESET}"
 
 if [ "$CREATE_PROJECT" = "n" ]; then
-    cp -n docker/conf/magento/* "$MAGENTO_DIR"
-    cp -n docker/conf/magento/.gitignore "$MAGENTO_DIR"
+    cp -n docker/conf/magento/* docker/conf/magento/.gitignore "$MAGENTO_DIR"
     echo "${GREEN}✓ Copied docker/magento/* to \"$MAGENTO_DIR\".${RESET}"
 fi
 
@@ -321,8 +320,7 @@ if [ "$RUN_COMPOSER" = "y" ]; then
         exit 1
     elif [ "$CREATE_PROJECT" = "y" ]; then
         # Move files in docker/conf/magento to Magento root (already done earlier if CREATE_PROJECT equals n)
-        cp docker/conf/magento/* "$MAGENTO_DIR"
-        cp docker/conf/magento/.gitignore "$MAGENTO_DIR"
+        cp docker/conf/magento/* docker/conf/magento/.gitignore "$MAGENTO_DIR"
     fi
 fi
 
