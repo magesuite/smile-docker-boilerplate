@@ -1,15 +1,15 @@
-ifneq ($(shell command -v docker > /dev/null; echo $$?), 0)
+ifneq ($(shell command -v docker > /dev/null; echo $$?),0)
     $(error Docker must be installed)
 endif
 
-ifneq ($(shell docker compose > /dev/null 2>&1; echo $$?), 0)
+ifneq ($(shell docker compose > /dev/null 2>&1; echo $$?),0)
     $(error Docker Compose plugin must be installed)
 endif
 
 include .env
 
 UNAME := $(shell uname)
-ifeq ($(UNAME), Darwin)
+ifeq ($(UNAME),Darwin)
     SEDI := sed -i ''
 else
     SEDI := sed -i
@@ -100,7 +100,7 @@ db-export: ## Dump the database. Pass the parameter "filename=" to set the filen
 
 .PHONY: toggle-cron
 toggle-cron: ## Enable/disable the cron container.
-ifeq ($(CRON_COMMAND), true)
+ifeq ($(CRON_COMMAND),true)
 	$(eval VALUE := run-cron)
 	$(eval STATUS := enabled)
 else
@@ -113,7 +113,7 @@ endif
 
 ## Magento
 .PHONY: magento
-magento: $(VENDOR_DIR) ## Run "bin/magento". Example: make magento c=indexer:reindex
+magento: ## Run "bin/magento". Pass the parameter "c=" to run a given command. Example: make magento c=indexer:status
 	$(PHP_CLI) bin/magento $(c)
 
 .PHONY: cache-clean
@@ -140,7 +140,7 @@ reindex: magento
 
 .PHONY: setup-install
 setup-install: $(VENDOR_DIR) ## Run "bin/magento setup:install". If you change a value in magento.env, you must re-execute this to apply the change. Pass the parameter "reset_db=1" to reset the database.
-	@$(eval reset_db = 0)
+	@$(eval reset_db ?= 0)
 ifneq ($(reset_db),$(filter $(reset_db),0 1))
 	$(error The parameter "reset_db" must be equal to 0 or 1)
 endif
@@ -185,7 +185,7 @@ smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
 .env: | .env.dist
 	@cp .env.dist .env
 	@echo ".env file was automatically created."
-ifeq ($(UNAME), Linux)
+ifeq ($(UNAME),Linux)
 	@sed -i -e "s/^DOCKER_UID=.*/DOCKER_UID=$$(id -u)/" -e "s/^DOCKER_GID=.*/DOCKER_GID=$$(id -g)/" .env
 endif
 	@if [ -z "$(COMPOSER_AUTH)" ] && command -v composer > /dev/null; then \
