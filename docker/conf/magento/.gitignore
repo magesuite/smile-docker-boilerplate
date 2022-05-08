@@ -45,6 +45,7 @@
 !/Makefile
 
 # Tools
+!/.gitlab-ci.yml
 !/.smileanalyser.yaml
 !/.spbuilder.yaml
 !/magepack.config.js
