@@ -88,6 +88,8 @@ services:
             interval: 30s
             timeout: 30s
             retries: 3
+        volumes:
+            - ./docker/conf/redis/redis.conf:/usr/local/etc/redis/redis.conf
 
     rabbitmq:
         image: ${RABBITMQ_IMAGE}
