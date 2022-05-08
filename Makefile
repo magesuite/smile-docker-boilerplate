@@ -9,6 +9,7 @@ endif
 include .env
 
 UNAME := $(shell uname)
+
 ifeq ($(UNAME),Darwin)
     SEDI := sed -i ''
 else
@@ -18,6 +19,7 @@ endif
 # Docker
 DOCKER_COMPOSE := docker compose
 PHP_SERVICE := php
+PHP_XDEBUG_SERVICE := php_xdebug
 DB_SERVICE := db
 PHP_CLI := $(DOCKER_COMPOSE) run --rm $(PHP_SERVICE)
 COMPOSER := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE) composer
@@ -72,40 +74,37 @@ build: ## Build images. Pass the parameter "service=" to filter which images to 
 	$(DOCKER_COMPOSE) build $(service)
 
 ## Services
-.PHONY: composer
-composer: $(COMPOSER_FILE) ## Run composer. Example: make composer c="require vendor/package:^1.0"
-	$(COMPOSER) $(c)
-
 .PHONY: sh
 sh: ## Open a shell on the php container. Pass the parameter "service=" to connect to another container. Example: make sh service=redis
-	@$(eval service ?= php)
-	@$(eval c ?= sh)
-	@if [ "$(service)" = "$(PHP_SERVICE)" ]; then echo "$(PHP_CLI) $(c)"; $(PHP_CLI) $(c); \
-	else echo "$(DOCKER_COMPOSE) exec $(service) $(c)"; $(DOCKER_COMPOSE) exec $(service) $(c); fi
+	$(eval service ?= php) $(eval c ?= sh)
+	@if [ "$(service)" = "$(PHP_SERVICE)" ] || [ "$(service)" = "$(PHP_XDEBUG_SERVICE)" ]; \
+		then echo "$(DOCKER_COMPOSE) run --rm $(service) $(c)"; $(DOCKER_COMPOSE) run --rm $(service) $(c); \
+		else echo "$(DOCKER_COMPOSE) exec $(service) $(c)"; $(DOCKER_COMPOSE) exec $(service) $(c); fi
 
 .PHONY: db
 db: ## Connect to the Magento database.
 	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysql $(DB_CONNECTION)'
 
 .PHONY: db-import
-db-import: ## Import a database dump. Pass the parameter "filename=" to set the filename (mandatory).
-	@if [ -z "$(filename)" ]; then echo "Please provide a filename."; echo "Example: make db-import filename=dump.sql"; exit 1; fi
-	@if [ ! -f "$(filename)" ]; then echo "File not found."; exit 1; fi
+db-import: ## Import a database dump. Pass the parameter "filename=" to set the filename (default: dump.sql).
+	$(eval filename ?= dump.sql)
 	$(DOCKER_COMPOSE) exec -T $(DB_SERVICE) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
 
 .PHONY: db-dump
 db-export: ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql).
-	$(eval filename ?= 'dump.sql')
+	$(eval filename ?= dump.sql)
 	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
+
+.PHONY: redis
+redis: ## Connect to the redis CLI. Pass the parameter "c=" to run a command instead. Example: make redis c="flushdb"
+	$(DOCKER_COMPOSE) exec redis redis-cli $(c)
 
 .PHONY: toggle-cron
 toggle-cron: ## Enable/disable the cron container.
 ifeq ($(CRON_COMMAND),true)
-	$(eval VALUE := run-cron)
-	$(eval STATUS := enabled)
+	$(eval VALUE := run-cron) $(eval STATUS := enabled)
 else
-	$(eval VALUE := true)
-	$(eval STATUS := disabled)
+	$(eval VALUE := true) $(eval STATUS := disabled)
 endif
 	@$(SEDI) -e "s/^CRON_COMMAND=.*/CRON_COMMAND=$(VALUE)/" .env
 	@echo "CRON_COMMAND was set to \"$(VALUE)\" in .env file ($(STATUS))."
@@ -113,7 +112,7 @@ endif
 
 ## Magento
 .PHONY: magento
-magento: ## Run "bin/magento". Pass the parameter "c=" to run a given command. Example: make magento c=indexer:status
+magento: $(VENDOR_DIR) ## Run "bin/magento". Pass the parameter "c=" to run a given command. Example: make magento c=indexer:status
 	$(PHP_CLI) bin/magento $(c)
 
 .PHONY: cache-clean
@@ -140,10 +139,8 @@ reindex: magento
 
 .PHONY: setup-install
 setup-install: $(VENDOR_DIR) ## Run "bin/magento setup:install". If you change a value in magento.env, you must re-execute this to apply the change. Pass the parameter "reset_db=1" to reset the database.
-	@$(eval reset_db ?= 0)
-ifneq ($(reset_db),$(filter $(reset_db),0 1))
-	$(error The parameter "reset_db" must be equal to 0 or 1)
-endif
+	$(eval reset_db ?= 0)
+	@if [ "$(reset_db)" != "0" ] && [ "$(reset_db)" != "1" ]; then echo "The variable "reset_db" must be equal to 0 or 1."; exit 1; fi
 	RESET_DB=$(reset_db) ./docker/bin/setup-db
 
 .PHONY: setup-upgrade
@@ -151,11 +148,22 @@ setup-upgrade: $(MAGENTO_ENV) ## Run "bin/magento setup:upgrade".
 setup-upgrade: c=setup:upgrade
 setup-upgrade: magento
 
+## Composer
+.PHONY: composer
+composer: $(COMPOSER_FILE) ## Run composer. Example: make composer c="require vendor/package:^1.0"
+	$(COMPOSER) $(c)
+
+.PHONY: vendor-bin
+vendor-bin: ## Run a binary located in vendor/bin. Example: make vendor-bin c=phpcs
+	@if [ -z "$(c)" ]; then echo "Please provide a command. Example: make vendor-bin c=phpcs."; exit 1; fi
+	$(VENDOR_BIN)/$(c)
+
 ## Code Quality
 .PHONY: phpcs
 phpcs: $(VENDOR_DIR) ## Run phpcs.
 	$(VENDOR_BIN)/phpcs $(c)
 
+.PHONY: phpmd
 phpmd: $(VENDOR_DIR) ## Run phpmd.
 	$(eval c ?= app/code ansi phpmd.xml.dist)
 	$(VENDOR_BIN)/phpmd $(c)
@@ -179,9 +187,10 @@ php-cs-fixer: $(VENDOR_DIR) ## Run php-cs-fixer.
 
 .PHONY: smileanalyser
 smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
-	@$(eval c ?= launch --profile magento2/*)
+	$(eval c ?= launch --profile magento2/*)
 	$(VENDOR_BIN)/SmileAnalyser $(c)
 
+# File targets
 .env: | .env.dist
 	@cp .env.dist .env
 	@echo ".env file was automatically created."
