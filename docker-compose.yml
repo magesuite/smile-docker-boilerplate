@@ -20,7 +20,7 @@ services:
             - php
         volumes:
             - appdata:/var/www/html
-            - ./docker/conf/nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - ./docker/conf/nginx/default-prod.conf:/etc/nginx/conf.d/default.conf
 
     php:
         image: ${PHP_FPM_IMAGE}
