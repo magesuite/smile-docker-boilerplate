@@ -65,10 +65,6 @@ logs: ## Show container logs. Pass the parameter "service=" to filter which cont
 top: ## Show running processes. Pass the parameter "service=" to filter which containers to list.
 	$(DOCKER_COMPOSE) top $(service)
 
-.PHONY: images
-images: ## List images used by containers. Pass the parameter "service=" to filter which images to list.
-	$(DOCKER_COMPOSE) images $(service)
-
 .PHONY: build
 build: ## Build images. Pass the parameter "service=" to filter which images to build.
 	$(DOCKER_COMPOSE) build $(service)
@@ -94,10 +90,6 @@ db-import: ## Import a database dump. Pass the parameter "filename=" to set the 
 db-export: ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql).
 	$(eval filename ?= dump.sql)
 	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
-
-.PHONY: redis
-redis: ## Connect to the redis CLI. Pass the parameter "c=" to run a command instead. Example: make redis c="flushdb"
-	$(DOCKER_COMPOSE) exec redis redis-cli $(c)
 
 .PHONY: toggle-cron
 toggle-cron: ## Enable/disable the cron container.
