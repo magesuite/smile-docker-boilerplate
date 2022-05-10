@@ -59,7 +59,8 @@ ps: ## List active containers. Pass the parameter "service=" to filter which con
 
 .PHONY: logs
 logs: ## Show container logs. Pass the parameter "service=" to filter which containers to watch.
-	$(DOCKER_COMPOSE) logs --tail=0 --follow $(service)
+	$(eval tail ?= 20)
+	$(DOCKER_COMPOSE) logs -f --tail $(tail) $(service)
 
 .PHONY: top
 top: ## Show running processes. Pass the parameter "service=" to filter which containers to list.
