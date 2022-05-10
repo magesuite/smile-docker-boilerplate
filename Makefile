@@ -163,18 +163,16 @@ vendor-bin: ## Run a binary located in vendor/bin. Example: make vendor-bin c=ph
 	$(VENDOR_BIN)/$(c)
 
 ## Code Quality
-.PHONY: phpcs
-phpcs: $(VENDOR_DIR) ## Run phpcs.
-	$(VENDOR_BIN)/phpcs $(c)
-
-.PHONY: phpmd
-phpmd: $(VENDOR_DIR) ## Run phpmd.
-	$(eval c ?= app/code ansi phpmd.xml.dist)
-	$(VENDOR_BIN)/phpmd $(c)
-
-.PHONY: phpstan
-phpstan: $(VENDOR_DIR) ## Run phpstan.
-	$(VENDOR_BIN)/phpstan $(c)
+.PHONY: analyse
+analyse: $(VENDOR_DIR) ## Run a static code analysis (phpcs, phpmd, phpstan, SmileAnalyser).
+	$(VENDOR_BIN)/phpcs
+	$(VENDOR_BIN)/phpmd app/code ansi phpmd.xml.dist
+	$(VENDOR_BIN)/phpstan
+	# SmileAnalyser creates a XML file that we have to read and delete
+	@$(DOCKER_COMPOSE) run --rm --no-deps php sh -c 'vendor/bin/SmileAnalyser launch --skipNotices yes --output xml --filename smileanalyser.xml \
+		&& ! cat smileanalyser.xml | grep "<error"'; \
+	status=$$?; rm -f $(MAGENTO_DIR)/smileanalyser.xml; if [ "$$status" -gt 0 ]; then exit "$$status"; fi
+	@printf "\033[32m✓ No errors found.\033[0m\n"
 
 .PHONY: phpunit
 phpunit: $(VENDOR_DIR) ## Run phpunit.
@@ -188,11 +186,6 @@ phpcbf: $(VENDOR_DIR) ## Run phpcbf.
 php-cs-fixer: $(VENDOR_DIR) ## Run php-cs-fixer.
 	$(eval c ?= fix --config=.php-cs-fixer.dist.php)
 	$(VENDOR_BIN)/php-cs-fixer $(c)
-
-.PHONY: smileanalyser
-smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
-	$(eval c ?= launch --profile magento2/*)
-	$(VENDOR_BIN)/SmileAnalyser $(c)
 
 # Docker files
 .env: | .env.dist
