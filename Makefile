@@ -113,7 +113,11 @@ endif
 ## Magento
 .PHONY: magento
 magento: $(VENDOR_DIR) ## Run "bin/magento". Pass the parameter "c=" to run a given command. Example: make magento c=indexer:status
-	$(PHP_CLI) bin/magento $(c)
+	$(eval debug ?= 0)
+	@if [ "$(debug)" != "0" ] && [ "$(debug)" != "1" ]; then echo "The variable "debug" must be equal to 0 or 1."; exit 1; \
+	elif [ "$(debug)" = "1" ]; then CMD="$(DOCKER_COMPOSE) run --rm --env PHP_IDE_CONFIG=serverName=_ $(PHP_XDEBUG_SERVICE) php -dxdebug.start_with_request=yes bin/magento $(c)"; \
+	else CMD="$(PHP_CLI) bin/magento $(c)"; fi; \
+	echo "$$CMD"; $$CMD
 
 .PHONY: cache-clean
 cache-clean: $(MAGENTO_ENV) ## Run "bin/magento cache:clean". Example: make cache-clean type="config layout"
