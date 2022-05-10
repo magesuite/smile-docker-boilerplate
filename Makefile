@@ -74,9 +74,8 @@ build: ## Build images. Pass the parameter "service=" to filter which images to 
 .PHONY: sh
 sh: ## Open a shell on the php container. Pass the parameter "service=" to connect to another container. Example: make sh service=redis
 	$(eval service ?= php) $(eval c ?= sh)
-	@if [ "$(service)" = "$(PHP_SERVICE)" ] || [ "$(service)" = "$(PHP_XDEBUG_SERVICE)" ]; \
-		then echo "$(DOCKER_COMPOSE) run --rm $(service) $(c)"; $(DOCKER_COMPOSE) run --rm $(service) $(c); \
-		else echo "$(DOCKER_COMPOSE) exec $(service) $(c)"; $(DOCKER_COMPOSE) exec $(service) $(c); fi
+	@[ "$(service)" = "$(PHP_SERVICE)" ] || [ "$(service)" = "$(PHP_XDEBUG_SERVICE)" ] \
+		&& CMD="$(DOCKER_COMPOSE) run --rm $(service) $(c)" || CMD="$(DOCKER_COMPOSE) exec $(service) $(c)"; echo "$$CMD" && $$CMD
 
 .PHONY: db
 db: ## Connect to the Magento database.
