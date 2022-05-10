@@ -32,8 +32,6 @@ services:
         user: ${DOCKER_UID}:${DOCKER_GID}
         environment:
             COMPOSER_AUTH: ${COMPOSER_AUTH:-}
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
         volumes:
             - ${MAGENTO_DIR}:/var/www/html:rw,cached
             - composer-cache:/tmp/composer
@@ -47,8 +45,6 @@ services:
                 PHP_VERSION: ${PHP_VERSION}
                 COMPOSER_VERSION: ${COMPOSER_VERSION}
         user: ${DOCKER_UID}:${DOCKER_GID}
-        environment:
-            PHP_IDE_CONFIG: serverName=_
         extra_hosts:
             - "host.docker.internal:host-gateway"
         volumes:
@@ -65,8 +61,6 @@ services:
         environment:
             DOCKER_UID: ${DOCKER_UID}
             DOCKER_GID: ${DOCKER_GID}
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
         volumes:
             - ${MAGENTO_DIR}:/var/www/html:rw,cached
 
