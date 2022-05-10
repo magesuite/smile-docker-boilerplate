@@ -27,9 +27,9 @@ VENDOR_BIN := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE) vendor/bin
 DB_CONNECTION := --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE
 
 # Target dependencies
-COMPOSER_FILE := $(MAGENTO_DIR)/composer.json
-VENDOR_DIR := $(MAGENTO_DIR)/vendor
 MAGENTO_ENV := $(MAGENTO_DIR)/app/etc/env.php
+NODE_MODULES_DIR := $(MAGENTO_DIR)/node_modules
+VENDOR_DIR := $(MAGENTO_DIR)/vendor
 
 .DEFAULT_GOAL := help
 
@@ -148,6 +148,10 @@ setup-upgrade: $(MAGENTO_ENV) ## Run "bin/magento setup:upgrade".
 setup-upgrade: c=setup:upgrade
 setup-upgrade: magento
 
+.PHONY: grunt
+grunt: $(NODE_MODULES_DIR) ## Run grunt. Example: make grunt c=watch
+	$(PHP_CLI) grunt $(c)
+
 ## Composer
 .PHONY: composer
 composer: $(COMPOSER_FILE) ## Run composer. Example: make composer c="require vendor/package:^1.0"
@@ -190,7 +194,7 @@ smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
 	$(eval c ?= launch --profile magento2/*)
 	$(VENDOR_BIN)/SmileAnalyser $(c)
 
-# File targets
+# Docker files
 .env: | .env.dist
 	@cp .env.dist .env
 	@echo ".env file was automatically created."
@@ -205,11 +209,20 @@ endif
 		fi; \
 	fi
 
+# Magento config file
 $(MAGENTO_ENV): | $(VENDOR_DIR)
 	$(error Please run `make setup-install` to initialize the database)
 
-$(VENDOR_DIR): | $(COMPOSER_FILE)
+# Composer files
+$(VENDOR_DIR): | $(MAGENTO_DIR)/composer.json
 	$(COMPOSER) install
 
-$(COMPOSER_FILE):
+$(MAGENTO_DIR)/composer.json:
+	$(error Please run `make init-project` to initialize the project)
+
+# Node files
+$(NODE_MODULES_DIR): | $(MAGENTO_DIR)/package.json
+	$(PHP_CLI) npm install
+
+$(MAGENTO_DIR)/package.json:
 	$(error Please run `make init-project` to initialize the project)
