@@ -39,14 +39,22 @@ Follow these steps:
    make install
    ```
 
-   This script will launch all containers and install the database (by running "bin/magento setup:install").
+   This script will install the database (by running "bin/magento setup:install").
 
-Magento should now be available at the following URLs:
+4. Launch containers that were not yet started (cron, web, varnish...):
+
+   ```
+   make up
+   ```
+
+Run the command `make ps` to check if all containers are up and healthy.
+
+## Accessing Magento
+
+Magento is available at the following URLs:
 
 - Magento frontend: https://{project_name}.docker.localhost
 - Magento admin: https://{project_name}.docker.localhost/admin (user: "admin", password: "magent0")
-
-If Magento is not available, run the command `make ps` to check if all containers are up and healthy.
 
 There are other services available at the following URLs:
 

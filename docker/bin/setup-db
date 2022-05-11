@@ -127,6 +127,9 @@ if [ "$USE_RABBITMQ" = "true" ]; then
         --amqp-virtualhost=$RABBITMQ_DEFAULT_VHOST"
 fi
 
+# Wait for the containers to be up and healthy
+print_and_run "docker compose up -d --remove-orphans --wait $PHP_CONTAINER"
+
 # Install Magento
 print_and_run $INSTALL_COMMAND
 
