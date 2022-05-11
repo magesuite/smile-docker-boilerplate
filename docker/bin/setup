@@ -282,10 +282,11 @@ fi
 # Step 4 - Update environment files.
 ########
 
-sedi "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env
 sedi "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env.dist
-sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
+sedi "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env
 sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env.dist
+sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
+sedi "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" .env.dist
 sedi "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" .env
 echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$PHP_VERSION to \"$PHP_VERSION\" and \$COMPOSER_VERSION to \"$COMPOSER_VERSION\" in .env and .env.dist.${RESET}"
 
