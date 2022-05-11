@@ -106,13 +106,13 @@ endif
 .PHONY: install
 install: $(VENDOR_DIR) ## Install Magento. If you change a value in magento.env, you must re-execute this to apply the change. Pass the parameter "reset_db=1" to reset the database.
 	$(eval reset_db ?= 0)
-	@if [ "$(reset_db)" != "0" ] && [ "$(reset_db)" != "1" ]; then echo "The variable "reset_db" must be equal to 0 or 1."; exit 1; fi
+	@if [ "$(reset_db)" != "0" ] && [ "$(reset_db)" != "1" ]; then echo "The variable \"reset_db\" must be equal to 0 or 1."; exit 1; fi
 	RESET_DB=$(reset_db) ./docker/bin/setup-db
 
 .PHONY: magento
 magento: $(VENDOR_DIR) ## Run "bin/magento". Pass the parameter "c=" to run a given command. Example: make magento c=indexer:status
 	$(eval debug ?= 0)
-	@if [ "$(debug)" != "0" ] && [ "$(debug)" != "1" ]; then echo "The variable "debug" must be equal to 0 or 1."; exit 1; \
+	@if [ "$(debug)" != "0" ] && [ "$(debug)" != "1" ]; then echo "The variable \"debug\" must be equal to 0 or 1."; exit 1; \
 	elif [ "$(debug)" = "1" ]; then CMD="$(DOCKER_COMPOSE) run --rm --env PHP_IDE_CONFIG=serverName=_ $(PHP_XDEBUG_SERVICE) php -dxdebug.start_with_request=yes bin/magento $(c)"; \
 	else CMD="$(PHP_CLI) bin/magento $(c)"; fi; \
 	echo "$$CMD"; $$CMD
