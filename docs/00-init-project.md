@@ -26,12 +26,13 @@ Follow these steps:
    make init-project
    ```
 
-   The script will behave differently depending on whether Magento files were found:
+   This script will:
 
-    - No Magento files found: the script will prompt you for the project information (project name, version, edition...), then initialize Magento with composer.
-    - Magento files found: the script will update the docker env files, and check if there is anything to add in composer.json (e.g. Smile modules or repositories).
+   - Update .env.dist and .env files (PROJECT_NAME, PHP_VERSION, COMPOSER_VERSION)
+   - Run composer create-project (if you did not copy a Magento installation to the "magento" directory)
+   - Add smile repositories / modules to composer.json file
 
-   By default, Magento is installed in a directory named "magento" (cf. $MAGENTO_DIR variable in .env.dist).
+   By default, Magento is initialized in a directory named "magento" (cf. $MAGENTO_DIR variable in .env.dist).
 
 3. Install the database with the following command:
 
