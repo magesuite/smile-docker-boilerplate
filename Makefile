@@ -103,6 +103,12 @@ endif
 	$(DOCKER_COMPOSE) up -d --no-deps cron
 
 ## Magento
+.PHONY: install
+install: $(VENDOR_DIR) ## Install Magento. If you change a value in magento.env, you must re-execute this to apply the change. Pass the parameter "reset_db=1" to reset the database.
+	$(eval reset_db ?= 0)
+	@if [ "$(reset_db)" != "0" ] && [ "$(reset_db)" != "1" ]; then echo "The variable "reset_db" must be equal to 0 or 1."; exit 1; fi
+	RESET_DB=$(reset_db) ./docker/bin/setup-db
+
 .PHONY: magento
 magento: $(VENDOR_DIR) ## Run "bin/magento". Pass the parameter "c=" to run a given command. Example: make magento c=indexer:status
 	$(eval debug ?= 0)
@@ -132,12 +138,6 @@ reconfigure: magento
 reindex: $(MAGENTO_ENV) ## Run "bin/magento indexer:reindex". Example: make reindex type="catalog_product"
 reindex: c=indexer:reindex $(type)
 reindex: magento
-
-.PHONY: setup-install
-setup-install: $(VENDOR_DIR) ## Run "bin/magento setup:install". If you change a value in magento.env, you must re-execute this to apply the change. Pass the parameter "reset_db=1" to reset the database.
-	$(eval reset_db ?= 0)
-	@if [ "$(reset_db)" != "0" ] && [ "$(reset_db)" != "1" ]; then echo "The variable "reset_db" must be equal to 0 or 1."; exit 1; fi
-	RESET_DB=$(reset_db) ./docker/bin/setup-db
 
 .PHONY: setup-upgrade
 setup-upgrade: $(MAGENTO_ENV) ## Run "bin/magento setup:upgrade".
