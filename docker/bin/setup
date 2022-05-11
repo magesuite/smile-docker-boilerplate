@@ -129,7 +129,7 @@ get_composer_create_project_cmd () {
 
     COMMAND="composer create-project --no-install --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_DIR"
 
-    if [ $(version_compare "$MAGENTO_VERSION" "2.4.4") = "<" ]; then
+    if [ $(version_compare "$MAGENTO_VERSION" "2.4.4") = "<" ] && [ "$COMPOSER_VERSION" != "1" ]; then
         COMMAND="$COMMAND && \
             composer config -d $TEMP_DIR allow-plugins.dealerdirect/phpcodesniffer-composer-installer true && \
             composer config -d $TEMP_DIR allow-plugins.laminas/laminas-dependency-plugin true && \
