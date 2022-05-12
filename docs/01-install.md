@@ -39,5 +39,5 @@ Magento is available at the following URLs:
 There are other services available at the following URLs:
 
 - Maildev interface: http://maildev.{project_name}.docker.localhost (this is where mails will be sent)
-- Elasticsearch REST API: http://elastic.{project_name}.skeleton.docker.localhost
+- Elasticsearch REST API: http://elastic.{project_name}.docker.localhost
 - Rabbitmq admin: http://rabbitmq.{project_name}.docker.localhost (user: "magento", password: "magento")
