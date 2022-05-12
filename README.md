@@ -34,7 +34,7 @@ Magento projects have the following requirements:
 
 ### Smile Images
 
-This boilerplate uses images hosted on https://registry.smile.fr.
+This boilerplate uses container images hosted on the Smile image registry.
 
 In order to use these images, generate a CLI secret on https://registry.smile.fr (in your user settings), then run the following command:
 
@@ -44,8 +44,7 @@ docker login -u <youruser> -p <your_secret> registry.smile.fr
 
 ## Documentation
 
-- [Setting Up the Boilerplate](docs/00-init-project.md) (for lead developers)
-- [Installation](docs/01-install.md) (for developers)
+- [Installation](docs/01-install.md)
 - [How to Use the Makefile](docs/02-makefile.md)
 - [Working with the Database](docs/03-database.md)
 - [How to use Xdebug](docs/04-xdebug.md)

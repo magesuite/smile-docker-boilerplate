@@ -13,57 +13,6 @@ sedi () {
     $($SEDI -e "$1" "$2")
 }
 
-# Ask user for an input value.
-ask_input () {
-    unset RESULT
-    QUESTION=$2
-    DEFAULT_VALUE=$3
-
-    while
-        printf "\n${GREEN}$QUESTION${RESET}\n"
-
-        if [ -n "$DEFAULT_VALUE" ]; then
-            read -p "[${BLUE}$DEFAULT_VALUE${RESET}] " RESULT
-        else
-            read RESULT
-        fi
-
-        if [ -z "$RESULT" ] && [ -n "$DEFAULT_VALUE" ]; then
-            RESULT="$DEFAULT_VALUE"
-        fi
-
-        [ "$RESULT" = "" ] && echo "${RED}Please provide a value.${RESET}"
-    do true; done
-
-    eval "$1='$RESULT'"
-}
-
-# Ask user to choose between yes and no.
-ask_yes_no () {
-    unset RESULT
-    QUESTION=$2
-    DEFAULT_VALUE=$3
-
-    while
-        printf "\n${GREEN}$QUESTION (${BLUE}y${GREEN}/${BLUE}n${GREEN})${RESET}\n"
-
-        if [ -n "$DEFAULT_VALUE" ]; then
-            read -p "[${BLUE}$DEFAULT_VALUE${RESET}] " RESULT
-        else
-            read RESULT
-        fi
-
-        if [ -z "$RESULT" ] && [ -n "$DEFAULT_VALUE" ]; then
-            RESULT="$DEFAULT_VALUE"
-        fi
-
-        RESULT=$(echo "$RESULT" | tr 'A-Z' 'a-z')
-        [ "$RESULT" != "y" ] && [ "$RESULT" != "n" ] && echo "${RED}You must choose between "y" or "n".${RESET}"
-    do true; done
-
-    eval "$1='$RESULT'"
-}
-
 # Compare two versions, returns "=", "<" or ">".
 version_compare () {
     if [[ $1 == $2 ]]; then
