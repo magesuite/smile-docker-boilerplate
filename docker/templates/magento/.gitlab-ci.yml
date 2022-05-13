@@ -7,5 +7,4 @@ sniffers:
         - php{php_ci_version}
         - ubuntu
     script:
-        - bin/magento setup:di:compile
         - vendor/bin/grumphp run --no-interaction

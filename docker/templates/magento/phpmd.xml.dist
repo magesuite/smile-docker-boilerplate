@@ -4,7 +4,10 @@
          xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
          xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
 
+    <rule ref="dev/tests/static/testsuite/Magento/Test/Php/_files/phpmd/ruleset.xml"/>
+
     <rule ref="rulesets/cleancode.xml">
+        <exclude name="ElseExpression"/>
         <exclude name="StaticAccess"/>
     </rule>
     <rule ref="rulesets/cleancode.xml/StaticAccess">
@@ -13,15 +16,4 @@
                 value="\DateTime"/>
         </properties>
     </rule>
-    <rule ref="rulesets/codesize.xml"/>
-    <rule ref="rulesets/design.xml"/>
-    <rule ref="rulesets/naming.xml">
-        <exclude name="LongVariable"/>
-    </rule>
-    <rule ref="rulesets/naming.xml/LongVariable">
-        <properties>
-            <property name="maximum" value="35" />
-        </properties>
-    </rule>
-    <rule ref="rulesets/unusedcode.xml"/>
 </ruleset>

@@ -36,10 +36,6 @@ VENDOR_DIR := $(MAGENTO_DIR)/vendor
 help:
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##)|(^##)' $(firstword $(MAKEFILE_LIST)) | awk 'BEGIN {FS = ":.*?## "; printf "Usage: make \033[32m<target>\033[0m\n"}{printf "\033[32m%-20s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /\n[33m/'
 
-.PHONY: init-project
-init-project:
-	@./docker/bin/setup
-
 ## Docker
 .PHONY: up
 up: ## Build and start containers. Pass the parameter "service=" to filter which containers to start. Example: make up service=php
@@ -106,7 +102,6 @@ endif
 .PHONY: install
 install: $(VENDOR_DIR) ## Install Magento. If you change a value in magento.env, you must re-execute this to apply the change. Pass the parameter "reset_db=1" to reset the database.
 	$(eval reset_db ?= 0)
-	@if [ "$(reset_db)" != "0" ] && [ "$(reset_db)" != "1" ]; then echo "The variable \"reset_db\" must be equal to 0 or 1."; exit 1; fi
 	RESET_DB=$(reset_db) ./docker/bin/setup-db
 
 .PHONY: magento
@@ -160,19 +155,23 @@ vendor-bin: ## Run a binary located in vendor/bin. Example: make vendor-bin c=ph
 
 ## Code Quality
 .PHONY: analyse
-analyse: $(VENDOR_DIR) ## Run a static code analysis (phpcs, phpmd, phpstan, SmileAnalyser).
-	$(VENDOR_BIN)/phpcs
-	$(VENDOR_BIN)/phpmd app/code ansi phpmd.xml.dist
-	$(VENDOR_BIN)/phpstan
-	# SmileAnalyser creates a XML file that we have to read and delete
-	@$(DOCKER_COMPOSE) run --rm --no-deps php sh -c 'vendor/bin/SmileAnalyser launch --skipNotices yes --output xml --filename smileanalyser.xml \
-		&& ! cat smileanalyser.xml | grep "<error"'; \
-	status=$$?; rm -f $(MAGENTO_DIR)/smileanalyser.xml; if [ "$$status" -gt 0 ]; then exit "$$status"; fi
-	@printf "\033[32m✓ No errors found.\033[0m\n"
+analyse: $(VENDOR_DIR) ## Run a static code analysis on the entire codebase (files must be known to git).
+	$(VENDOR_BIN)/grumphp run --testsuite=static
 
-.PHONY: phpunit
-phpunit: $(VENDOR_DIR) ## Run phpunit.
-	$(VENDOR_BIN)/phpunit $(c)
+.PHONY: pre-commit
+pre-commit: $(VENDOR_DIR) ## Run a static code analysis on staged files.
+	$(VENDOR_BIN)/grumphp git:pre-commit
+
+.PHONY: smileanalyser
+smileanalyser: ## Run smileanalyser
+	@$(DOCKER_COMPOSE) run --rm --no-deps php sh -c 'vendor/bin/SmileAnalyser launch --skipNotices yes --output xml --filename smileanalyser.xml \
+		&& [ -f "smileanalyser.xml" ] && ! cat smileanalyser.xml | grep "<error"'; \
+	status=$$?; rm -f $(MAGENTO_DIR)/smileanalyser.xml; if [ "$$status" -gt 0 ]; then exit "$$status"; fi
+	@printf "\033[32mNo errors found.\033[0m\n"
+
+.PHONY: tests
+tests: $(VENDOR_DIR) ## Run phpunit.
+	$(VENDOR_BIN)/grumphp run --testsuite=tests
 
 .PHONY: phpcbf
 phpcbf: $(VENDOR_DIR) ## Run phpcbf.
@@ -182,6 +181,11 @@ phpcbf: $(VENDOR_DIR) ## Run phpcbf.
 php-cs-fixer: $(VENDOR_DIR) ## Run php-cs-fixer.
 	$(eval c ?= fix --config=.php-cs-fixer.dist.php)
 	$(VENDOR_BIN)/php-cs-fixer $(c)
+
+# Targets not shown in help
+.PHONY: init-project
+init-project:
+	@./docker/bin/setup
 
 # Docker files
 .env: | .env.dist

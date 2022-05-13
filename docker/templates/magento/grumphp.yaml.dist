@@ -1,0 +1,46 @@
+# GrumPHP analyses all files that are not in .gitignore.
+# In the pre-commit hook, it analyses all staged files.
+grumphp:
+    git_hook_variables:
+        EXEC_GRUMPHP_COMMAND: docker compose --project-directory ../ run -T --rm --no-deps php
+    process_timeout: 120
+    fixer:
+        enabled: false
+    ascii:
+        failed: ~
+        succeeded: ~
+    tasks:
+        phpcs:
+            # No need to include phpcs.xml.dist (automatically detected)
+            whitelist_patterns:
+                - /^app\/code/
+                - /^app\/design/
+            triggered_by:
+                - php
+                - phtml
+        phpmd:
+            ruleset:
+                - phpmd.xml.dist
+            report_format: ansi
+            whitelist_patterns:
+                - /^app\/code/
+        phpstan:
+            # No need to include phpstan.neon.dist (automatically detected)
+            ignore_patterns:
+                - /^(?!app\/code)/
+        phpunit: ~
+            # No need to include phpunit.xml.dist (automatically detected)
+    testsuites:
+        git_pre_commit:
+            tasks:
+                - phpcs
+                - phpmd
+                - phpstan
+        static:
+            tasks:
+                - phpcs
+                - phpmd
+                - phpstan
+        tests:
+            tasks:
+                - phpunit

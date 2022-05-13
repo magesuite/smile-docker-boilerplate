@@ -57,11 +57,15 @@ Example: `make setup-upgrade debug=1`
 
 The following targets can be used to analyse your code/run tests:
 
-- `make analyse`: run phpcs, phpmd, phpstan and smileanalyser.
-- `make phpunit`: run phpunit.
+- `make analyse`: run a static code analysis ([GrumPHP](../docker/templates/magento/grumphp.yaml.dist)) on the entire codebase (files must be known to git).
+- `make pre-commit`: run a static code analysis ([GrumPHP](../docker/templates/magento/grumphp.yaml.dist)) on staged files.
+- `make smileanalyser`: run [SmileAnalyser](https://git.smile.fr/dirtech/smileanalyser/).
+- `make tests`: run phpunit.
 
 **These targets must not report any error**!
 Don't commit your code if these commands report errors.
+
+If GrumPHP is installed correctly, your code will be automatically validated when you create a new commit.
 
 ## Composer
 
