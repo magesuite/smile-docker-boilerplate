@@ -237,7 +237,7 @@ fi
 # Check whether Magento files already exist
 [ -f "$MAGENTO_DIR/composer.json" ] && CREATE_PROJECT=n || CREATE_PROJECT=y
 
-# Project name (PROJECT_NAME in command-line)
+# Project name ("PROJECT" in command-line)
 PROJECT_NAME="${PROJECT:-$PROJECT_NAME}"
 ! validate_project_name $PROJECT_NAME && exit 1
 
