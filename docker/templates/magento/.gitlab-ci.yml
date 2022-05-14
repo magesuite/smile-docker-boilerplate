@@ -8,3 +8,5 @@ sniffers:
         - ubuntu
     script:
         - vendor/bin/grumphp run --no-interaction
+        - vendor/bin/SmileAnalyser launch --skipNotices yes --output xml --filename smileanalyser.xml && [ -f "smileanalyser.xml" ] && ! cat smileanalyser.xml | grep "<error"; status=$?
+        - if [ "$status" -gt 0 ]; then exit "$status"; fi
