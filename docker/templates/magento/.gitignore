@@ -40,8 +40,8 @@
 
 # Docker (when installed in the same directory as Magento)
 !/.env.dist
-!/docker-compose.yml
-!/docker-compose.*.yml
+!/compose.yaml
+!/compose.*.yaml
 !/Makefile
 
 # Tools

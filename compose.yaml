@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
     varnish:
         image: ${VARNISH_IMAGE}
