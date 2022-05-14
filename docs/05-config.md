@@ -42,6 +42,7 @@ services:
     redis:
         volumes:
             - redisdata:/data
+
 volumes:
     redisdata:
 ```
