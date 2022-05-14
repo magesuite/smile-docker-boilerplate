@@ -74,16 +74,19 @@ sh: ## Open a shell on the php container. Pass the parameter "service=" to conne
 		&& CMD="$(DOCKER_COMPOSE) run --rm $(service) $(c)" || CMD="$(DOCKER_COMPOSE) exec $(service) $(c)"; echo "$$CMD" && $$CMD
 
 .PHONY: db
-db: ## Connect to the Magento database.
+db: service := --wait db
+db: up ## Connect to the Magento database.
 	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysql $(DB_CONNECTION)'
 
 .PHONY: db-import
-db-import: ## Import a database dump. Pass the parameter "filename=" to set the filename (default: dump.sql).
+db-import: service := --wait db
+db-import: up ## Import a database dump. Pass the parameter "filename=" to set the filename (default: dump.sql).
 	$(eval filename ?= dump.sql)
 	$(DOCKER_COMPOSE) exec -T $(DB_SERVICE) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
 
-.PHONY: db-dump
-db-export: ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql).
+.PHONY: db-export
+db-export: service := --wait db
+db-export: up ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql).
 	$(eval filename ?= dump.sql)
 	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
 
