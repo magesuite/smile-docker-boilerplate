@@ -23,12 +23,12 @@ cd ../..
 # Validate the project name.
 validate_project_name () {
     if [ -z "$1" ]; then
-        echo "${RED}You must set the variable \"\$PROJECT\" (project name).${RESET}"
+        echo "${RED}You must set the variable \"PROJECT\" (project name).${RESET}"
         return 1
     fi
 
     if [ "$(echo "$1" | tr -d 'a-z0-9-')" != "" ]; then
-        echo "${RED}The project name is not valid. Use only lowercase letters, numbers, and hyphens.${RESET}"
+        echo "${RED}The project name \"$1\" is not valid. Use only lowercase letters, numbers, and hyphens.${RESET}"
         return 1
     fi
 
@@ -38,20 +38,20 @@ validate_project_name () {
 # Validate the Magento version.
 validate_magento_version () {
     if [ -z "$1" ]; then
-        echo "${RED}You must set the variable \"\$VERSION\" (Magento version, e.g. \"2.4.4\").${RESET}"
+        echo "${RED}You must set the variable \"VERSION\" (e.g. \"2.4.4\").${RESET}"
         return 1
     fi
 
     if [[ ! "$1" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
-        echo "${RED}The Magento version is not valid.${RESET}"
+        echo "${RED}The value \"$1\" is not a valid Magento version.${RESET}"
         return 1
     fi
 
     if [ $(version_compare "$1" "2.4.0") = "<" ]; then
-        echo "${RED}The version must be greater or equal to 2.4.0.${RESET}"
+        echo "${RED}The Magento version must be greater or equal to 2.4.0.${RESET}"
         return 1
     elif [ $(version_compare "$1" "2.4.5") != "<" ]; then
-        echo "${RED}The version must be lower or equal to 2.4.4.${RESET}"
+        echo "${RED}The Magento version must be lower or equal to 2.4.4.${RESET}"
         return 1
     fi
 
@@ -233,7 +233,7 @@ MAGENTO_EDITION="${EDITION:-community}"
 
 # Whether to add Smile modules / packagist ("SMILE_PACKAGES" in command-line)
 ADD_SMILE_PACKAGES="${SMILE_PACKAGES:-y}"
-[ "$ADD_SMILE_PACKAGES" != "y" ] && [ "$ADD_SMILE_PACKAGES" != "n" ] && echo "${RED}\$ADD_SMILE_PACKAGES must be equal to \"y\" or \"n\".${RESET}." && exit 1
+[ "$ADD_SMILE_PACKAGES" != "y" ] && [ "$ADD_SMILE_PACKAGES" != "n" ] && echo "${RED}SMILE_PACKAGES must be equal to \"y\" or \"n\".${RESET}." && exit 1
 
 # Smile packagist type (SMILE_PACKAGIST in command-line)
 [ "$CREATE_PROJECT" = "n" ] && grep -F -e magento/magento-cloud-metapackage "$MAGENTO_DIR/composer.json" > /dev/null && DEFAULT_SMILE_PACKAGIST=public || DEFAULT_SMILE_PACKAGIST=internal
