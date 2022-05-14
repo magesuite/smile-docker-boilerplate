@@ -35,7 +35,8 @@ ENV COMPOSER_HOME /tmp/composer
 RUN set -ex; \
     mkdir $COMPOSER_HOME; \
     chmod 777 $COMPOSER_HOME; \
-    curl -sS https://getcomposer.org/installer | php -- --$COMPOSER_VERSION --install-dir=/usr/local/bin --filename=composer
+    curl -sS https://getcomposer.org/installer | php -- --$COMPOSER_VERSION --install-dir=/usr/local/bin --filename=composer; \
+    if [ "$COMPOSER_VERSION" = "1" ]; then composer global require hirak/prestissimo; fi
 
 # Add Smile certificates (required for https access to Smile packagist)
 RUN set -ex; \
