@@ -49,3 +49,11 @@ docker login -u <youruser> -p <your_secret> registry.smile.fr
 - [Working with the Database](docs/03-database.md)
 - [How to use Xdebug](docs/04-xdebug.md)
 - [Customizing Containers](docs/05-config.md)
+
+## Links
+
+We encourage you to read the following resources:
+
+- [Magento best practices](https://wiki.galaxy.intranet/wiki/Best_Practices_(Magento))
+- [Magento performance tuning](https://wiki.galaxy.intranet/wiki/Performance_Tuning_(Magento))
+- [Installing Magepack](https://wiki.galaxy.intranet/wiki/Magepack) (recommended if you extend the luma or blank themes)

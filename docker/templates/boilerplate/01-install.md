@@ -47,6 +47,7 @@ There are other services available at the following URLs:
 If you experience any issue with the docker containers:
 
 - Make sure that Traefik is [up and running](https://git.smile.fr/docker/traefik#usage).
+- Make sure that the "magento" directory isn't owned by the root user.
 - Check if the .env file exists.
 - In the .env file:
    - Check if that PROJECT_NAME is defined.

@@ -18,11 +18,7 @@ Traefik must be [up and running](https://git.smile.fr/docker/traefik#usage).
    git clone --depth=1 git@git.smile.fr:magento2/docker-boilerplate $PROJECT_NAME && cd "$_" && rm -rf .git
    ```
 
-The project name must only use the following characters:
-
-- lowercase letters (`a-z`)
-- numbers (`0-9`)
-- hyphens (`-`)
+   The project name must only contain the following characters: lowercase letters (`a-z`), numbers (`0-9`) and hyphens (`-`).
 
 3. The next step will depend on what you need to do:
 
@@ -42,12 +38,13 @@ Follow the steps below:
    make init-project PROJECT=$PROJECT_NAME VERSION=2.4.4 EDITION=community
    ```
 
-   This script will create the Magento files in ./magento.
+   This script will update the docker env files and run "composer create-project".
+   The Magento project is created in the "magento" directory.
 
-   The "EDITION" variable can be either `community` or `enterprise`.
+   The "EDITION" variable must be either `community` or `enterprise`.
    The full list of parameters handled by this script is [documented here](../docker/bin/setup#L6).
 
-2. Install the Magento database with the following command:
+2. Run the following command to install the Magento database:
 
    ```
    make install
@@ -90,7 +87,7 @@ This section will show you how to initialize a new Magento cloud project with th
 
    The full list of parameters handled by this script is [documented here](../docker/bin/setup#L6).
 
-4. Install the Magento database with the following command:
+4. Run the following command to install the Magento database:
 
    ```
    make install
@@ -127,13 +124,18 @@ This section will show you how to use this boilerplate with existing Magento sou
 
    The full list of parameters handled by this script is [documented here](../docker/bin/setup#L6).
 
-3. Install the Magento database with the following command:
+3. *Optional:* if you need to import a database dump file, run the following command:
+   `make db-import filename=/path/to/dump.sql`
+
+4. Run the following command to install Magento:
 
    ```
    make install
    ```
 
-4. If you already had a .gitlab-ci.yml file in your Magento codebase, you might want to update it with the contents of [docker/templates/magento/.gitlab-ci.yml](../docker/templates/magento/.gitlab-ci.yml)
+   It will install and configure Magento by running setup:install (as well as several other commands, such as deploy:mode:set).
+
+5. If you already had a .gitlab-ci.yml file in your Magento codebase, you might want to update it with the contents of [docker/templates/magento/.gitlab-ci.yml](../docker/templates/magento/.gitlab-ci.yml)
    (you will have to manually replace "{php_ci_version}" with a valid php version, e.g. "81"). 
    Same with the [.gitignore](../docker/templates/magento/.gitignore) file.
 
@@ -142,26 +144,26 @@ You can move to the next step: [checking if the Magento store is available](#acc
 
 ## Accessing the Magento Store
 
-First, execute the following command to launch the containers that were not yet started (cron, web, varnish...):
+1. First, execute the following command to launch the containers that were not yet started (cron, web, varnish...):
 
-```
-make up
-```
+   ```
+   make up
+   ```
 
-Then, run the command `make ps` to make sure that no container failed to start.
+2. Run the command `make ps` to make sure that no container failed to start.
 
-Magento is available at the following URLs (replace "myproject" with your project name):
+3. Magento is available at the following URLs (replace "myproject" with your project name):
 
-- Magento frontend: https://myproject.docker.localhost
-- Magento admin: https://myproject.docker.localhost/admin (user: "admin", password: "magent0")
+   - Magento frontend: https://myproject.docker.localhost
+   - Magento admin: https://myproject.docker.localhost/admin (user: "admin", password: "magent0")
 
-There are other services available at the following URLs (replace "myproject" with your project name):
+   There are other services available at the following URLs (replace "myproject" with your project name):
 
-- Maildev interface: http://maildev.myproject.docker.localhost (this is where mails will be sent)
-- Elasticsearch REST API: http://elastic.myproject.docker.localhost
-- Rabbitmq admin: http://rabbitmq.myproject.docker.localhost (user: "magento", password: "magento")
+   - Maildev interface: http://maildev.myproject.docker.localhost (this is where mails will be sent)
+   - Elasticsearch REST API: http://elastic.myproject.docker.localhost
+   - Rabbitmq admin: http://rabbitmq.myproject.docker.localhost (user: "magento", password: "magento")
 
-If the Magento store is available, you can move to the final step: [creating Git repositories](#creating-git-repositories).
+If the Magento store is available, you can move to the final step: [creating git repositories](#creating-git-repositories).
 
 ## Creating Git Repositories
 
@@ -174,7 +176,8 @@ After you have confirmed that Magento is properly installed:
    - https://git.smile.fr/myproject/docker-boilerplate
    - https://git.smile.fr/myproject/magento
 
-2. Update the file docs/01-install.md and update the sample URLs (git repository URLs, docker container URLs).
+2. Update the file docs/01-install.md and update the sample git URLs.
+   Don't forget to regularly update this file when necessary (e.g. adding a step to recommend running `make reconfigure env=dev` if your project uses the Smile reconfigure module).
 
 3. Push the boilerplate and Magento files to these repositories.
    For example:
@@ -208,6 +211,7 @@ After you have pushed your code to both repositories, your project is now succes
 If you experience any issue with the docker containers:
 
 - Make sure that Traefik is [up and running](https://git.smile.fr/docker/traefik#usage).
+- Make sure that the "magento" directory isn't owned by the root user.
 - Check if the .env file exists.
 - In the .env file:
     - Check if that PROJECT_NAME is defined.
