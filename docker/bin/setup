@@ -58,27 +58,11 @@ validate_magento_version () {
     return 0
 }
 
-# Validate the Magento edition.
+# Validate the Magento edition (no validation when Magento sources already exist, because this variable won't be used).
 validate_magento_edition () {
-    if [ "$CREATE_PROJECT" = "y" ]; then
-        if [ -z "$1" ]; then
-            echo "${RED}You must set the variable \"\$EDITION\" (\"community\" or \"enterprise\").${RESET}"
-            echo && echo "If you want to initialize a Magento cloud project, you must first move your Magento installation to $MAGENTO_DIR, then re-execute this script without specifying the edition variable."
-            return 1
-        fi
-
-        if [ "$1" != "community" ] && [ "$1" != "enterprise" ]; then
-            echo "${RED}The Magento edition must be either \"community\" or \"enterprise\".${RESET}"
-            echo && echo "If you want to initialize a Magento cloud project, you must first move your Magento installation to $MAGENTO_DIR, then re-execute this script without specifying the edition variable."
-            return 1
-        fi
-    fi
-
-    return 0
-
-    if [ "$1" != "community" ] && [ "$1" != "enterprise" ]; then
+    if [ "$CREATE_PROJECT" = "y" ] && [ "$1" != "community" ] && [ "$1" != "enterprise" ]; then
         echo "${RED}The Magento edition must be either \"community\" or \"enterprise\".${RESET}"
-        echo && echo "Notice: If you want to initialize a Magento cloud project, you must first move your Magento installation to $MAGENTO_DIR, then re-execute this script without specifying the edition variable."
+        echo && echo "If you want to initialize a Magento cloud project, you must first move your Magento installation to $MAGENTO_DIR, then re-execute this script without specifying the edition variable."
         return 1
     fi
 
