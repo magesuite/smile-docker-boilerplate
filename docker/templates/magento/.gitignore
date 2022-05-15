@@ -1,44 +1,43 @@
-# Magento
-/app/*.*
-/app/design/*/Magento
-/app/etc/*
-/app/i18n/magento
-/bin
-/dev/.htaccess
-/dev/tests
-/dev/tools/*.*
-/dev/tools/grunt
-/dev/tools/Magento
-/dev/tools/UpgradeScripts
-/generated
-/lib/.htaccess
-/lib/internal/GnuFreeFont
-/lib/internal/LinLibertineFont
-/lib/web
-/node_modules
-/phpserver
-/pub
-/setup
-/var
-/vendor
-/*.*
-/robots.txt
-!/app/etc/config.php
-!/dev/tools/grunt/configs/local-themes.js
-!/grunt-config.json
-!/Gruntfile.js
-!/package.json
+*
 
-# Generic
-.DS_Store
-/.idea
-/.vscode
+# Magento
+!/app
+!/app/code
+!/app/code/**
+!/app/etc
+!/app/design
+!/app/design/**
+!/app/etc/config.php
+!/app/i18n
+!/app/i18n/**
+!/dev
+!/dev/tools
+!/dev/tools/grunt
+!/dev/tools/grunt/configs
+!/dev/tools/grunt/configs/local-themes.js
+!/m2-hotfixes
+!/m2-hotfixes/**
 !/.gitignore
 !/composer.json
 !/composer.lock
-!/README*.md
+!/grunt-config.json
+!/Gruntfile.js
+!/package.json
+!/README.md
+
+# Magento Cloud
+!/.magento
+!/.magento/**
+/.magento/local
+!/.magento.app.yaml
+!/.magento.env.yaml*
+!/magento-vars.php
 
 # Docker (when installed in the same directory as Magento)
+!/docker
+!/docker/**
+!/docs
+!/docs/**
 !/.env.dist
 !/compose.yaml
 !/compose.*.yaml

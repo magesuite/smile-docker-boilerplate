@@ -1,7 +1,7 @@
 ARG PHP_VERSION=8.1
 FROM registry.smile.fr/magento2/php:$PHP_VERSION-fpm as base
 
-# Install msmtp, git (required for projects that use grumphp) and shadow utils (for usermod/groupmod)
+# Install msmtp, git (for git clone and GrumPHP) and shadow utils (for usermod/groupmod)
 RUN set -ex; \
     apk update; \
     apk add --no-cache git msmtp shadow
@@ -36,7 +36,7 @@ RUN set -ex; \
     mkdir $COMPOSER_HOME; \
     chmod 777 $COMPOSER_HOME; \
     curl -sS https://getcomposer.org/installer | php -- --$COMPOSER_VERSION --install-dir=/usr/local/bin --filename=composer; \
-    if [ "$COMPOSER_VERSION" = "1" ]; then composer global require hirak/prestissimo; fi
+    if [ "$COMPOSER_VERSION" = "1" ]; then composer global require --no-cache --no-plugins hirak/prestissimo; fi
 
 # Add Smile certificates (required for https access to Smile packagist)
 RUN set -ex; \

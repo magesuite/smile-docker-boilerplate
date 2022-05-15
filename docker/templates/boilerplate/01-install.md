@@ -28,6 +28,7 @@ Follow these steps:
    ```
 
 Run the command `make ps` to check if all containers are up and running.
+If a container failed to start, go to [the troubleshooting section](#troubleshooting).
 
 ## Accessing Magento
 
