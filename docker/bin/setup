@@ -382,8 +382,6 @@ cp -n docker/templates/magento/grumphp.yaml.dist "$MAGENTO_DIR"
 # Step 5 - Run composer.
 ########
 
-RUN_COMPOSER=y
-
 if [ "$RUN_COMPOSER" = "y" ]; then
     if [ "$SMILE_PACKAGIST" = "public" ] && [ "$ADD_SMILE_PACKAGIST" = "y" ]; then
         echo && echo "${YELLOW}WARNING: This script will add the repository \"$SMILE_PACKAGIST_URL\" to composer.json. Composer will ask for access keys."
