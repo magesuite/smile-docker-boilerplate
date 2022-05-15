@@ -31,7 +31,9 @@
 /.magento/local
 !/.magento.app.yaml
 !/.magento.env.yaml*
+!/build_options.ini
 !/magento-vars.php
+!/op-exclude.txt
 
 # Docker (when installed in the same directory as Magento)
 !/docker
