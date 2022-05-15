@@ -19,7 +19,7 @@ This boilerplate is currently only compatible with Linux.
 The following tools **must** be installed on your system:
 
 - Git
-- [Docker Compose V2](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+- [Docker Compose V2](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository) (don't forget to apply the [post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/))
 - [Traefik Proxy](https://git.smile.fr/docker/traefik)
 
 To check if Docker Compose V2 is installed on your system, run the following command: `docker compose version`.
@@ -49,6 +49,7 @@ docker login -u <youruser> -p <your_secret> registry.smile.fr
 - [Working with the Database](docs/03-database.md)
 - [How to use Xdebug](docs/04-xdebug.md)
 - [Customizing Containers](docs/05-config.md)
+- [Troubleshooting](docs/06-troubleshooting.md)
 
 ## Links
 

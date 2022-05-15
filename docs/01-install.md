@@ -123,7 +123,7 @@ You can move to the next step: [checking if the Magento store is available](#acc
    ```
 
 2. Run the command `make ps` to make sure that no container failed to start.
-   If a container failed to start, go to [the troubleshooting section](#troubleshooting).
+   If a container failed to start, please refer to [the troubleshooting section](06-troubleshooting.md).
 
 4. Magento is available at the following URLs (replace "myproject" with your project name):
 
@@ -197,39 +197,3 @@ In Settings > CI/CD, add a variable named "COMPOSER_AUTH":
 ```
 
 If you initialized a Magento cloud project, this variable must also contain the access keys to packagist.smile.fr.
-
-## Troubleshooting
-
-### Docker
-
-If you experience any issue with the docker containers:
-
-- Make sure that Traefik is [up and running](https://git.smile.fr/docker/traefik#usage).
-- Make sure that the "magento" directory isn't owned by the root user.
-- Check if the .env file exists.
-- In the .env file:
-    - Check if that PROJECT_NAME is defined.
-    - Check if DOCKER_UID and DOCKER_GID match the output of `id -u` and `id -g`.
-    - Check if PHP_VERSION and COMPOSER_VERSION match the requirements of your project.
-
-If a container is failing, you can check the startup logs by running `docker compose run --rm <container_name>` (e.g. "web").
-
-### GitLab CI
-
-If you are using Magento < 2.4.2, the gitlab runner will probably fail.
-This is because the gitlab runner only has composer 2 available, but older versions of Magento require composer 1.
-
-To fix the issue, in magento/.gitlab-ci.yml, change:
-
-```
-before_script:
-    - composer install
-```
-
-To:
-
-```
-before_script:
-    - curl -sS https://getcomposer.org/installer | php -- --1
-    - ./composer.phar install
-```

@@ -28,7 +28,7 @@ Follow these steps:
    ```
 
 Run the command `make ps` to check if all containers are up and running.
-If a container failed to start, go to [the troubleshooting section](#troubleshooting).
+If a container failed to start, please refer to [the troubleshooting section](06-troubleshooting.md).
 
 ## Accessing Magento
 
@@ -42,17 +42,3 @@ There are other services available at the following URLs:
 - Maildev interface: http://maildev.{project_name}.docker.localhost (this is where mails will be sent)
 - Elasticsearch REST API: http://elastic.{project_name}.docker.localhost
 - Rabbitmq admin: http://rabbitmq.{project_name}.docker.localhost (user: "magento", password: "magento")
-
-## Troubleshooting
-
-If you experience any issue with the docker containers:
-
-- Make sure that Traefik is [up and running](https://git.smile.fr/docker/traefik#usage).
-- Make sure that the "magento" directory isn't owned by the root user.
-- Check if the .env file exists.
-- In the .env file:
-   - Check if that PROJECT_NAME is defined.
-   - Check if DOCKER_UID and DOCKER_GID match the output of `id -u` and `id -g`.
-   - Check if PHP_VERSION and COMPOSER_VERSION match the requirements of your project.
-
-If a container is failing, you can check the startup logs by running `docker compose run --rm <container_name>` (e.g. "web").
