@@ -1,14 +1,10 @@
-ifneq ($(shell command -v docker > /dev/null; echo $$?),0)
-    $(error Docker must be installed)
-endif
+.DEFAULT_GOAL := help
+SHELL := /bin/bash
+UNAME := $(shell uname)
 
-ifneq ($(shell docker compose > /dev/null 2>&1; echo $$?),0)
+ifneq ($(shell docker compose version > /dev/null 2>&1; echo $$?),0)
     $(error Docker Compose plugin must be installed)
 endif
-
-include .env
-
-UNAME := $(shell uname)
 
 ifeq ($(UNAME),Darwin)
     SEDI := sed -i ''
@@ -16,22 +12,20 @@ else
     SEDI := sed -i
 endif
 
+include .env
+
 # Docker
 DOCKER_COMPOSE := docker compose
 PHP_SERVICE := php
 PHP_XDEBUG_SERVICE := php_xdebug
 DB_SERVICE := db
-PHP_CLI := $(DOCKER_COMPOSE) run --rm $(PHP_SERVICE)
-COMPOSER := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE) composer
-VENDOR_BIN := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE) vendor/bin
+PHP_CLI := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE)
 DB_CONNECTION := --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE
 
 # Target dependencies
 MAGENTO_ENV := $(MAGENTO_DIR)/app/etc/env.php
 NODE_MODULES_DIR := $(MAGENTO_DIR)/node_modules
 VENDOR_DIR := $(MAGENTO_DIR)/vendor
-
-.DEFAULT_GOAL := help
 
 help:
 	@grep -E '(^[a-zA-Z0-9_-]+:.*?##)|(^##)' $(firstword $(MAKEFILE_LIST)) | awk 'BEGIN {FS = ":.*?## "; printf "Usage: make \033[32m<target>\033[0m\n"}{printf "\033[32m%-20s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /\n[33m/'
@@ -74,18 +68,18 @@ sh: ## Open a shell on the php container. Pass the parameter "service=" to conne
 		&& CMD="$(DOCKER_COMPOSE) run --rm $(service) $(c)" || CMD="$(DOCKER_COMPOSE) exec $(service) $(c)"; echo "$$CMD" && $$CMD
 
 .PHONY: db
-db: service := --wait db
+db: service := --wait $(DB_SERVICE)
 db: up ## Connect to the Magento database.
 	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysql $(DB_CONNECTION)'
 
 .PHONY: db-import
-db-import: service := --wait db
+db-import: service := --wait $(DB_SERVICE)
 db-import: up ## Import a database dump. Pass the parameter "filename=" to set the filename (default: dump.sql).
 	$(eval filename ?= dump.sql)
 	$(DOCKER_COMPOSE) exec -T $(DB_SERVICE) sh -c 'mysql $(DB_CONNECTION)' < $(filename)
 
 .PHONY: db-export
-db-export: service := --wait db
+db-export: service := --wait $(DB_SERVICE)
 db-export: up ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql).
 	$(eval filename ?= dump.sql)
 	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
@@ -112,7 +106,7 @@ magento: $(VENDOR_DIR) ## Run "bin/magento". Pass the parameter "c=" to run a gi
 	$(eval debug ?= 0)
 	@if [ "$(debug)" != "0" ] && [ "$(debug)" != "1" ]; then echo "The variable \"debug\" must be equal to 0 or 1."; exit 1; \
 	elif [ "$(debug)" = "1" ]; then CMD="$(DOCKER_COMPOSE) run --rm --env PHP_IDE_CONFIG=serverName=_ $(PHP_XDEBUG_SERVICE) php -dxdebug.start_with_request=yes bin/magento $(c)"; \
-	else CMD="$(PHP_CLI) bin/magento $(c)"; fi; \
+	else CMD="$(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) bin/magento $(c)"; fi; \
 	echo "$$CMD"; $$CMD
 
 .PHONY: cache-clean
@@ -148,42 +142,37 @@ grunt: $(NODE_MODULES_DIR) ## Run grunt. Example: make grunt c=watch
 
 ## Composer
 .PHONY: composer
-composer: $(COMPOSER_FILE) ## Run composer. Example: make composer c="require vendor/package:^1.0"
-	$(COMPOSER) $(c)
+composer: $(VENDOR_DIR) ## Run composer. Example: make composer c="require vendor/package:^1.0"
+	$(PHP_CLI) composer $(c)
 
 .PHONY: vendor-bin
-vendor-bin: ## Run a binary located in vendor/bin. Example: make vendor-bin c=phpcs
+vendor-bin: $(VENDOR_DIR) ## Run a binary located in vendor/bin. Example: make vendor-bin c=phpcs
 	@if [ -z "$(c)" ]; then echo "Please provide a command. Example: make vendor-bin c=phpcs."; exit 1; fi
-	$(VENDOR_BIN)/$(c)
+	$(PHP_CLI) vendor/bin/$(c)
 
 ## Code Quality
 .PHONY: analyse
 analyse: $(VENDOR_DIR) ## Run a static code analysis on the entire codebase (files must be known to git).
-	$(VENDOR_BIN)/grumphp run --testsuite=static
+	$(PHP_CLI) vendor/bin/grumphp run --testsuite=static
 
 .PHONY: pre-commit
 pre-commit: $(VENDOR_DIR) ## Run a static code analysis on staged files.
-	$(VENDOR_BIN)/grumphp git:pre-commit
+	$(PHP_CLI) vendor/bin/grumphp git:pre-commit
 
 .PHONY: smileanalyser
-smileanalyser: ## Run smileanalyser
-	@$(DOCKER_COMPOSE) run --rm --no-deps php sh -c 'vendor/bin/SmileAnalyser launch --skipNotices yes --output xml --filename smileanalyser.xml \
+smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
+	@$(PHP_CLI) sh -c 'vendor/bin/SmileAnalyser launch --skipNotices yes --output xml --filename smileanalyser.xml \
 		&& [ -f "smileanalyser.xml" ] && ! cat smileanalyser.xml | grep "<error"'; \
 	status=$$?; rm -f $(MAGENTO_DIR)/smileanalyser.xml; if [ "$$status" -gt 0 ]; then exit "$$status"; fi
 	@printf "\033[32mNo errors found.\033[0m\n"
 
 .PHONY: tests
 tests: $(VENDOR_DIR) ## Run phpunit.
-	$(VENDOR_BIN)/grumphp run --testsuite=tests
+	$(PHP_CLI) vendor/bin/grumphp run --testsuite=tests
 
 .PHONY: phpcbf
 phpcbf: $(VENDOR_DIR) ## Run phpcbf.
-	$(VENDOR_BIN)/phpcbf $(c)
-
-.PHONY: php-cs-fixer
-php-cs-fixer: $(VENDOR_DIR) ## Run php-cs-fixer.
-	$(eval c ?= fix --config=.php-cs-fixer.dist.php)
-	$(VENDOR_BIN)/php-cs-fixer $(c)
+	$(PHP_CLI) vendor/bin/phpcbf $(c)
 
 # Targets not shown in help
 .PHONY: init-project
@@ -195,7 +184,7 @@ init-project:
 	@cp .env.dist .env
 	@echo ".env file was automatically created."
 ifeq ($(UNAME),Linux)
-	@sed -i -e "s/^DOCKER_UID=.*/DOCKER_UID=$$(id -u)/" -e "s/^DOCKER_GID=.*/DOCKER_GID=$$(id -g)/" .env
+	@$(SEDI) -e "s/^DOCKER_UID=.*/DOCKER_UID=$$(id -u)/" -e "s/^DOCKER_GID=.*/DOCKER_GID=$$(id -g)/" .env
 endif
 	@if [ -z "$(COMPOSER_AUTH)" ] && command -v composer > /dev/null; then \
 		COMPOSER_GITHUB_TOKEN="$$(composer config --global github-oauth.github.com 2>/dev/null || true)"; \
@@ -211,7 +200,7 @@ $(MAGENTO_ENV): | $(VENDOR_DIR)
 
 # Composer files
 $(VENDOR_DIR): | $(MAGENTO_DIR)/composer.json
-	$(COMPOSER) install
+	$(PHP_CLI) composer install
 
 $(MAGENTO_DIR)/composer.json:
 	$(error Please run `make init-project` to initialize the project)
