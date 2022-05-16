@@ -1,11 +1,25 @@
+image: registry.smile.fr/magento2/php:{php_version}-fpm
+
+cache:
+    - key: composer-cache
+      paths:
+          - .composer-cache/
+
 before_script:
-    - composer install
+    # PHP configuration
+    - ln -sf $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
+    # Install git (required by grumphp)
+    - apk update && apk add --no-cache git
+    # Install composer
+    - curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt && update-ca-certificates
+    - curl -sS https://getcomposer.org/installer | php -- --{composer_version}
+    - ./composer.phar config -g cache-dir "$(pwd)/.composer-cache"
+    - ./composer.phar install
 
 sniffers:
     stage: test
     tags:
-        - php{php_ci_version}
-        - ubuntu
+        - galaxy-docker-shared
     script:
         - vendor/bin/grumphp run --no-interaction
         - vendor/bin/SmileAnalyser launch --skipNotices yes --output xml --filename smileanalyser.xml && [ -f "smileanalyser.xml" ] && ! cat smileanalyser.xml | grep "<error"; status=$?

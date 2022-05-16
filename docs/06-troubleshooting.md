@@ -20,29 +20,7 @@ If a container is failing, you can check the startup logs by running `docker com
 
 ## GitLab CI
 
-### Composer Authentication
-
 If the CI fails, make sure that the variable "COMPOSER_AUTH" is defined in the settings of the git repository, and that it contains all required access keys.
-
-### Composer 1
-
-If you are using Magento < 2.4.2, the gitlab runner will probably fail.
-This is because the gitlab runner only has composer 2 available, but older versions of Magento require composer 1.
-
-To fix the issue, in magento/.gitlab-ci.yml, change:
-
-```yaml
-before_script:
-    - composer install
-```
-
-To:
-
-```yaml
-before_script:
-    - curl -sS https://getcomposer.org/installer | php -- --1
-    - ./composer.phar install
-```
 
 ## PhpStorm Code Inspection
 

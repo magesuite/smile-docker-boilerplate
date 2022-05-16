@@ -406,7 +406,8 @@ fi
 # Copy Magento template files
 echo && echo "Updating project files"
 cp -n docker/templates/magento/* docker/templates/magento/.[!.]* "$MAGENTO_DIR"
-sedi "s/{php_ci_version}/$(echo "$PHP_VERSION" | tr -d ".")/" "$MAGENTO_DIR/.gitlab-ci.yml"
+sedi "s/{php_version}/$PHP_VERSION/" "$MAGENTO_DIR/.gitlab-ci.yml"
+sedi "s/{composer_version}/$COMPOSER_VERSION/" "$MAGENTO_DIR/.gitlab-ci.yml"
 echo "${GREEN}✓ Copied ./docker/templates/magento/* to $MAGENTO_DIR.${RESET}"
 
 # Copy installation doc template file
