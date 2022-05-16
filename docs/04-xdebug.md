@@ -15,12 +15,12 @@ Then, in PhpStorm:
 
 ## Debugging CLI commands
 
-There is a make target to launch PHP commands with Xdebug enabled.
-Example:
+To debug the Magento CLI, pass the parameter "debug=1" to any Magento target of the Makefile.
 
-```
-make xdebug c=bin/magento
-```
+Examples:
+
+- `make magento debug=1 c="smilepatch:reapply MyProject\Theme\Setup\Patch\Data\ApplyTheme"`
+- `make setup-upgrade debug=1`
 
 ## Toubleshooting
 
