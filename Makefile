@@ -39,7 +39,7 @@ up: ## Build and start containers. Pass the parameter "service=" to filter which
 down: ## Stop and remove containers.
 	$(DOCKER_COMPOSE) down --remove-orphans
 
-PHONY: restart
+.PHONY: restart
 restart: ## Restart containers. Pass the parameter "service=" to filter which containers to restart.
 	$(DOCKER_COMPOSE) restart $(service)
 
@@ -114,11 +114,6 @@ cache-clean: $(MAGENTO_ENV) ## Run "bin/magento cache:clean". Example: make cach
 cache-clean: c=cache:clean $(type)
 cache-clean: magento
 cc: cache-clean
-
-.PHONY: generate-di
-generate-di: ## Run "bin/magento setup:di:compile".
-generate-di: c=setup:di:compile
-generate-di: magento
 
 .PHONY: reconfigure
 reconfigure: $(MAGENTO_ENV) ## Run "bin/magento smilereconfigure:apply-conf". Example: make reconfigure env=dev
