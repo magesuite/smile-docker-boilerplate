@@ -2,7 +2,6 @@ FROM nginx:1.21-alpine
 
 # Add self-signed certificate (otherwise Traefik would be mandatory for https)
 RUN set -ex; \
-    apk update; \
     apk add --no-cache --virtual .build-deps \
         openssl; \
     mkdir /etc/nginx/certs; \

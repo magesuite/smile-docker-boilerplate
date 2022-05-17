@@ -2,9 +2,7 @@ ARG PHP_VERSION=8.1
 FROM registry.smile.fr/magento2/php:$PHP_VERSION-fpm as base
 
 # Install msmtp, git (for git clone and GrumPHP) and shadow utils (for usermod/groupmod)
-RUN set -ex; \
-    apk update; \
-    apk add --no-cache git msmtp shadow
+RUN apk add --no-cache git msmtp shadow
 
 # PHP dev configuration
 RUN ln -sf $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
