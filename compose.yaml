@@ -35,7 +35,7 @@ services:
 
     cron:
         image: ${PHP_FPM_IMAGE}
-        command: ${CRON_COMMAND:?CRON_COMMAND must be set.}
+        command: ${CRON_COMMAND}
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
         depends_on:
