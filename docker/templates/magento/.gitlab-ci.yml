@@ -9,7 +9,7 @@ before_script:
     # PHP configuration
     - ln -sf $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
     # Install git (required by grumphp)
-    - apk update && apk add --no-cache git
+    - apk add --no-cache git
     # Install composer
     - curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt && update-ca-certificates
     - curl -sS https://getcomposer.org/installer | php -- --{composer_version}
