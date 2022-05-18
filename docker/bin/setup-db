@@ -90,6 +90,11 @@ if [ -n "$CACHE_PREFIX" ]; then
         --page-cache-id-prefix=$CACHE_PREFIX"
 fi
 
+if [ -n "$SEARCH_ENGINE" ]; then
+    INSTALL_COMMAND="$INSTALL_COMMAND \
+        --search-engine=$SEARCH_ENGINE"
+fi
+
 if [ "$USE_REDIS_CACHE" = "true" ]; then
     INSTALL_COMMAND="$INSTALL_COMMAND \
         --cache-backend=redis \
