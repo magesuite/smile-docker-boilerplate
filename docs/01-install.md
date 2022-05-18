@@ -56,7 +56,7 @@ Follow the steps below:
        }
    }
    ```
-   
+
    If it doesn't exist, add it, and run `make composer c=update`.
 
 3. Run the following command to install the Magento database:
