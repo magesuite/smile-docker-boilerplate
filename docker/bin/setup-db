@@ -123,7 +123,8 @@ if [ "$USE_RABBITMQ" = "true" ]; then
         --amqp-port=$RABBITMQ_PORT \
         --amqp-user=$RABBITMQ_DEFAULT_USER \
         --amqp-password=$RABBITMQ_DEFAULT_PASS \
-        --amqp-virtualhost=$RABBITMQ_DEFAULT_VHOST"
+        --amqp-virtualhost=$RABBITMQ_DEFAULT_VHOST \
+        --amqp-ssl=false" # Fixes https://github.com/magento/magento2/issues/35380 (Magento 2.4.4)
 fi
 
 # Wait for the containers to be up and healthy
