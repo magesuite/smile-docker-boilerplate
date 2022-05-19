@@ -10,7 +10,7 @@ Follow these steps:
 1. Go to the directory where you store your PHP projects, and clone the project repositories:
 
    ```
-   git clone git@git.smile.fr:{project_name}/docker-boilerplate.git {project_name} && cd "$_" && git clone git@git.smile.fr:{project_name}/magento.git
+   git clone git@git.smile.fr:{{ project_name }}/docker-boilerplate.git {{ project_name }} && cd "$_" && git clone git@git.smile.fr:{{ project_name }}/magento.git
    ```
 
 2. Install Magento:
@@ -34,11 +34,11 @@ If a container failed to start, please refer to [the troubleshooting section](06
 
 Magento is available at the following URLs:
 
-- Magento frontend: https://{project_name}.docker.localhost
-- Magento admin: https://{project_name}.docker.localhost/admin (user: "admin", password: "magent0")
+- Magento frontend: https://{{ project_name }}.docker.localhost
+- Magento admin: https://{{ project_name }}.docker.localhost/admin (user: "admin", password: "magent0")
 
 There are other services available at the following URLs:
 
-- Maildev interface: http://maildev.{project_name}.docker.localhost (this is where mails will be sent)
-- Elasticsearch REST API: http://elastic.{project_name}.docker.localhost
-- Rabbitmq admin: http://rabbitmq.{project_name}.docker.localhost (user: "magento", password: "magento")
+- Maildev interface: http://maildev.{{ project_name }}.docker.localhost (this is where mails will be sent)
+- Elasticsearch REST API: http://elastic.{{ project_name }}.docker.localhost
+- Rabbitmq admin: http://rabbitmq.{{ project_name }}.docker.localhost (user: "magento", password: "magento")

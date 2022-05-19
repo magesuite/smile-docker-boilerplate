@@ -1,4 +1,4 @@
-image: registry.smile.fr/magento2/php:{php_version}-fpm
+image: registry.smile.fr/magento2/php:{{ php_version }}-fpm
 
 cache:
     - key: composer-cache
@@ -12,7 +12,7 @@ before_script:
     - apk add --no-cache git
     # Install composer
     - curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt && update-ca-certificates
-    - curl -sS https://getcomposer.org/installer | php -- --{composer_version}
+    - curl -sS https://getcomposer.org/installer | php -- --{{ composer_version }}
     - ./composer.phar config -g cache-dir "$(pwd)/.composer-cache"
     - ./composer.phar install
 

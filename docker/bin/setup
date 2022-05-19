@@ -376,7 +376,7 @@ if [ "$CREATE_PROJECT" = "y" ] && [ ! -d "$MAGENTO_DIR" ]; then
 fi
 
 # Copy grumphp.yaml.dist to Magento root dir (must be copied before composer install is run, otherwise git hook has not the expected contents)
-cp -n docker/templates/magento/grumphp.yaml.dist "$MAGENTO_DIR"
+sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ composer_version }}/$COMPOSER_VERSION/g" docker/templates/magento/grumphp.yaml.dist > "$MAGENTO_DIR/grumphp.yaml.dist"
 
 ########
 # Step 5 - Run composer.
@@ -405,14 +405,14 @@ fi
 
 # Copy Magento template files
 echo && echo "Updating project files"
-cp -n docker/templates/magento/* docker/templates/magento/.[!.]* "$MAGENTO_DIR"
-sedi "s/{php_version}/$PHP_VERSION/g" "$MAGENTO_DIR/.gitlab-ci.yml"
-sedi "s/{composer_version}/$COMPOSER_VERSION/g" "$MAGENTO_DIR/.gitlab-ci.yml"
+for FILE in docker/templates/magento/{.[!.]*,*}; do
+    sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ composer_version }}/$COMPOSER_VERSION/g" "$FILE" > "$MAGENTO_DIR/$(basename "$FILE")"
+done
 echo "${GREEN}✓ Copied ./docker/templates/magento/* to $MAGENTO_DIR.${RESET}"
 
-# Copy installation doc template file
-sed "s/{project_name}/$PROJECT_NAME/g" docker/templates/boilerplate/01-install.md > docs/01-install.md
-echo "${GREEN}✓ Copied ./docker/templates/boilerplate/01-install.md to ./docs.${RESET}"
+# Copy project installation doc file
+sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ composer_version }}/$COMPOSER_VERSION/g" docker/templates/01-install.md > docs/01-install.md
+echo "${GREEN}✓ Copied ./docker/templates/01-install.md to ./docs.${RESET}"
 
 # Rename sample files
 [ -f "$MAGENTO_DIR/dev/tools/grunt/configs/themes.js" ] && cp -n "$MAGENTO_DIR/dev/tools/grunt/configs/themes.js" "$MAGENTO_DIR/dev/tools/grunt/configs/local-themes.js" || true
