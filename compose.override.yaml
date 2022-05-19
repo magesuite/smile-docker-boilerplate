@@ -9,6 +9,8 @@ services:
             - traefik.http.routers.$PROJECT_NAME-magento-https.rule=Host(`$PROJECT_NAME.docker.localhost`)
             - traefik.http.routers.$PROJECT_NAME-magento-https.entrypoints=https
             - traefik.http.routers.$PROJECT_NAME-magento-https.tls=true
+        volumes:
+            - ./docker/conf/varnish/default.vcl:/etc/varnish/default.vcl
 
     web:
         image: ${PROJECT_NAME?PROJECT_NAME must be set.}_web

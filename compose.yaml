@@ -6,7 +6,7 @@ services:
         depends_on:
             - web
         volumes:
-            - ./docker/conf/varnish/default.vcl:/etc/varnish/default.vcl
+            - ./docker/conf/varnish/default-prod.vcl:/etc/varnish/default.vcl
 
     web:
         image: ${NGINX_IMAGE}

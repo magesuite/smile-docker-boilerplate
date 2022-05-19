@@ -4,6 +4,7 @@ import std;
 
 # The minimal Varnish version is 4.0.
 # For SSL offloading, pass the following header in your proxy server or load balancer: 'SSL-OFFLOADED: https'.
+# WARNING: this file was not tested on a real production environment. Don't use it as-is, it's missing admin/purge ACLs.
 
 backend default {
     .host = "web";
@@ -26,11 +27,6 @@ sub vcl_recv {
         }
         ban("obj.http.X-Magento-Tags ~ " + req.http.X-Magento-Tags-Pattern);
         return (synth(200, "Purged"));
-    }
-
-    # Bypass cache if no-cache header is present in the request, or if the xdebug session cookie is defined
-    if (req.http.Cache-Control ~ "no-cache" || req.http.Cookie ~ "(^|;\s*)(XDEBUG_SESSION=.*)(;|$)") {
-        return (pass);
     }
 
     if (req.method != "GET" &&
@@ -167,8 +163,11 @@ sub vcl_deliver {
         set resp.http.X-Magento-Cache-Debug = "MISS";
     }
 
+    unset resp.http.X-Magento-Debug;
+    unset resp.http.X-Magento-Tags;
     unset resp.http.X-Powered-By;
     unset resp.http.Server;
+    unset resp.http.X-Varnish;
     unset resp.http.Via;
     unset resp.http.Link;
 }
