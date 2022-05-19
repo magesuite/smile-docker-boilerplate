@@ -184,7 +184,7 @@ endif
 	@if [ -z "$(COMPOSER_AUTH)" ] && command -v composer > /dev/null; then \
 		COMPOSER_GITHUB_TOKEN="$$(composer config --global github-oauth.github.com 2>/dev/null || true)"; \
 		if [ -n "$$COMPOSER_GITHUB_TOKEN" ]; then \
-			$(SEDI) -e "s/^#COMPOSER_AUTH=.*/COMPOSER_AUTH={\"github-oauth\":{\"github.com\":\"$$COMPOSER_GITHUB_TOKEN\"}}/g" .env; \
+			$(SEDI) -e "s/^#COMPOSER_AUTH=.*/COMPOSER_AUTH={\"github-oauth\":{\"github.com\":\"$$COMPOSER_GITHUB_TOKEN\"}}/" .env; \
 			echo "Your composer GitHub token was saved in .env file."; \
 		fi; \
 	fi

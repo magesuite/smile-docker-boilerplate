@@ -406,12 +406,12 @@ fi
 # Copy Magento template files
 echo && echo "Updating project files"
 cp -n docker/templates/magento/* docker/templates/magento/.[!.]* "$MAGENTO_DIR"
-sedi "s/{php_version}/$PHP_VERSION/" "$MAGENTO_DIR/.gitlab-ci.yml"
-sedi "s/{composer_version}/$COMPOSER_VERSION/" "$MAGENTO_DIR/.gitlab-ci.yml"
+sedi "s/{php_version}/$PHP_VERSION/g" "$MAGENTO_DIR/.gitlab-ci.yml"
+sedi "s/{composer_version}/$COMPOSER_VERSION/g" "$MAGENTO_DIR/.gitlab-ci.yml"
 echo "${GREEN}✓ Copied ./docker/templates/magento/* to $MAGENTO_DIR.${RESET}"
 
 # Copy installation doc template file
-sed "s/{project_name}/$PROJECT_NAME/" docker/templates/boilerplate/01-install.md > docs/01-install.md
+sed "s/{project_name}/$PROJECT_NAME/g" docker/templates/boilerplate/01-install.md > docs/01-install.md
 echo "${GREEN}✓ Copied ./docker/templates/boilerplate/01-install.md to ./docs.${RESET}"
 
 # Rename sample files
