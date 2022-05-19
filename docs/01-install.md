@@ -65,6 +65,8 @@ Follow the steps below:
    make install
    ```
 
+   If you get the following error: "Could not connect to the Amqp Server", just run the command again.
+
 Magento is now installed.
 You can move to the next step: [checking if the Magento store is available](#accessing-the-magento-store).
 
@@ -106,6 +108,8 @@ This section will show you how to use this boilerplate with existing Magento sou
    ```
 
    It will install and configure Magento by running setup:install (as well as several other commands, such as deploy:mode:set).
+
+   If you get the following error: "Could not connect to the Amqp Server", just run the command again.
 
 5. If you already had a .gitlab-ci.yml file in your Magento codebase, you might want to update it with the contents of [docker/templates/magento/.gitlab-ci.yml](../docker/templates/magento/.gitlab-ci.yml)
    (you will have to manually replace "{php_ci_version}" with a valid php version, e.g. "81"). 
