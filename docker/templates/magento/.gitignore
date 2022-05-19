@@ -35,16 +35,6 @@
 !/magento-vars.php
 !/op-exclude.txt
 
-# Docker (when installed in the same directory as Magento)
-!/docker
-!/docker/**
-!/docs
-!/docs/**
-!/.env.dist
-!/compose.yaml
-!/compose.*.yaml
-!/Makefile
-
 # Tools
 !/.gitlab-ci.yml
 !/.smileanalyser.yaml
