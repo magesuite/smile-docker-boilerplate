@@ -4,7 +4,7 @@
 
 First, make sure that your browser is properly configured:
 
-- Install a xdebug helper extension in your browser ([Firefox](https://addons.mozilla.org/en-US/firefox/addon/xdebug-helper-for-firefox/), [Chrome](https://chrome.google.com/webstore/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc?hl=en)) and enabled it (xdebug icon in the address bar).
+- Install a xdebug helper extension in your browser ([Firefox](https://addons.mozilla.org/en-US/firefox/addon/xdebug-helper-for-firefox/), [Chrome](https://chrome.google.com/webstore/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc?hl=en)) and enable it (xdebug icon in the address bar).
 - Click on "Disable cache" in the "network" section of the dev toolbar (F12).
 
 Then, in PhpStorm:
