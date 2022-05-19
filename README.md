@@ -1,7 +1,5 @@
 # Magento Docker Boilerplate
 
-**/!\ This is a work in progress, there is no official release yet.**
-
 ## Description
 
 This repository provides a boilerplate that allows to set up Magento projects with Docker Compose.
