@@ -24,6 +24,8 @@ The following tools **must** be installed on your system:
 
 To check if Docker Compose V2 is installed on your system, run the following command: `docker compose version`.
 
+Warning: if most of your available disk space is dedicated to the HOME partition, you will need to move the /var/lib/docker directory to /home/docker (cf. [how to move docker data directory](https://www.guguweb.com/2019/02/07/how-to-move-docker-data-directory-to-another-location-on-ubuntu/)).
+
 ### Composer Requirements
 
 This boilerplate uses composer to install Magento.
