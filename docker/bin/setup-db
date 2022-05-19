@@ -13,7 +13,7 @@ cd ../..
 
 # Print and run a command.
 print_and_run () {
-    echo "Running ${BLUE}$@${RESET}"
+    echo -e "Running ${BLUE}$@${NC}"
     eval "$@"
 }
 
@@ -22,19 +22,19 @@ print_and_run () {
 ########
 
 if [ ! -f ".env" ]; then
-    echo "${RED}The file .env does not exist.${RESET}"
+    echo -e "${RED}The file .env does not exist.${NC}"
     exit 1
 fi
 
 . ./.env
 
 if [ ! -d "$MAGENTO_DIR/vendor" ]; then
-    echo "${RED}Please set up the project before running this command.${RESET}"
+    echo -e "${RED}Please set up the project before running this command.${NC}"
     exit 1
 fi
 
 if [ -n "$RESET_DB" ] && [ "$RESET_DB" != "0" ] && [ "$RESET_DB" != "1" ]; then
-    echo "${RED}The variable \"RESET_DB\" must be equal to 0 or 1.${RESET}"
+    echo -e "${RED}The variable \"RESET_DB\" must be equal to 0 or 1.${NC}"
     exit 1
 fi
 
@@ -155,4 +155,4 @@ if [ "$MAGENTO_RUN_MODE" = "production" ]; then
 fi
 
 echo
-echo "${GREEN}Installation complete.${RESET}"
+echo -e "${GREEN}Installation complete.${NC}"

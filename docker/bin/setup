@@ -28,12 +28,12 @@ init_project_name () {
     PROJECT_NAME="${1:-$PROJECT_NAME}"
 
     if [ -z "$PROJECT_NAME" ]; then
-        echo "${RED}You must set the variable \"PROJECT\" (project name).${RESET}"
+        echo -e "${RED}You must set the variable \"PROJECT\" (project name).${NC}"
         exit 1
     fi
 
     if [ "$(echo "$PROJECT_NAME" | tr -d 'a-z0-9-')" != "" ]; then
-        echo "${RED}The project name \"$PROJECT_NAME\" is not valid. Use only lowercase letters, numbers, and hyphens.${RESET}"
+        echo -e "${RED}The project name \"$PROJECT_NAME\" is not valid. Use only lowercase letters, numbers, and hyphens.${NC}"
         exit 1
     fi
 }
@@ -44,7 +44,7 @@ init_magento_edition () {
         MAGENTO_EDITION="${1:-community}"
 
         if [ "$MAGENTO_EDITION" != "community" ] && [ "$MAGENTO_EDITION" != "enterprise" ] && [ "$MAGENTO_EDITION" != "cloud" ]; then
-            echo "${RED}The Magento edition must be either \"community\", \"enterprise\" or \"cloud\".${RESET}"
+            echo -e "${RED}The Magento edition must be either \"community\", \"enterprise\" or \"cloud\".${NC}"
             exit 1
         fi
     elif grep -F -e magento/magento-cloud-metapackage "$MAGENTO_DIR/composer.json" > /dev/null; then
@@ -61,25 +61,25 @@ init_magento_version () {
     MAGENTO_VERSION="$1"
 
     if [ -z "$MAGENTO_VERSION" ]; then
-        echo "${RED}You must set the variable \"VERSION\" (e.g. \"2.4.4\").${RESET}"
+        echo -e "${RED}You must set the variable \"VERSION\" (e.g. \"2.4.4\").${NC}"
         exit 1
     fi
 
     if [[ ! "$MAGENTO_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
-        echo "${RED}The value \"$MAGENTO_VERSION\" is not a valid Magento version.${RESET}"
+        echo -e "${RED}The value \"$MAGENTO_VERSION\" is not a valid Magento version.${NC}"
         exit 1
     fi
 
     if [ $(version_compare "$MAGENTO_VERSION" "2.4.0") = "<" ]; then
-        echo "${RED}The Magento version must be greater or equal to 2.4.0.${RESET}"
+        echo -e "${RED}The Magento version must be greater or equal to 2.4.0.${NC}"
         exit 1
     elif [ $(version_compare "$MAGENTO_VERSION" "2.4.5") != "<" ]; then
-        echo "${RED}The Magento version must be lower or equal to 2.4.4.${RESET}"
+        echo -e "${RED}The Magento version must be lower or equal to 2.4.4.${NC}"
         exit 1
     fi
 
     if [ "$MAGENTO_EDITION" = "cloud" ] && echo $MAGENTO_VERSION | grep -; then
-        echo "${RED}The Magento version \"$MAGENTO_VERSION\" cannot be used for a Magento cloud project. Expected format: \"x.y.z\".${RESET}"
+        echo -e "${RED}The Magento version \"$MAGENTO_VERSION\" cannot be used for a Magento cloud project. Expected format: \"x.y.z\".${NC}"
         exit 1
     fi
 }
@@ -89,7 +89,7 @@ init_smile_packages () {
     ADD_SMILE_PACKAGES="${1:-y}"
 
     if [ "$ADD_SMILE_PACKAGES" != "y" ] && [ "$ADD_SMILE_PACKAGES" != "n" ]; then
-        echo "${RED}SMILE_PACKAGES must be equal to \"y\" or \"n\".${RESET}."
+        echo -e "${RED}SMILE_PACKAGES must be equal to \"y\" or \"n\".${NC}."
         exit 1
     fi
 }
@@ -100,7 +100,7 @@ init_smile_packagist () {
     SMILE_PACKAGIST="${1:-$DEFAULT_SMILE_PACKAGIST}"
 
     if [ "$SMILE_PACKAGIST" != "internal" ] && [ "$SMILE_PACKAGIST" != "public" ]; then
-        echo "${RED}The Smile packagist must be \"internal\" (https://packagist.galaxy.intranet) or \"public\" (https://packagist.smile.fr).${RESET}"
+        echo -e "${RED}The Smile packagist must be \"internal\" (https://packagist.galaxy.intranet) or \"public\" (https://packagist.smile.fr).${NC}"
         exit 1
     fi
 }
@@ -116,48 +116,48 @@ init_composer_vars () {
 
 # Display information about the project before running the setup.
 display_project_information () {
-    echo && echo "${YELLOW}Project summary:${RESET}"
-    echo "- Project name: ${BLUE}$PROJECT_NAME${RESET}"
-    echo "- Magento directory: ${BLUE}$MAGENTO_DIR${RESET}"
+    echo && echo -e "${YELLOW}Project summary:${NC}"
+    echo -e "- Project name: ${BLUE}$PROJECT_NAME${NC}"
+    echo -e "- Magento directory: ${BLUE}$MAGENTO_DIR${NC}"
     if [ "$CREATE_PROJECT" = "y" ]; then
-        echo "- Magento version: ${BLUE}$MAGENTO_VERSION${RESET}"
-        echo "- Magento edition: ${BLUE}$MAGENTO_EDITION${RESET}"
+        echo -e "- Magento version: ${BLUE}$MAGENTO_VERSION${NC}"
+        echo -e "- Magento edition: ${BLUE}$MAGENTO_EDITION${NC}"
     fi
-    echo "- PHP version: ${BLUE}$PHP_VERSION${RESET}"
-    echo "- Composer version: ${BLUE}$COMPOSER_VERSION${RESET}"
+    echo -e "- PHP version: ${BLUE}$PHP_VERSION${NC}"
+    echo -e "- Composer version: ${BLUE}$COMPOSER_VERSION${NC}"
 
     if [ "$CREATE_PROJECT" = "n" ]; then
-        echo "- Update composer file: ${BLUE}$RUN_COMPOSER${RESET}"
+        echo -e "- Update composer file: ${BLUE}$RUN_COMPOSER${NC}"
     fi
 
     if [ "$RUN_COMPOSER" = "y" ]; then
-        echo && echo "${YELLOW}Composer actions:${RESET}"
+        echo && echo -e "${YELLOW}Composer actions:${NC}"
 
         if [ "$CREATE_PROJECT" = "y" ]; then
-            echo "- Run ${BLUE}composer create-project --no-install${RESET}"
+            echo -e "- Run ${BLUE}composer create-project --no-install${NC}"
         fi
 
         if [ "$ADD_SMILE_PACKAGIST" = "y" ]; then
-            echo "- Add Smile packagist: ${BLUE}$SMILE_PACKAGIST_URL${RESET}"
+            echo -e "- Add Smile packagist: ${BLUE}$SMILE_PACKAGIST_URL${NC}"
         fi
 
         if [ "$ADD_SMILE_PACKAGES" = "y" ]; then
-            echo "- Add Smile packages: ${BLUE}$SMILE_PACKAGES_LIST${RESET}"
-            echo "- Add Smile dev packages: ${BLUE}$SMILE_DEV_PACKAGES_LIST${RESET}"
+            echo -e "- Add Smile packages: ${BLUE}$SMILE_PACKAGES_LIST${NC}"
+            echo -e "- Add Smile dev packages: ${BLUE}$SMILE_DEV_PACKAGES_LIST${NC}"
         fi
 
         if [ "$ADD_GRUMPHP" = "y" ]; then
-            echo "- Add package ${BLUE}phpro/grumphp-shim${RESET}"
+            echo -e "- Add package ${BLUE}phpro/grumphp-shim${NC}"
         fi
 
         if [ "$ADD_DEPLOY_IGNORE" = "y" ]; then
-            echo "- Add config ${BLUE}extra.magento-deploy-ignore${RESET}"
+            echo -e "- Add config ${BLUE}extra.magento-deploy-ignore${NC}"
         fi
 
         if [ "$CREATE_PROJECT" = "y" ]; then
-            echo "- Run ${BLUE}composer install${RESET}"
+            echo -e "- Run ${BLUE}composer install${NC}"
         elif [ "$COMPOSER_INVALIDATED" = "y" ]; then
-            echo "- Run ${BLUE}composer update${RESET}"
+            echo -e "- Run ${BLUE}composer update${NC}"
         fi
     fi
 }
@@ -174,10 +174,10 @@ check_intranet_reachable () {
 
     if curl --output /dev/null --head --silent --fail "$SMILE_PACKAGIST_URL"; then
         echo && echo "Checking Smile network"
-        echo "${GREEN}✓ Smile network is reachable.${RESET}"
+        echo -e "${GREEN}✓ Smile network is reachable.${NC}"
     else
-        echo "${RED}The URL \"$SMILE_PACKAGIST_URL\" is unreachable."
-        echo "You need to be connected to the Smile network (e.g. with a VPN) to use the internal packagist repository.${RESET}"
+        echo -e "${RED}The URL \"$SMILE_PACKAGIST_URL\" is unreachable."
+        echo -e "You need to be connected to the Smile network (e.g. with a VPN) to use the internal packagist repository.${NC}"
         exit 1
     fi
 }
@@ -246,7 +246,7 @@ get_composer_command () {
 
 # Add instructions to an existing command.
 append_command () {
-    COMMAND="$COMMAND && printf \"\nRunning ${BLUE}$1${RESET}\n\" && $1"
+    COMMAND="$COMMAND && printf \"\nRunning ${BLUE}$1${NC}\n\" && $1"
 }
 
 ########
@@ -254,12 +254,12 @@ append_command () {
 ########
 
 if [ ! -f ".env" ]; then
-    echo "${RED}The file .env does not exist.${RESET}"
+    echo -e "${RED}The file .env does not exist.${NC}"
     exit 1
 fi
 
 if ! command -v "curl" > /dev/null || ! command -v "sed" > /dev/null || ! command -v "grep" > /dev/null; then
-    echo "${RED}This setup requires the following commands to be installed: curl, sed, grep.${RESET}"
+    echo -e "${RED}This setup requires the following commands to be installed: curl, sed, grep.${NC}"
     exit 1
 fi
 
@@ -303,7 +303,7 @@ if [ "$CREATE_PROJECT" = "y" ]; then
     RUN_COMPOSER=y
 else
     if [ -n "$EDITION" ]; then
-        echo "${YELLOW}Your project is already initialized, the edition parameter will be ignored.${RESET}" && echo
+        echo -e "${YELLOW}Your project is already initialized, the edition parameter will be ignored.${NC}" && echo
     fi
 
     echo "Magento is already installed in $MAGENTO_DIR."
@@ -345,9 +345,10 @@ init_composer_vars
 display_project_information
 
 # User confirmation
-echo && read -p "${YELLOW}Proceed with the above information? [y/n] ${RESET}" RESULT
+echo && echo -en "${YELLOW}Proceed with the above information? [y/n] ${NC}"
+read RESULT
 if [ "$RESULT" != "y" ] && [ "$RESULT" != "Y" ]; then
-    echo "${RED}Aborted by user.${RESET}"
+    echo -e "${RED}Aborted by user.${NC}"
     exit 1
 fi
 
@@ -362,11 +363,11 @@ sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env.dist
 sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
 sedi "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" .env.dist
 sedi "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" .env
-echo "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$PHP_VERSION to \"$PHP_VERSION\" and \$COMPOSER_VERSION to \"$COMPOSER_VERSION\" in .env and .env.dist.${RESET}"
+echo -e "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$PHP_VERSION to \"$PHP_VERSION\" and \$COMPOSER_VERSION to \"$COMPOSER_VERSION\" in .env and .env.dist.${NC}"
 
 # Rebuild the PHP image if PHP version or composer version was changed
 if [ "$PHP_VERSION" != "$PHP_VERSION_ENV" ] || [ "$COMPOSER_VERSION" != "$COMPOSER_VERSION_ENV" ]; then
-    echo && echo "${YELLOW}Rebuilding the PHP container${RESET}"
+    echo && echo -e "${YELLOW}Rebuilding the PHP container${NC}"
     $DOCKER_COMPOSE build $PHP_CONTAINER
 fi
 
@@ -384,19 +385,19 @@ sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSI
 
 if [ "$RUN_COMPOSER" = "y" ]; then
     if [ "$SMILE_PACKAGIST" = "public" ] && [ "$ADD_SMILE_PACKAGIST" = "y" ]; then
-        echo && echo "${YELLOW}WARNING: This script will add the repository \"$SMILE_PACKAGIST_URL\" to composer.json. Composer will ask for access keys."
-        echo "If you don't already have them, please ask dirtech@smile.fr to create a packagist account for your project.${RESET}"
+        echo && echo -e "${YELLOW}WARNING: This script will add the repository \"$SMILE_PACKAGIST_URL\" to composer.json. Composer will ask for access keys."
+        echo -e "If you don't already have them, please ask dirtech@smile.fr to create a packagist account for your project.${NC}"
     fi
 
     # Execute the composer command on the container
     if [ "$CREATE_PROJECT" = "y" ]; then
-        echo && echo "${YELLOW}Magento will now be initialized with composer.${RESET}"
+        echo && echo -e "${YELLOW}Magento will now be initialized with composer.${NC}"
     else
-        echo && echo "${YELLOW}Updating composer.json file.${RESET}"
+        echo && echo -e "${YELLOW}Updating composer.json file.${NC}"
     fi
 
     if ! $DOCKER_COMPOSE run --rm --no-deps $PHP_CONTAINER sh -c "$(get_composer_command)"; then
-        echo "${RED}Failed to initialize the project, aborting.${RESET}"
+        echo -e "${RED}Failed to initialize the project, aborting.${NC}"
         # Remove composer.json on project creation error only if Magento files were not generated
         [ "$CREATE_PROJECT" = "y" ] && [ ! -f "$MAGENTO_DIR/composer.lock" ] && [ ! -d "$MAGENTO_DIR/vendor" ] && rm -f "$MAGENTO_DIR/composer.json" "$MAGENTO_DIR/grumphp.yaml.dist"
         exit 1
@@ -408,17 +409,17 @@ echo && echo "Updating project files"
 for FILE in docker/templates/magento/{.[!.]*,*}; do
     sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ composer_version }}/$COMPOSER_VERSION/g" "$FILE" > "$MAGENTO_DIR/$(basename "$FILE")"
 done
-echo "${GREEN}✓ Copied ./docker/templates/magento/* to $MAGENTO_DIR.${RESET}"
+echo -e "${GREEN}✓ Copied ./docker/templates/magento/* to $MAGENTO_DIR.${NC}"
 
 # Copy project installation doc file
 sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ composer_version }}/$COMPOSER_VERSION/g" docker/templates/01-install.md > docs/01-install.md
-echo "${GREEN}✓ Copied ./docker/templates/01-install.md to ./docs.${RESET}"
+echo -e "${GREEN}✓ Copied ./docker/templates/01-install.md to ./docs.${NC}"
 
 # Rename sample files
 [ -f "$MAGENTO_DIR/dev/tools/grunt/configs/themes.js" ] && cp -n "$MAGENTO_DIR/dev/tools/grunt/configs/themes.js" "$MAGENTO_DIR/dev/tools/grunt/configs/local-themes.js" || true
 [ -f "$MAGENTO_DIR/grunt-config.json.sample" ] && mv -n "$MAGENTO_DIR/grunt-config.json.sample" "$MAGENTO_DIR/grunt-config.json" || true
 [ -f "$MAGENTO_DIR/Gruntfile.js.sample" ] && mv -n "$MAGENTO_DIR/Gruntfile.js.sample" "$MAGENTO_DIR/Gruntfile.js" || true
 [ -f "$MAGENTO_DIR/package.json.sample" ] && mv -n "$MAGENTO_DIR/package.json.sample" "$MAGENTO_DIR/package.json" || true
-echo "${GREEN}✓ Renamed sample files in Magento root directory.${RESET}"
+echo -e "${GREEN}✓ Renamed sample files in Magento root directory.${NC}"
 
-echo && echo "${GREEN}The project was successfully initialized.${RESET}"
+echo && echo -e "${GREEN}The project was successfully initialized.${NC}"
