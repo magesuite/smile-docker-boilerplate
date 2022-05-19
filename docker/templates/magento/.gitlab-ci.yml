@@ -1,4 +1,4 @@
-image: registry.smile.fr/magento2/php:{{ php_version }}-fpm
+image: registry.smile.fr/magento2/php:{{ php_version }}-fpm-1
 
 cache:
     - key: composer-cache
