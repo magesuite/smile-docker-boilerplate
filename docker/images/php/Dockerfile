@@ -7,7 +7,7 @@ RUN apk add --no-cache git msmtp shadow
 # PHP dev configuration
 RUN ln -sf $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
 COPY ./etc/msmtprc /etc/
-COPY ./etc/php-mail.ini $PHP_INI_DIR/conf.d/zz-mail.ini
+COPY ./etc/php.ini $PHP_INI_DIR/conf.d/zz-override.ini
 
 # Binary files
 COPY ./bin/run-cron /usr/local/bin/
