@@ -9,22 +9,29 @@
 
 ## Installation
 
-1. First, Go to the directory where you store your Magento projects:
+Open a terminal and apply the following steps:
+
+1. Go to the directory where you store your Magento projects:
 
    ```
    cd ~/path/to/projects
    ```
 
-2. Clone this repository (**make sure to change the value of the PROJECT_NAME variable**):
+2. Set the project name in a variable named "PROJECT_NAME" (will be reused in future commands):
 
    ```
-   PROJECT_NAME=myproject
-   git clone --depth=1 git@git.smile.fr:magento2/docker-boilerplate $PROJECT_NAME && cd "$_" && rm -rf .git
+   PROJECT_NAME=xxxx
    ```
 
-   The project name must only contain the following characters: lowercase letters (`a-z`), numbers (`0-9`) and hyphens (`-`).
+   **The project name must only contain the following characters**: lowercase letters (`a-z`), numbers (`0-9`) and hyphens (`-`).
 
-3. The next step will depend on what you need to do:
+3. Clone the boilerplate repository:
+
+   ```
+   git clone -q -c advice.detachedHead=false --depth 1 --branch latest git@git.smile.fr:magento2/docker-boilerplate "$PROJECT_NAME" && cd $_ && rm -rf .git
+   ```
+
+4. The next step will depend on what you need to do:
 
    - [Creating a **new Magento project** with the boilerplate.](#user-content-creating-a-new-magento-project-with-the-boilerplate)
    - [Setting up the boilerplate with an **existing Magento codebase**.](#setting-up-the-boilerplate-with-an-existing-magento-codebase)
@@ -38,7 +45,7 @@ Follow the steps below:
 1. Run the following command (**don't blindly copy it, make sure to set the version and edition that you need**):
 
    ```
-   make init-project PROJECT=$PROJECT_NAME VERSION=2.4.4 EDITION=community
+   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.4 EDITION=community
    ```
 
    This script will update the docker env files and run "composer create-project".
@@ -91,7 +98,7 @@ This section will show you how to use this boilerplate with existing Magento sou
 2. Run the following command (**don't blindly copy it, the version must match your composer.json file**):
 
    ```
-   make init-project PROJECT=$PROJECT_NAME VERSION=2.4.4
+   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.4
    ```
 
    This script will update the docker env files, and check if anything needs to be added to composer.json (Smile modules, Smile packagist repositories...).
