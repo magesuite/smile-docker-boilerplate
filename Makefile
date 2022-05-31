@@ -191,7 +191,7 @@ endif
 
 # Magento config file
 $(MAGENTO_ENV): | $(VENDOR_DIR)
-	$(error Please run `make setup-install` to initialize the database)
+	$(error Please run `make install` to initialize the database)
 
 # Composer files
 $(VENDOR_DIR): | $(MAGENTO_DIR)/composer.json
