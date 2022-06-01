@@ -59,6 +59,7 @@ services:
             timeout: 30s
             retries: 3
         volumes:
+            - ./docker/conf/mysql/magento.cnf:/etc/mysql/conf.d/magento.cnf
             - dbdata:/var/lib/mysql
 
     elasticsearch:

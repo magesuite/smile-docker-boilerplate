@@ -1,0 +1,4 @@
+[mysqld]
+# Solve slow reindexation issue with MariaDB 10.4
+optimizer_switch = 'rowid_filter=off'
+optimizer_use_condition_selectivity = 1
