@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Upgrade maildev from 1.1.1 to 2.0.5.
+- Update Varnish VCL file
 - Rename configuration files with ambiguous names (e.g. "default.conf" renamed to "default-dev.conf").
 
 ### Fixed
