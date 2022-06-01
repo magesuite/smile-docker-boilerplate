@@ -43,7 +43,6 @@ services:
             target: xdebug
             args:
                 PHP_VERSION: ${PHP_VERSION}
-                COMPOSER_VERSION: ${COMPOSER_VERSION}
         user: ${DOCKER_UID}:${DOCKER_GID}
         extra_hosts:
             - "host.docker.internal:host-gateway"
@@ -57,7 +56,6 @@ services:
             target: base
             args:
                 PHP_VERSION: ${PHP_VERSION}
-                COMPOSER_VERSION: ${COMPOSER_VERSION}
         environment:
             DOCKER_UID: ${DOCKER_UID}
             DOCKER_GID: ${DOCKER_GID}
