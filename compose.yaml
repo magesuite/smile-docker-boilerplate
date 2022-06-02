@@ -1,8 +1,6 @@
 services:
     varnish:
         image: ${VARNISH_IMAGE}
-        ports:
-            - 80
         depends_on:
             - web
         volumes:
@@ -10,10 +8,6 @@ services:
 
     web:
         image: ${NGINX_IMAGE}
-        ports:
-            - 80
-            - 443
-            - 8080
         depends_on:
             - php
         volumes:
@@ -22,8 +16,6 @@ services:
 
     php:
         image: ${PHP_FPM_IMAGE}
-        ports:
-            - 9000
         depends_on:
             - db
             - elasticsearch
@@ -49,8 +41,6 @@ services:
 
     db:
         image: ${MYSQL_IMAGE}
-        ports:
-            - 3306
         env_file:
             - docker/env/db.env
         healthcheck:
@@ -64,8 +54,6 @@ services:
 
     elasticsearch:
         image: ${ELASTICSEARCH_IMAGE}
-        ports:
-            - 9200
         ulimits:
             memlock:
                 soft: -1
@@ -80,8 +68,6 @@ services:
 
     redis:
         image: ${REDIS_IMAGE}
-        ports:
-            - 6379
         healthcheck:
             test: 'redis-cli ping || exit 1'
             interval: 30s
@@ -92,9 +78,6 @@ services:
 
     rabbitmq:
         image: ${RABBITMQ_IMAGE}
-        ports:
-            - 15672
-            - 5672
         env_file:
             - docker/env/rabbitmq.env
         healthcheck:
@@ -104,9 +87,6 @@ services:
 
     maildev:
         image: ${MAILDEV_IMAGE}
-        ports:
-            - 1025
-            - 1080
 
 volumes:
     appdata:
