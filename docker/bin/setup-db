@@ -17,42 +17,21 @@ print_and_run () {
     eval "$@"
 }
 
-########
-# Step 1 - Validate pre-requisites.
-########
-
-if [ ! -f ".env" ]; then
-    echo -e "${RED}The file .env does not exist.${NC}"
-    exit 1
-fi
-
-. ./.env
-
-if [ ! -d "$MAGENTO_DIR/vendor" ]; then
-    echo -e "${RED}Please set up the project before running this command.${NC}"
-    exit 1
-fi
-
+# Validate RESET_DB value
 if [ -n "$RESET_DB" ] && [ "$RESET_DB" != "0" ] && [ "$RESET_DB" != "1" ]; then
     echo -e "${RED}The variable \"RESET_DB\" must be equal to 0 or 1.${NC}"
     exit 1
 fi
 
-########
-# Step 2 - Read env files.
-########
-
+# Read env files
+. ./.env
 . ./docker/env/db.env
 . ./docker/env/magento.env
 . ./docker/env/rabbitmq.env
 
-########
-# Step 3 - Install Magento.
-########
-
+# Prepare the install command
 MAGENTO_COMMAND="$DOCKER_COMPOSE run --rm $PHP_CONTAINER bin/magento"
 
-# Prepare the install command
 INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
     --db-host=$MYSQL_HOST \
     --db-name=$MYSQL_DATABASE \
@@ -74,25 +53,16 @@ INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
     --currency=$CURRENCY \
     --magento-init-params=\"MAGE_MODE=$MAGENTO_RUN_MODE\""
 
-if [ "$RESET_DB" = "1" ]; then
-    INSTALL_COMMAND="$INSTALL_COMMAND \
-        --cleanup-database"
-fi
-
 if [ -n "$ENCRYPTION_KEY" ]; then
-    INSTALL_COMMAND="$INSTALL_COMMAND \
-        --key=$ENCRYPTION_KEY"
+    INSTALL_COMMAND="$INSTALL_COMMAND --key=$ENCRYPTION_KEY"
 fi
 
 if [ -n "$CACHE_PREFIX" ]; then
-    INSTALL_COMMAND="$INSTALL_COMMAND \
-        --cache-id-prefix=$CACHE_PREFIX \
-        --page-cache-id-prefix=$CACHE_PREFIX"
+    INSTALL_COMMAND="$INSTALL_COMMAND --cache-id-prefix=$CACHE_PREFIX --page-cache-id-prefix=$CACHE_PREFIX"
 fi
 
 if [ -n "$SEARCH_ENGINE" ]; then
-    INSTALL_COMMAND="$INSTALL_COMMAND \
-        --search-engine=$SEARCH_ENGINE"
+    INSTALL_COMMAND="$INSTALL_COMMAND --search-engine=$SEARCH_ENGINE"
 fi
 
 if [ "$USE_REDIS_CACHE" = "true" ]; then
@@ -113,8 +83,7 @@ if [ "$USE_REDIS_SESSIONS" = "true" ]; then
 fi
 
 if [ "$USE_VARNISH" = "true" ]; then
-    INSTALL_COMMAND="$INSTALL_COMMAND \
-        --http-cache-hosts=$HTTP_CACHE_HOSTS"
+    INSTALL_COMMAND="$INSTALL_COMMAND --http-cache-hosts=$HTTP_CACHE_HOSTS"
 fi
 
 if [ "$USE_RABBITMQ" = "true" ]; then
@@ -125,6 +94,10 @@ if [ "$USE_RABBITMQ" = "true" ]; then
         --amqp-password=$RABBITMQ_DEFAULT_PASS \
         --amqp-virtualhost=$RABBITMQ_DEFAULT_VHOST \
         --amqp-ssl=false" # Fixes https://github.com/magento/magento2/issues/35380 (Magento 2.4.4)
+fi
+
+if [ "$RESET_DB" = "1" ]; then
+    INSTALL_COMMAND="$INSTALL_COMMAND --cleanup-database"
 fi
 
 # Wait for the containers to be up and healthy
