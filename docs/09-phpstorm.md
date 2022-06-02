@@ -1,31 +1,29 @@
-# Troubleshooting
+# PhpStorm Configuration
 
-## Docker Containers
+## Magento Plugin
 
-If you experience any issue related to your Docker containers, please follow these steps.
+A Magento plugin is available in PhpStorm.
 
-Check your Docker installation:
+You can install it by following these steps:
 
-- Make sure that Traefik is [up and running](https://git.smile.fr/docker/traefik#usage).
-- Double check that you applied the [post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/) after you installed Docker Compose.
-- Make sure that the "magento" directory isn't owned by the root user.
+1. Open the PhpStorm configuration (File > Settings in the menu).
+2. In the **Plugins** section, click on "Marketplace", then type "Magento" in the search box.
+3. Install the plugin named "Magento PhpStorm".
+4. Restart PhpStorm.
 
-Check the .env file:
+You can then enable the plugin on a per-project basis:
 
-- The variable PROJECT_NAME must be defined.
-- The variables DOCKER_UID and DOCKER_GID must match the output of `id -u` and `id -g`.
-- The variables PHP_VERSION and COMPOSER_VERSION must match the requirements of your project.
+1. Open the settings again, and go to PHP > Frameworks.
+2. In the Magento section:
+   - Check "Enable Magento integration".
+   - Specify the Magento installation path.
+   - Click on "Regenerate URN mappings".
+3. Wait for the project to be reindexed.
 
-If a container is failing, you can check the startup logs by running `docker compose run --rm <container_name>` (e.g. "web").
-
-## GitLab CI
-
-If the CI fails, make sure that the variable "COMPOSER_AUTH" is defined in the settings of the git repository, and that it contains all required access keys.
-
-## PhpStorm Code Inspection
+## Code Inspection
 
 Code inspection in PhpStorm doesn't work out of the box with docker.
-The recommended way to validate your code is to [use the Makefile](02-makefile.md#code-quality).
+The recommended way to validate your code is to [use the Makefile](06-code-quality.md).
 
 However, if you still want to enable the code inspection in PhpStorm, follow these steps:
 

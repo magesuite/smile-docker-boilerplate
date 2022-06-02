@@ -134,7 +134,7 @@ You can move to the next step: [checking if the Magento store is available](#acc
    ```
 
 2. Run the command `make ps` to make sure that no container failed to start.
-   If a container failed to start, please refer to [the troubleshooting section](06-troubleshooting.md).
+   If a container failed to start, please refer to [the troubleshooting section](03-docker-compose.md#troubleshooting).
 
 4. Magento is available at the following URLs (replace "myproject" with your project name):
 

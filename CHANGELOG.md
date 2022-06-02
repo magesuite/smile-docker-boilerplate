@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Better smileanalyser output (requires SmileAnalyser >= 8.1).
+- Improve the documentation (added docker architecture and deployment sections, moved multiple sections).
 
 ### Removed
 

@@ -45,11 +45,14 @@ docker login -u <youruser> -p <your_secret> registry.smile.fr
 ## Documentation
 
 - [Installation](docs/01-install.md)
-- [How to Use the Makefile](docs/02-makefile.md)
-- [Working with the Database](docs/03-database.md)
-- [How to use Xdebug](docs/04-xdebug.md)
-- [Customizing Containers](docs/05-config.md)
-- [Troubleshooting](docs/06-troubleshooting.md)
+- [Architecture](docs/02-architecture.md)
+- [Working with Docker](docs/03-docker-compose.md)
+- [Working with Magento](docs/04-magento.md)
+- [Working with the Database](docs/05-database.md)
+- [Code Quality](docs/06-code-quality.md)
+- [How to use Xdebug](docs/07-xdebug.md)
+- [Deployment](docs/08-deployment.md)
+- [PhpStorm Configuration](docs/09-phpstorm.md) (optional)
 
 ## Links
 
