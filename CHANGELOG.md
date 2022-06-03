@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Better smileanalyser output (requires SmileAnalyser >= 8.1).
+
 ### Removed
 
 - Remove unused port mappings in compose.yaml.

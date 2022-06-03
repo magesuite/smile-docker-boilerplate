@@ -109,7 +109,7 @@ init_smile_packagist () {
 init_composer_vars () {
     [ "$ADD_SMILE_PACKAGES" = "n" ] && [ "$ADD_GRUMPHP" = "n" ] && COMPOSER_INVALIDATED=n || COMPOSER_INVALIDATED=y
     SMILE_PACKAGES_LIST="smile/module-patch=^1.0 smile/module-reconfigure=^5.0"
-    SMILE_DEV_PACKAGES_LIST="smile/module-debug-toolbar=^5.0 smile-sa/smileanalyser=^8.0"
+    SMILE_DEV_PACKAGES_LIST="smile/module-debug-toolbar=^5.0 smile-sa/smileanalyser=^8.1"
     [ "$SMILE_PACKAGIST" = "public" ] && SMILE_PACKAGIST_URL="https://packagist.smile.fr" || SMILE_PACKAGIST_URL="https://packagist.galaxy.intranet"
     MAGENTO_PACKAGIST_URL="https://repo.magento.com/"
 }

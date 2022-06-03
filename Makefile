@@ -156,10 +156,7 @@ pre-commit: $(VENDOR_DIR) ## Run a static code analysis on staged files.
 
 .PHONY: smileanalyser
 smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
-	@$(PHP_CLI) sh -c 'vendor/bin/SmileAnalyser launch --skipNotices yes --output xml --filename smileanalyser.xml \
-		&& [ -f "smileanalyser.xml" ] && ! cat smileanalyser.xml | grep "<error"'; \
-	status=$$?; rm -f $(MAGENTO_DIR)/smileanalyser.xml; if [ "$$status" -gt 0 ]; then exit "$$status"; fi
-	@printf "\033[32mNo errors found.\033[0m\n"
+	$(PHP_CLI) vendor/bin/SmileAnalyser launch --strict --skipNotices yes
 
 .PHONY: tests
 tests: $(VENDOR_DIR) ## Run phpunit.
