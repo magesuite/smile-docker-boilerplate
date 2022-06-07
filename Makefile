@@ -162,10 +162,6 @@ smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
 tests: $(VENDOR_DIR) ## Run phpunit.
 	$(PHP_CLI) vendor/bin/grumphp run --testsuite=tests
 
-.PHONY: phpcbf
-phpcbf: $(VENDOR_DIR) ## Run phpcbf.
-	$(PHP_CLI) vendor/bin/phpcbf $(c)
-
 # Targets not shown in help
 .PHONY: init-project
 init-project:

@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - Remove unused port mappings in compose.yaml.
+- Remove phpcbf from the Makefile (can still be run with `make vendor-bin`).
 
 ## [1.0.0-rc2] - 2022-06-01
 
