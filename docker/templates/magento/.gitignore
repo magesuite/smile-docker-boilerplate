@@ -39,6 +39,8 @@
 !/.gitlab-ci.yml
 !/.smileanalyser.yaml
 !/.spbuilder.yaml
+!/deploy.php
+!/deploy.yaml
 !/grumphp.yaml.dist
 !/magepack.config.js
 !/phpcs.xml.dist

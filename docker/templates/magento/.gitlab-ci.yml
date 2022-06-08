@@ -1,25 +1,23 @@
-image: registry.smile.fr/magento2/php:{{ php_version }}-fpm-1
-
-cache:
-    - key: composer-cache
-      paths:
-          - .composer-cache/
-
-before_script:
-    # PHP configuration
-    - ln -sf $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
-    # Install git (required by grumphp)
-    - apk add --no-cache git
-    # Install composer
-    - curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt && update-ca-certificates
-    - curl -sS https://getcomposer.org/installer | php -- --{{ composer_version }}
-    - ./composer.phar config -g cache-dir "$(pwd)/.composer-cache"
-    - ./composer.phar install
+default:
+    image: registry.smile.fr/magento2/php:{{ php_version }}-fpm-1
+    tags:
+        - galaxy-docker-shared
+    cache:
+        - key: composer-cache
+          paths:
+              - .composer-cache/
+    before_script:
+        # PHP configuration
+        - ln -sf $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
+        # Install composer
+        - curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt && update-ca-certificates
+        - curl -sS https://getcomposer.org/installer | php -- --{{ composer_version }} --install-dir=/usr/local/bin --filename=composer
+        - composer config -g cache-dir "$(pwd)/.composer-cache"
 
 sniffers:
     stage: test
-    tags:
-        - galaxy-docker-shared
     script:
+        - apk add --no-cache git
+        - composer install --no-interaction
         - vendor/bin/grumphp run --no-interaction
         - vendor/bin/SmileAnalyser launch --strict --skipNotices yes
