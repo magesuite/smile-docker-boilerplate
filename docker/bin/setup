@@ -367,8 +367,8 @@ echo -e "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$PHP_VERSION 
 
 # Rebuild the PHP image if PHP version or composer version was changed
 if [ "$PHP_VERSION" != "$PHP_VERSION_ENV" ] || [ "$COMPOSER_VERSION" != "$COMPOSER_VERSION_ENV" ]; then
-    echo && echo -e "${YELLOW}Rebuilding the PHP container${NC}"
-    $DOCKER_COMPOSE build $PHP_CONTAINER
+    echo && echo -e "${YELLOW}Rebuilding PHP containers${NC}"
+    $DOCKER_COMPOSE build "$PHP_CONTAINER" "$PHP_XDEBUG_CONTAINER" "$CRON_CONTAINER"
 fi
 
 # Make sure that the Magento root dir already exists (if Docker creates it, it ends up with root ownership)

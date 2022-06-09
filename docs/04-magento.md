@@ -39,16 +39,6 @@ To speed up this process, after you made a change to the code, clear only the ca
 
 For example, if you made a change in a layout file, run this command: `make cc type=layout`.
 
-### Crontab
-
-By default, the cron container is enabled.
-
-If it takes too much resource on your computer, you can disable it with the following command:
-
-```
-make toggle-cron
-```
-
 ### Debugging MySQL Queries
 
 You can use the [Smile Debug Toolbar module](https://github.com/Smile-SA/magento2-module-debug-toolbar) to display the SQL queries that are executed to build a page:

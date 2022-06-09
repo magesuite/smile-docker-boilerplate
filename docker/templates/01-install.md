@@ -21,7 +21,7 @@ Follow these steps:
 
    This script will run "composer install" and install the database (by running "bin/magento setup:install").
 
-3. Launch containers that were not yet started (cron, web, varnish...):
+3. Launch containers that were not yet started:
 
    ```
    make up

@@ -27,6 +27,18 @@ For example:
 - `make sh service=redis` opens a shell on the redis container.
 - `make sh service=redis c="redis-cli flushdb"` runs the command defined in the parameter "c=" on the redis container.
 
+## Crontab
+
+By default, the cron container is disabled (it is quite resource-intensive).
+
+To enable it, run the following command:
+
+```
+make toggle-cron
+```
+
+Running the command again will disable it.
+
 ## Customizing Containers
 
 ### Editing a Configuration File

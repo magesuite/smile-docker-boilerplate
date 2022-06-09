@@ -43,4 +43,5 @@ BLUE="\033[34m"
 # Docker
 DOCKER_COMPOSE="docker compose"
 PHP_CONTAINER="php"
+PHP_XDEBUG_CONTAINER="php_xdebug"
 CRON_CONTAINER="cron"

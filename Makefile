@@ -85,15 +85,10 @@ db-export: up ## Dump the database. Pass the parameter "filename=" to set the fi
 	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
 
 .PHONY: toggle-cron
-toggle-cron: ## Enable/disable the cron container.
-ifeq ($(CRON_COMMAND),true)
-	$(eval VALUE := run-cron) $(eval STATUS := enabled)
-else
-	$(eval VALUE := true) $(eval STATUS := disabled)
-endif
-	@$(SEDI) -e "s/^CRON_COMMAND=.*/CRON_COMMAND=$(VALUE)/" .env
-	@echo "CRON_COMMAND was set to \"$(VALUE)\" in .env file ($(STATUS))."
-	$(DOCKER_COMPOSE) up -d --no-deps cron
+toggle-cron: ## Enable/disable the cron container (disabled by default).
+	@if [[ $$($(DOCKER_COMPOSE) ps | grep cron) ]]; then CMD="$(DOCKER_COMPOSE) stop cron && $(DOCKER_COMPOSE) rm -f cron"; \
+	else CMD="$(DOCKER_COMPOSE) --profile cron up -d cron"; fi; \
+	echo "$$CMD"; eval "$$CMD"
 
 ## Magento
 .PHONY: install
@@ -107,7 +102,7 @@ magento: $(VENDOR_DIR) ## Run "bin/magento". Pass the parameter "c=" to run a gi
 	@if [ "$(debug)" != "0" ] && [ "$(debug)" != "1" ]; then echo "The variable \"debug\" must be equal to 0 or 1."; exit 1; \
 	elif [ "$(debug)" = "1" ]; then CMD="$(DOCKER_COMPOSE) run --rm --env PHP_IDE_CONFIG=serverName=_ $(PHP_XDEBUG_SERVICE) php -dxdebug.start_with_request=yes bin/magento $(c)"; \
 	else CMD="$(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) bin/magento $(c)"; fi; \
-	echo "$$CMD"; $$CMD
+	echo "$$CMD"; eval "$$CMD"
 
 .PHONY: cache-clean
 cache-clean: $(MAGENTO_ENV) ## Run "bin/magento cache:clean". Example: make cache-clean type="config layout"

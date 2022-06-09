@@ -27,7 +27,7 @@ services:
 
     cron:
         image: ${PHP_FPM_IMAGE}
-        command: ${CRON_COMMAND}
+        command: run-cron
         environment:
             CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
         depends_on:
@@ -36,6 +36,8 @@ services:
             - maildev
             - rabbitmq
             - redis
+        profiles:
+            - cron
         volumes:
             - appdata:/var/www/html
 
