@@ -41,35 +41,24 @@ Running the command again will disable it.
 
 ## Customizing Containers
 
-### Editing a Configuration File
+### Configuration Files
 
 The configuration files are located here:
 
-- Nginx vhost: ./docker/conf/nginx/default.conf
-- Varnish VCL: ./docker/conf/varnish/default.vcl
-- Redis conf: ./docker/conf/redis/redis.conf
+- Nginx: docker/conf/nginx
+- Varnish: docker/conf/varnish
+- MariaDB: docker/conf/mysql
+- Redis: docker/conf/redis
 
-These files are mapped to the containers in compose.yaml.
+These files are mapped to the containers in [compose.yaml](../compose.yaml).
+You can create additional config files by using the same logic.
 
-If you change the contents of one of these files, you must restart the container to apply the change.
-For example, if you change the contents of the nginx vhost, run `make restart service=web`.
+To apply a change:
 
-### Adding a Configuration File
-
-It is very easy to bind a new configuration file to a container.
-For example, to add a configuration file for MySQL:
-
-- Create the file "./docker/conf/mysql/mysql.cnf".
-- Add a volume to the `db` service in compose.yaml:
-
-    ```yaml
-    db:
-        # Replace "myproject" by your project name
-        volumes:
-            - ./docker/conf/mysql/mysql.cnf:/etc/mysql/conf.d/myproject.cnf`
-    ```
-
-- Recreate the service: `make up service=db`.
+- If you changed the contents of an existing file, you must restart the container:
+  `make restart service=xxx`.
+- If you added a new config file, you must recreate the container:
+  `make up service=xxx`.
 
 ### Persisting the Redis Cache
 
