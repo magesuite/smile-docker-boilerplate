@@ -31,7 +31,7 @@ Please find below an example on how to implement PHP Deployer and set up aumomat
 It was not tested on a real production environment.
 Expect a few bugs/issues, especially on the very first deployment (because the file app/etc/env.php will not exist yet on the remote environment).
 
-### Configuration
+### Deployment File
 
 Create a file named "deploy.php" at the root of the magento directory.
 
@@ -42,30 +42,7 @@ Example contents of this file:
 
 namespace Deployer;
 
-require 'contrib/rsync.php';
 require 'recipe/magento2.php';
-
-// Config
-set('rsync_src', __DIR__);
-set('rsync',[
-    'exclude' => [
-        '.git',
-        'deploy.php',
-    ],
-    'exclude-file' => false,
-    'include' => [],
-    'include-file' => false,
-    'filter' => [],
-    'filter-file'  => false,
-    'filter-perdir'=> false,
-    'flags' => 'rz', // Recursive, with compress
-    'options' => ['delete'],
-    'timeout' => 600,
-]);
-
-add('shared_files', []);
-add('shared_dirs', []);
-add('writable_dirs', []);
 
 // Hosts
 host('preprod')
@@ -78,15 +55,71 @@ host('prod')
     ->setRemoteUser('myuser')
     ->setDeployPath('/var/www/myproject');
 
-// Rsync the source code to the remote host
-after('deploy:update_code', 'rsync');
+// Variables
+set('static_content_locales', 'en_US');
+add('magento_themes', []);
+add('shared_files', []);
+add('shared_dirs', []);
+add('writable_dirs', []);
 
-// Disable tasks that pull and compile the code on the remote host (the code is already compiled and sent via rsync)
+set('artifact_source_dir', '/tmp');
+set('artifact_dest_dir', '/tmp');
+set('artifact_name', sprintf('artifact-%s.tgz', date('YmdHis')));
+set('artifact_exclude', [
+    './.git',
+    './*.dist',
+    './*.md',
+    './*.txt',
+    './*.sample',
+    './.editorconfig',
+    './.gitignore',
+    './.gitlab-ci.yml',
+    './.smileanalyser.yaml',
+    './.user.ini',
+    './deploy.php',
+    './grunt-config.json',
+    './Gruntfile.js',
+    './package.json',
+]);
+
+desc('Create an artifact file with the contents of the current directory');
+task('artifact:create', function () {
+    $artifact = get('artifact_source_dir') . '/' . get('artifact_name');
+    $excludes = array_map(fn($value) => '--exclude=' . $value, get('artifact_exclude', []));
+    $excludeOption = implode(' ', $excludes);
+    runLocally("tar --xform s:'./':: $excludeOption -zcf $artifact ./");
+})->hidden();
+
+desc('Upload an artifact to the remote server');
+task('artifact:upload', function () {
+    $source = get('artifact_source_dir') . '/' . get('artifact_name');
+    $dest = get('artifact_dest_dir') . '/' . get('artifact_name');
+    upload($source, $dest);
+    runLocally("rm -f $source");
+})->hidden();
+
+desc('Extract an artifact to the release path');
+task ('artifact:unpack', function () {
+    $artifact = get('artifact_dest_dir') . '/' . get('artifact_name');
+    run("tar -xzf $artifact -C {{release_or_current_path}}");
+    run("rm -f $artifact");
+})->hidden();
+
+desc('Create an artifact file locally and deploy it to the release path');
+task('deploy:artifact', [
+    'artifact:create',
+    'artifact:upload',
+    'artifact:unpack',
+]);
+
+// Create and upload an artifact file instead of using git
 task('deploy:update_code')->disable();
-task('deploy:vendors')->disable();
-task('deploy:clear_paths')->disable();
-task('magento:compile')->disable();
-task('magento:deploy:assets')->disable();
+after('deploy:update_code', 'deploy:artifact');
+
+// Override deploy:info
+task('deploy:info', function () {
+    info("Deploying {{artifact_name}}");
+});
 
 after('deploy:failed', 'deploy:unlock');
 ```
@@ -96,10 +129,48 @@ Don't forget to replace the sample values defined in the host functions (hostnam
 Quick explanation of this configuration file:
 
 - Uses the magento2 recipe.
-- Disables the tasks that pull/compile the code on the remote host.
-- Adds a rsync mechanism that sends the code to the remote host.
+- Creates and uploads an artifact to the remote host instead of using git.
 
-The rsync will be done by the GitLab CI (cf. automatic deployment below).
+To launch a deployment:
+
+```
+deployer deploy <host>
+```
+
+### Build Magento Locally
+
+The magento2 recipe builds Magento on the remote host (composer install, setup:di:compile, setup:static-content:deploy).
+To speed up the deployment process, we recommend building Magento on the local machine instead (GitLab CI if possible).
+
+Example implementation (in deploy.php):
+
+```php
+desc('Build Magento locally');
+task('build', function () {
+    $themesToCompile = '';
+    if (count(get('magento_themes')) > 0) {
+        foreach (get('magento_themes') as $theme) {
+            $themesToCompile .= ' -t ' . $theme;
+        }
+    }
+
+    info('Building Magento locally');
+    runLocally('composer install --no-interaction');
+    runLocally('bin/magento setup:di:compile');
+    runLocally("bin/magento setup:static-content:deploy -f --content-version={{content_version}} {{static_content_locales}} $themesToCompile -j {{static_content_jobs}}");
+});
+
+// Disable tasks that build Magento on the remote host (it is built locally instead with the "build" task)
+task('deploy:vendors')->disable();
+task('deploy:clear_paths')->disable();
+task('magento:compile')->disable();
+task('magento:deploy:assets')->disable();
+```
+
+The deployment process becomes the following:
+
+1. Run `deployer build` to build Magento locally
+2. Run `deployer deploy <host>` to deploy Magento to the remote host
 
 ### Automatic Deployment
 
@@ -126,11 +197,8 @@ Then, you must add a deployment stage to the .gitlab-ci.yml file:
         - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
         - mkdir -p ~/.ssh && chmod 700 ~/.ssh
         - ssh-keyscan -t rsa $HOSTNAME >> ~/.ssh/known_hosts
-        # Build Magento
-        - composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction
-        - bin/magento setup:di:compile
-        - bin/magento setup:static-content:deploy -f -t Magento/luma -j 1 en_US
         # Run deployer
+        - deployer build
         - deployer deploy $ENV_NAME
 
 deploy_preprod:
@@ -159,13 +227,6 @@ deploy_prod:
 Don't forget to replace the HOSTNAME value with the IP or domain of the servers.
 
 When a tag is created with the pattern `preprod-*` or `prod-*`, this job will be automatically executed by the GitLab CI.
-It will run the following steps:
-
-- Pull an image with PHP preinstalled.
-- Add composer and deployer to the image.
-- Run composer install.
-- Compile Magento.
-- Run deployer.
 
 We recommend creating a custom image that already includes deployer and the ssh keys.
 It will make the build process more reliable.
