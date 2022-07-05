@@ -38,6 +38,7 @@ INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
     --db-user=$MYSQL_USER \
     --db-password=$MYSQL_PASSWORD \
     --elasticsearch-host=$ELASTICSEARCH_HOST \
+    --elasticsearch-port=$ELASTICSEARCH_PORT \
     --base-url=$BASE_URL \
     --base-url-secure=$SECURE_BASE_URL \
     --use-secure=$USE_SECURE \

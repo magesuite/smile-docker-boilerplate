@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## WIP
 
+### Added
+
+- Add option to change elasticsearch port in Magento install script.
+
 ### Fixed
 
 - Init script does not fail anymore if the templates directory was deleted.
