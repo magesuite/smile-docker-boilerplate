@@ -123,6 +123,10 @@ if [ "$USE_VARNISH" = "true" ]; then
     echo && print_and_run "$MAGENTO_COMMAND config:set --scope=default --scope-code=0 system/full_page_cache/varnish/backend_port $VARNISH_BACKEND_PORT"
 fi
 
+if [ "$MAGENTO_RUN_MODE" = "developer" ] && [ -d "$MAGENTO_DIR/vendor/smile/module-debug-toolbar" ]; then
+    echo && print_and_run "$MAGENTO_COMMAND config:set smile_debugtoolbar/configuration/enabled 1"
+fi
+
 if [ "$MAGENTO_RUN_MODE" = "production" ]; then
     echo && print_and_run "$MAGENTO_COMMAND setup:di:compile"
     echo && print_and_run "$MAGENTO_COMMAND cache:clean"
