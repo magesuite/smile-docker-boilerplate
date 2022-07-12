@@ -44,7 +44,7 @@ However, if you still want to enable the code inspection in PhpStorm, follow the
 
 4. Go to **PHP > Quality Tools**. For each tool, select the php interpreter that you created.
 
-5. Go to **Editor > Inspections**. In the Quality tools section, enable and configure the following tools (disable the others):
+5. Go to **Editor > Inspections**. In the subsection **PHP > Quality tools**, enable and configure the following tools (disable the others):
 
     - PHP_CodeSniffer validation:
         - Uncheck "Installed standard path"
