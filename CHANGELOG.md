@@ -5,15 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## WIP
+## [1.0.0-rc5] - 2022-08-03
 
 ### Added
 
-- Enable debug toolbar in Magento installation script if the module is installed
+- Enable debug toolbar in Magento installation script if the module is installed.
 
 ### Fixed
 
-- It is now possible to apply composer patches (`patch` package added to the php image)
+- It is now possible to apply composer patches (`patch` package added to the php image).
 
 ## [1.0.0-rc4] - 2022-07-05
 
@@ -58,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release candidate.
 
+[1.0.0-rc5]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc4...1.0.0-rc5
 [1.0.0-rc4]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc3...1.0.0-rc4
 [1.0.0-rc3]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc2...1.0.0-rc3
 [1.0.0-rc2]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc1...1.0.0-rc2
