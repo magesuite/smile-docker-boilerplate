@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Enable debug toolbar in Magento installation script if the module is installed
 
+### Fixed
+
+- It is now possible to apply composer patches (`patch` package added to the php image)
+
 ## [1.0.0-rc4] - 2022-07-05
 
 ### Added

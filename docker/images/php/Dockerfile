@@ -15,7 +15,7 @@ COPY ./bin/run-cron /usr/local/bin/
 FROM base as dev
 
 # Install npm
-RUN apk add --no-cache npm
+RUN apk add --no-cache npm patch
 
 # Install grunt
 RUN set -ex; \
