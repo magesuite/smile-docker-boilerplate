@@ -1,7 +1,7 @@
 ARG PHP_VERSION=8.1
 FROM registry.smile.fr/magento2/php:$PHP_VERSION-fpm-1 as base
 
-# Install git (for git clone and GrumPHP), msmtp and shadow utils (for usermod/groupmod)
+# Install git (for git clone and GrumPHP), msmtp (for emails) and shadow utils (for usermod/groupmod)
 RUN apk add --no-cache git msmtp shadow
 
 # PHP dev configuration
@@ -14,7 +14,7 @@ COPY ./bin/run-cron /usr/local/bin/
 
 FROM base as dev
 
-# Install npm
+# Install npm (grunt requirement) and patch (to be able to apply composer patches)
 RUN apk add --no-cache npm patch
 
 # Install grunt
