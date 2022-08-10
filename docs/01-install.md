@@ -45,7 +45,7 @@ Follow the steps below:
 1. Run the following command (**don't blindly copy it, make sure to set the version and edition that you need**):
 
    ```
-   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.4 EDITION=community
+   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.5 EDITION=community
    ```
 
    This script will update the docker env files and run "composer create-project".
@@ -98,7 +98,7 @@ This section will show you how to use this boilerplate with existing Magento sou
 2. Run the following command (**don't blindly copy it, the version must match your composer.json file**):
 
    ```
-   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.4
+   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.5
    ```
 
    This script will update the docker env files, and check if anything needs to be added to composer.json (Smile modules, Smile packagist repositories...).
