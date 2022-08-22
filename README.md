@@ -29,7 +29,7 @@ Warning: if most of your available disk space is dedicated to the HOME partition
 This boilerplate uses composer to install Magento.
 Magento projects have the following requirements:
 
-- Generate a [GitHub token](https://getcomposer.org/doc/articles/authentication-for-private-packages.md#github-oauth) if you don't already have one.
+- Generate a [GitHub token](https://getcomposer.org/doc/articles/authentication-for-private-packages.md#github-oauth) if you don't already have one (no scope required).
 - Get [Magento access keys](https://devdocs.magento.com/guides/v2.4/install-gde/prereq/connect-auth.html).
 
 ### Smile Images
@@ -58,6 +58,6 @@ docker login -u <youruser> -p <your_secret> registry.smile.fr
 
 We encourage you to read the following resources:
 
-- [Magento best practices](https://wiki.galaxy.intranet/wiki/Best_Practices_(Magento))
-- [Magento performance tuning](https://wiki.galaxy.intranet/wiki/Performance_Tuning_(Magento))
+- [Magento Best Practices](https://wiki.galaxy.intranet/wiki/Best_Practices_(Magento))
+- [Magento Performance Tuning](https://wiki.galaxy.intranet/wiki/Performance_Tuning_(Magento))
 - [Installing Magepack](https://wiki.galaxy.intranet/wiki/Magepack) (recommended if you extend the luma or blank themes)
