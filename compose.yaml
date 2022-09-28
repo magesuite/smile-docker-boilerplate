@@ -29,7 +29,7 @@ services:
         image: ${PHP_FPM_IMAGE}
         command: run-cron
         environment:
-            CRONTAB: '* * * * * /usr/local/bin/php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
+            CRONTAB: '* * * * * php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
         depends_on:
             - db
             - elasticsearch

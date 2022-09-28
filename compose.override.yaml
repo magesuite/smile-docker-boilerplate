@@ -25,40 +25,29 @@ services:
         image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
         build:
             context: ./docker/images/php
-            target: dev
             args:
+                APP_UID: ${DOCKER_UID}
+                APP_GID: ${DOCKER_GID}
                 PHP_VERSION: ${PHP_VERSION}
-                COMPOSER_VERSION: ${COMPOSER_VERSION}
-        user: ${DOCKER_UID}:${DOCKER_GID}
         environment:
             COMPOSER_AUTH: ${COMPOSER_AUTH:-}
         volumes:
             - ${MAGENTO_DIR}:/var/www/html:rw,cached
-            - composer-cache:/tmp/composer
-            - npm-cache:/tmp/npm
+            - composer:/home/www-data/.composer
+            - npm:/home/www-data/.npm
 
     php_xdebug:
-        build:
-            context: ./docker/images/php
-            target: xdebug
-            args:
-                PHP_VERSION: ${PHP_VERSION}
-        user: ${DOCKER_UID}:${DOCKER_GID}
+        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
+        environment:
+            XDEBUG_MODE: develop,debug
         extra_hosts:
-            - "host.docker.internal:host-gateway"
+            - "host.docker.internal:host-gateway" # matches xdebug.client_host
         volumes:
             - ${MAGENTO_DIR}:/var/www/html:rw,cached
 
     cron:
-        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_cron
-        build:
-            context: ./docker/images/php
-            target: base
-            args:
-                PHP_VERSION: ${PHP_VERSION}
-        environment:
-            DOCKER_UID: ${DOCKER_UID}
-            DOCKER_GID: ${DOCKER_GID}
+        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
+        user: root
         volumes:
             - ${MAGENTO_DIR}:/var/www/html:rw,cached
 
@@ -87,5 +76,5 @@ services:
             - traefik.http.routers.$PROJECT_NAME-maildev-http.entrypoints=http
 
 volumes:
-    composer-cache:
-    npm-cache:
+    composer:
+    npm:

@@ -91,6 +91,6 @@ Check the .env file:
 
 - The variable PROJECT_NAME must be defined.
 - The variables DOCKER_UID and DOCKER_GID must match the output of `id -u` and `id -g`.
-- The variables PHP_VERSION and COMPOSER_VERSION must match the requirements of your project.
+- The variables PHP_VERSION must match the requirements of your project.
 
 If a container is failing, you can check the startup logs by running `docker compose run --rm <container_name>` (e.g. "web").

@@ -5,7 +5,7 @@
 #
 # Mandatory variables:
 # - PROJECT             Project name. Must use only "a-z0-9-" characters. Optional if PROJECT_NAME is defined in .env.
-# - VERSION             Magento version (must be >= 2.4.0).
+# - VERSION             Magento version (must be >= 2.4.2).
 #
 # Optional variables:
 # - EDITION             Magento edition to install ("community", "enterprise" or "cloud"). Default: "community".
@@ -70,8 +70,8 @@ init_magento_version () {
         exit 1
     fi
 
-    if [ $(version_compare "$MAGENTO_VERSION" "2.4.0") = "<" ]; then
-        echo -e "${RED}The Magento version must be greater or equal to 2.4.0.${NC}"
+    if [ $(version_compare "$MAGENTO_VERSION" "2.4.2") = "<" ]; then
+        echo -e "${RED}The Magento version must be greater or equal to 2.4.2.${NC}"
         exit 1
     elif [ $(version_compare "$MAGENTO_VERSION" "2.4.6") != "<" ]; then
         echo -e "${RED}The Magento version must be lower or equal to 2.4.5.${NC}"
@@ -124,7 +124,6 @@ display_project_information () {
         echo -e "- Magento edition: ${BLUE}$MAGENTO_EDITION${NC}"
     fi
     echo -e "- PHP version: ${BLUE}$PHP_VERSION${NC}"
-    echo -e "- Composer version: ${BLUE}$COMPOSER_VERSION${NC}"
 
     if [ "$CREATE_PROJECT" = "n" ]; then
         echo -e "- Update composer file: ${BLUE}$RUN_COMPOSER${NC}"
@@ -204,7 +203,7 @@ get_composer_command () {
         fi
     fi
 
-    if [ $(version_compare "$MAGENTO_VERSION" "2.4.4") = "<" ] && [ "$COMPOSER_VERSION" -gt 1 ]; then
+    if [ $(version_compare "$MAGENTO_VERSION" "2.4.4") = "<" ]; then
         append_command "composer config $DIR_OPT allow-plugins.dealerdirect/phpcodesniffer-composer-installer true"
         append_command "composer config $DIR_OPT allow-plugins.laminas/laminas-dependency-plugin true"
         append_command "composer config $DIR_OPT allow-plugins.magento/* true"
@@ -221,9 +220,7 @@ get_composer_command () {
     fi
 
     if [ "$ADD_GRUMPHP" = "y" ]; then
-        if [ "$COMPOSER_VERSION" -gt 1 ]; then
-            append_command "composer config $DIR_OPT allow-plugins.phpro/grumphp-shim true"
-        fi
+        append_command "composer config $DIR_OPT allow-plugins.phpro/grumphp-shim true"
         append_command "composer require $DIR_OPT --dev --no-update phpro/grumphp-shim"
     fi
 
@@ -282,15 +279,13 @@ init_smile_packagist "$SMILE_PACKAGIST" # Sets SMILE_PACKAGIST
 
 # Will be compared against PHP_VERSION to check if PHP image must be rebuilt
 PHP_VERSION_ENV="$PHP_VERSION"
-COMPOSER_VERSION_ENV="$COMPOSER_VERSION"
 
-# PHP and composer versions (deducted from Magento version)
-[ $(version_compare "$MAGENTO_VERSION" "2.4.2") = "<" ] && COMPOSER_VERSION=1 || COMPOSER_VERSION=2
+# PHP version (deducted from Magento version)
 [ $(version_compare "$MAGENTO_VERSION" "2.4.4") = "<" ] && PHP_VERSION=7.4 || PHP_VERSION=8.1
 
 # Composer actions that are not configurable through command-line
 [ "$ADD_SMILE_PACKAGES" = "y" ] && ADD_SMILE_PACKAGIST=y || ADD_SMILE_PACKAGIST=n
-[ "$COMPOSER_VERSION" -gt 1 ] && ADD_DEPLOY_IGNORE=y || ADD_DEPLOY_IGNORE=n
+ADD_DEPLOY_IGNORE=y
 ADD_GRUMPHP=y
 
 ########
@@ -331,9 +326,7 @@ else
     fi
 
     # Whether to add magento-deploy-ignore
-    if [ "$ADD_DEPLOY_IGNORE" = "y" ]; then
-        grep -F -e magento-deploy-ignore "$MAGENTO_DIR/composer.json" > /dev/null && ADD_DEPLOY_IGNORE=n || RUN_COMPOSER=y
-    fi
+    grep -F -e magento-deploy-ignore "$MAGENTO_DIR/composer.json" > /dev/null && ADD_DEPLOY_IGNORE=n || RUN_COMPOSER=y
 fi
 
 ########
@@ -361,12 +354,10 @@ sedi "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env.dist
 sedi "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env
 sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env.dist
 sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
-sedi "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" .env.dist
-sedi "s/^COMPOSER_VERSION=.*/COMPOSER_VERSION=$COMPOSER_VERSION/" .env
-echo -e "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\", \$PHP_VERSION to \"$PHP_VERSION\" and \$COMPOSER_VERSION to \"$COMPOSER_VERSION\" in .env and .env.dist.${NC}"
+echo -e "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\" and \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.dist.${NC}"
 
-# Rebuild the PHP image if PHP version or composer version was changed
-if [ "$PHP_VERSION" != "$PHP_VERSION_ENV" ] || [ "$COMPOSER_VERSION" != "$COMPOSER_VERSION_ENV" ]; then
+# Rebuild the PHP image if PHP version was changed
+if [ "$PHP_VERSION" != "$PHP_VERSION_ENV" ]; then
     echo && echo -e "${YELLOW}Rebuilding PHP containers${NC}"
     $DOCKER_COMPOSE build "$PHP_CONTAINER" "$PHP_XDEBUG_CONTAINER" "$CRON_CONTAINER"
 fi
@@ -378,7 +369,7 @@ fi
 
 # Copy grumphp.yaml.dist to Magento root dir (must be copied before composer install is run, otherwise git hook has not the expected contents)
 if [ -f "docker/templates/magento/grumphp.yaml.dist" ]; then
-    sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ composer_version }}/$COMPOSER_VERSION/g" docker/templates/magento/grumphp.yaml.dist > "$MAGENTO_DIR/grumphp.yaml.dist"
+    sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" docker/templates/magento/grumphp.yaml.dist > "$MAGENTO_DIR/grumphp.yaml.dist"
 fi
 
 ########
@@ -411,7 +402,7 @@ echo && echo "Updating project files"
 # Copy Magento template files
 if [ -d "docker/templates/magento" ]; then
     for FILE in $(find docker/templates/magento -maxdepth 1 -type f); do
-        sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ composer_version }}/$COMPOSER_VERSION/g" "$FILE" > "$MAGENTO_DIR/$(basename "$FILE")"
+        sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" "$FILE" > "$MAGENTO_DIR/$(basename "$FILE")"
     done
     echo -e "${GREEN}✓ Copied ./docker/templates/magento/* to $MAGENTO_DIR.${NC}"
 fi
@@ -419,7 +410,7 @@ fi
 # Copy documentation template files
 if [ -d "docker/templates/docs" ]; then
     for FILE in $(find docker/templates/docs -maxdepth 1 -type f); do
-        sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ composer_version }}/$COMPOSER_VERSION/g" "$FILE" > "docs/$(basename "$FILE")"
+        sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" "$FILE" > "docs/$(basename "$FILE")"
     done
     echo -e "${GREEN}✓ Copied ./docker/templates/docs/* to ./docs.${NC}"
 fi

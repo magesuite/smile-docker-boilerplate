@@ -128,7 +128,7 @@ setup-upgrade: magento
 
 .PHONY: grunt
 grunt: $(NODE_MODULES_DIR) ## Run grunt. Example: make grunt c=watch
-	$(PHP_CLI) grunt $(c)
+	$(PHP_CLI) npm exec grunt $(c)
 
 ## Composer
 .PHONY: composer

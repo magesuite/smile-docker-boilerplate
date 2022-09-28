@@ -58,6 +58,6 @@ docker login -u <youruser> -p <your_secret> registry.smile.fr
 
 We encourage you to read the following resources:
 
-- [Magento Best Practices](https://wiki.galaxy.intranet/wiki/Best_Practices_(Magento))
-- [Magento Performance Tuning](https://wiki.galaxy.intranet/wiki/Performance_Tuning_(Magento))
-- [Installing Magepack](https://wiki.galaxy.intranet/wiki/Magepack) (recommended if you extend the luma or blank themes)
+- [Magento Best Practices](https://wiki.smile.fr/wiki/Best_Practices_(Magento))
+- [Magento Performance Tuning](https://wiki.smile.fr/wiki/Performance_Tuning_(Magento))
+- [Installing Magepack](https://wiki.smile.fr/wiki/Magepack) (recommended if you extend the luma or blank themes)

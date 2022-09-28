@@ -1,51 +1,21 @@
 ARG PHP_VERSION=8.1
-FROM registry.smile.fr/magento2/php:$PHP_VERSION-fpm-1 as base
+FROM registry.smile.fr/magento2/php:$PHP_VERSION-fpm-dev
 
-# Install git (for git clone and GrumPHP), msmtp (for emails) and shadow utils (for usermod/groupmod)
-RUN apk add --no-cache git msmtp shadow
-
-# PHP dev configuration
-RUN ln -sf $PHP_INI_DIR/php.ini-development $PHP_INI_DIR/php.ini
+# Install msmtp (for emails)
+RUN apk add --no-cache msmtp
 COPY ./etc/msmtprc /etc/
+
+# PHP configuration
 COPY ./etc/php.ini $PHP_INI_DIR/conf.d/zz-override.ini
 
-# Binary files
-COPY ./bin/run-cron /usr/local/bin/
-
-FROM base as dev
-
-# Install npm (grunt requirement) and patch (to be able to apply composer patches)
-RUN apk add --no-cache npm patch
-
-# Install grunt
+# Change app user id
+ARG APP_UID=1000
+ARG APP_GID=1000
 RUN set -ex; \
-    npm install -g grunt-cli; \
-    mkdir /tmp/npm; \
-    chmod 777 /tmp/npm; \
-    npm config -g set cache /tmp/npm
+    groupmod -g $APP_GID www-data; \
+    usermod -u $APP_UID -g $APP_GID www-data
 
-# Install composer
-ARG COMPOSER_VERSION=2
-ENV COMPOSER_ALLOW_SUPERUSER 1
-ENV COMPOSER_HOME /tmp/composer
-RUN set -ex; \
-    mkdir $COMPOSER_HOME; \
-    chmod 777 $COMPOSER_HOME; \
-    curl -sS https://getcomposer.org/installer | php -- --$COMPOSER_VERSION --install-dir=/usr/local/bin --filename=composer; \
-    if [ "$COMPOSER_VERSION" = "1" ]; then composer global require --no-cache --no-plugins hirak/prestissimo; fi
+USER www-data
 
-# Add Smile certificates (required for https access to Smile packagist)
-RUN set -ex; \
-    curl https://pki.smile.fr/smile2016.crt -so /usr/local/share/ca-certificates/smile.crt; \
-    update-ca-certificates
-
-FROM base as xdebug
-
-RUN set -ex; \
-    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS; \
-    pecl install -o -f xdebug; \
-    apk del .build-deps; \
-    rm -rf /tmp/pear; \
-    docker-php-ext-enable xdebug
-
-COPY ./etc/php-xdebug.ini $PHP_INI_DIR/conf.d/zz-xdebug.ini
+# Create directories that may be mounted as volumes (otherwise they would be created with root permissions)
+RUN mkdir -p ~/.composer ~/.npm ~/.cache/yarn ~/.ssh
