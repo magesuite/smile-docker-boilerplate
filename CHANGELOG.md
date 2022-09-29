@@ -10,18 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added how to transfer SSH keys to the php container in the documentation.
+- Added configuration file in docker/conf/rabbitmq/rabbitmq.conf.
 
 ### Changed
 
 - Use fpm-dev as the base fpm image.
+- Upgraded RabbitMQ from 3.8 to 3.9.
 
 ### Removed
 
-- Remove compatibility with Magento 2.4.0 and 2.4.1 (requires composer 1, which is not installed in the fpm-dev image).
+- Removed compatibility with Magento 2.4.0 and 2.4.1 (requires composer 1, which is not installed in the fpm-dev image).
 
 ### Fixed
 
-- Fix rabbitmq data being deleted when the container is removed.
+- Fixed rabbitmq data being deleted when the container is removed.
 
 ## [1.0.0-rc6] - 2022-08-10
 
@@ -43,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Add option to change elasticsearch port in Magento install script.
+- Added option to change elasticsearch port in Magento install script.
 
 ### Fixed
 
@@ -55,28 +57,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Cron container is now disabled by default.
 - Better smileanalyser output (requires SmileAnalyser >= 8.1).
-- Improve the documentation (added docker architecture and deployment sections, moved multiple sections).
+- Improved the documentation (added docker architecture and deployment sections, moved multiple sections).
 
 ### Removed
 
-- Remove unused port mappings in compose.yaml.
-- Remove phpcbf from the Makefile (can still be run with `make vendor-bin`).
+- Removed unused port mappings in compose.yaml.
+- Removed phpcbf from the Makefile (can still be run with `make vendor-bin`).
 
 ## [1.0.0-rc2] - 2022-06-01
 
 ### Added
 
-- Add configuration file for mariadb (fixes [slow reindexation issue](https://experienceleague.adobe.com/docs/commerce-operations/performance-best-practices/configuration.html#indexers)).
+- Added configuration file for mariadb (fixes [slow reindexation issue](https://experienceleague.adobe.com/docs/commerce-operations/performance-best-practices/configuration.html#indexers)).
 
 ### Changed
 
-- Upgrade maildev from 1.1.1 to 2.0.5.
-- Update Varnish VCL file.
-- Rename configuration files with ambiguous names (e.g. "default.conf" renamed to "default-dev.conf").
+- Upgraded maildev from 1.1.1 to 2.0.5.
+- Updated Varnish VCL file.
+- Renamed configuration files with ambiguous names (e.g. "default.conf" renamed to "default-dev.conf").
 
 ### Fixed
 
-- Fix PHP file caching issue by setting `opcache.validate_timestamps = On` in the php dev image.
+- Fixed PHP file caching issue by setting `opcache.validate_timestamps = On` in the php dev image.
 
 ## 1.0.0-rc1 - 2022-05-19
 

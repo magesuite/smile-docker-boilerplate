@@ -86,6 +86,7 @@ services:
         healthcheck:
             test: 'rabbitmq-diagnostics -q ping'
         volumes:
+            - ./docker/conf/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
             - rabbitmqdata:/var/lib/rabbitmq
 
     maildev:

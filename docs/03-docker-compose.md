@@ -43,12 +43,7 @@ Running the command again will disable it.
 
 ### Configuration Files
 
-The configuration files are located here:
-
-- Nginx: docker/conf/nginx
-- Varnish: docker/conf/varnish
-- MariaDB: docker/conf/mysql
-- Redis: docker/conf/redis
+The configuration files are located in the directory "docker/conf".
 
 These files are mapped to the containers in [compose.yaml](../compose.yaml).
 You can create additional config files by using the same logic.
