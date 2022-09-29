@@ -1,5 +1,5 @@
 ARG PHP_VERSION=8.1
-FROM registry.smile.fr/magento2/php:$PHP_VERSION-fpm-dev
+FROM registry.smile.fr/magento2/php:$PHP_VERSION-fpm-dev-1
 
 # Install msmtp (for emails)
 RUN apk add --no-cache msmtp
