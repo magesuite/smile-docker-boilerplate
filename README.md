@@ -4,7 +4,7 @@
 
 This repository provides a boilerplate that allows to set up Magento projects with Docker Compose.
 
-It is compatible with Magento >= 2.4.0.
+It is compatible with Magento >= 2.4.2.
 For older Magento versions, use the [ansible skeleton](https://git.smile.fr/magento2/architecture-skeleton).
 
 ## Requirements
