@@ -41,7 +41,7 @@ services:
         environment:
             XDEBUG_MODE: develop,debug
         extra_hosts:
-            - "host.docker.internal:host-gateway" # matches xdebug.client_host
+            - "host.docker.internal:host-gateway" # Matches xdebug.client_host
         volumes:
             - ${MAGENTO_DIR}:/var/www/html:rw,cached
 

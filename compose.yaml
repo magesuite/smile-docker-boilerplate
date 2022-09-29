@@ -80,7 +80,7 @@ services:
 
     rabbitmq:
         image: ${RABBITMQ_IMAGE}
-        hostname: rabbitmq
+        hostname: rabbitmq # Ensures data persistence, cf. https://hub.docker.com/_/rabbitmq
         env_file:
             - docker/env/rabbitmq.env
         healthcheck:
