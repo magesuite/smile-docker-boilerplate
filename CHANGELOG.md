@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove compatibility with Magento 2.4.0 and 2.4.1 (requires composer 1, which is not installed in the fpm-dev image).
 
+### Fixed
+
+- Fix rabbitmq data being deleted when the container is removed.
+
 ## [1.0.0-rc6] - 2022-08-10
 
 ### Added

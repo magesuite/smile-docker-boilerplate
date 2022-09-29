@@ -80,6 +80,7 @@ services:
 
     rabbitmq:
         image: ${RABBITMQ_IMAGE}
+        hostname: rabbitmq
         env_file:
             - docker/env/rabbitmq.env
         healthcheck:
