@@ -77,6 +77,25 @@ volumes:
     redisdata:
 ```
 
+### Using Your SSH Keys Inside a Container
+
+If you need to use your SSH keys inside the php container, add the following configuration in compose.override.yaml:
+
+```yaml
+services:
+    php:
+        # ...
+        environment:
+            # ...
+            SSH_AUTH_SOCK: $SSH_AUTH_SOCK
+        volumes:
+            # ...
+            - $SSH_AUTH_SOCK:$SSH_AUTH_SOCK
+            - ~/.ssh:/home/www-data/.ssh
+```
+
+Then, run the following command to apply the change: `make up service=php`
+
 ## Troubleshooting
 
 If you experience any issue related to your Docker containers, please follow these steps.
