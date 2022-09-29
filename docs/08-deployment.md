@@ -19,9 +19,10 @@ A simple git push to the cloud repository triggers a new build on the environmen
 
 ## Environments hosted on a docker architecture
 
-There is nothing available yet, but we are currently creating helm charts.
+The deployment entirely depends on the docker architecture used on the production environment.
 
-Once available, it will be documented here:
+Smile is currently developing helm charts, but their main use will be for integration environments hosted on https://rancher.smile.fr.
+Once available, these helm charts will be documented here:
 https://wiki.smile.fr/wiki/Magento_Helm_Charts
 
 ## Environments hosted without Docker
