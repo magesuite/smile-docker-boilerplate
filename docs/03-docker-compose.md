@@ -95,10 +95,14 @@ Then, run the following command to apply the change: `make up service=php`
 
 Some packages require to use yarn instead of npm (e.g. elasticsuite premium).
 
-To replace npm with yarn, apply the following changes to the Makefile:
+To replace npm with yarn, apply the following changes:
 
-- Replace `npm install` with `yarn install`.
-- Replace `npm exec grunt` with `yarn exec grunt`.
+- In Makefile:
+    - Replace `npm install` with `yarn install`.
+    - Replace `npm exec grunt` with `yarn exec grunt`.
+- In compose.override.yaml:
+    - Replace `npm:/home/www-data/.npm` with `yarn:/home/www-data/.cache/yarn`
+    - Rename `npm` volume to `yarn`
 
 ## Troubleshooting
 
