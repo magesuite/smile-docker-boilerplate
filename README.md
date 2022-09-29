@@ -58,6 +58,7 @@ docker login -u <youruser> -p <your_secret> registry.smile.fr
 
 We encourage you to read the following resources:
 
+- [How to Start a Magento Project](https://wiki.smile.fr/wiki/How_to_start_a_Magento_project)
 - [Magento Best Practices](https://wiki.smile.fr/wiki/Best_Practices_(Magento))
 - [Magento Performance Tuning](https://wiki.smile.fr/wiki/Performance_Tuning_(Magento))
 - [Installing Magepack](https://wiki.smile.fr/wiki/Magepack) (recommended if you extend the luma or blank themes)
