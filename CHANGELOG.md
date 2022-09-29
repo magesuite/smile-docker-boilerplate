@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## WIP
 
+### Added
+
+- Added how to transfer SSH keys to the php container in the documentation.
+
 ### Changed
 
 - Use fpm-dev as the base fpm image.
