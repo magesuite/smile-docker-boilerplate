@@ -28,4 +28,4 @@ If PhpStorm reports an issue with invalid path mapping:
 
 1. Go to Settings > PHP > Servers.
 2. Make sure that there is a server defined, and that its name is `_`.
-4. Make sure that there is a path mapping between the Magento root directory and /var/www/html.
+3. Make sure that there is a path mapping between the Magento root directory and /var/www/html.
