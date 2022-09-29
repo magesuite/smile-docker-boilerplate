@@ -91,6 +91,15 @@ services:
 
 Then, run the following command to apply the change: `make up service=php`
 
+### Replacing npm with yarn
+
+Some packages require to use yarn instead of npm (e.g. elasticsuite premium).
+
+To replace npm with yarn, apply the following changes to the Makefile:
+
+- Replace `npm install` with `yarn install`.
+- Replace `npm exec grunt` with `yarn exec grunt`.
+
 ## Troubleshooting
 
 If you experience any issue related to your Docker containers, please follow these steps.
