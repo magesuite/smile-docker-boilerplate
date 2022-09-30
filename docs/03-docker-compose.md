@@ -86,7 +86,7 @@ services:
         volumes:
             # ...
             - $SSH_AUTH_SOCK:$SSH_AUTH_SOCK
-            - ~/.ssh:/home/www-data/.ssh
+            - ~/.ssh:/home/www/.ssh
 ```
 
 Then, run the following command to apply the change: `make up service=php`
@@ -101,7 +101,7 @@ To replace npm with yarn, apply the following changes:
     - Replace `npm install` with `yarn install`.
     - Replace `npm exec grunt` with `yarn exec grunt`.
 - In compose.override.yaml:
-    - Replace `npm:/home/www-data/.npm` with `yarn:/home/www-data/.cache/yarn`
+    - Replace `npm:/home/www/.npm` with `yarn:/home/www/.cache/yarn`
     - Rename `npm` volume to `yarn`
 
 ## Troubleshooting

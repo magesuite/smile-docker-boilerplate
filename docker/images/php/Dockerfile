@@ -8,14 +8,15 @@ COPY ./etc/msmtprc /etc/
 # PHP configuration
 COPY ./etc/php.ini $PHP_INI_DIR/conf.d/zz-override.ini
 
-# Change app user id
+# Add application user (more elegant than changing the uid of www-data, which is a system user)
 ARG APP_UID=1000
 ARG APP_GID=1000
 RUN set -ex; \
-    groupmod -g $APP_GID www-data; \
-    usermod -u $APP_UID -g $APP_GID www-data
+    addgroup --gid "$APP_GID" www; \
+    adduser --uid "$APP_UID" --ingroup www --disabled-password --gecos "" www
 
-USER www-data
+ENV CRON_USER=www
+USER www
 
 # Create directories that may be mounted as volumes (otherwise they would be created with root permissions)
 RUN mkdir -p ~/.composer ~/.npm ~/.cache/yarn ~/.ssh

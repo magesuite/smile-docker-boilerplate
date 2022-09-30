@@ -33,8 +33,8 @@ services:
             COMPOSER_AUTH: ${COMPOSER_AUTH:-}
         volumes:
             - ${MAGENTO_DIR}:/var/www/html:rw,cached
-            - composer:/home/www-data/.composer
-            - npm:/home/www-data/.npm
+            - composer:/home/www/.composer
+            - npm:/home/www/.npm
 
     php_xdebug:
         image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
