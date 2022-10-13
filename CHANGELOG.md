@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## WIP
+## [1.0.0-rc9] - 2022-10-13
 
 ### Added
 
@@ -96,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release candidate.
 
+[1.0.0-rc9]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc8...1.0.0-rc9
 [1.0.0-rc8]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc7...1.0.0-rc8
 [1.0.0-rc7]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc6...1.0.0-rc7
 [1.0.0-rc6]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc5...1.0.0-rc6
