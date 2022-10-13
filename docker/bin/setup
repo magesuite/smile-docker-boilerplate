@@ -135,7 +135,7 @@ init_composer_vars () {
         DEV_PACKAGES_LIST="${DEV_PACKAGES_LIST:1}";
     fi
 
-    [ "$PACKAGES_LIST" != "" ] || "$DEV_PACKAGES_LIST" != "" ] && COMPOSER_INVALIDATED=y || COMPOSER_INVALIDATED=n
+    [ "$PACKAGES_LIST" = "" ] && [ "$DEV_PACKAGES_LIST" = "" ] && COMPOSER_INVALIDATED=n || COMPOSER_INVALIDATED=y
 }
 
 # Display information about the project before running the setup.
