@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## WIP
+
+### Added
+
+- Added [Smile Quality Suite](https://github.com/Smile-SA/magento2-smilelab-quality-suite) (rulesets for phpcs, phpmd, phpstan).
+
 ## [1.0.0-rc8] - 2022-09-30
 
 ### Added

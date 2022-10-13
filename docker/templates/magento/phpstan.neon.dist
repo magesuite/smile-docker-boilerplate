@@ -5,4 +5,4 @@ parameters:
         - app/code
 
 includes:
-    - dev/tests/static/testsuite/Magento/Test/Php/_files/phpstan/phpstan.neon
+    - vendor/smile/magento2-smilelab-phpstan/extension.neon
