@@ -64,7 +64,7 @@ You can update an existing docker boilerplate by applying the following process:
     - Remove the current boilerplate files: `rm -rf docker docs .env`
     - Extract the archive: `tar -xf ~/Downloads/docker-boilerplate-latest.tar.gz --strip-components=1`
 3. Use a git diff tool to reapply your project modifications to the updated files.
-   Don't forget to set the project name in .env.dist.
+   Don't forget to set the project name in ".env.dist", and to restore the file "docs/01-install.md".
 4. Rebuild the images: `make build`
 5. *[Optional]*: run `make init-project version=xxx` (where "xxx" is your current version of Magento).
    This command will update some files and packages in the Magento installation (e.g. gitlab-ci.yml).
