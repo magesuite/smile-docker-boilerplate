@@ -54,6 +54,24 @@ docker login -u <youruser> -p <your_secret> registry.smile.fr
 - [Deployment](docs/08-deployment.md)
 - [PhpStorm Configuration](docs/09-phpstorm.md) (optional)
 
+## How to Update an Already Installed Boilerplate?
+
+You can update an existing docker boilerplate by applying the following process:
+
+1. Download the latest release:
+   https://git.smile.fr/magento2/docker-boilerplate/-/archive/latest/docker-boilerplate-latest.tar.gz
+2. At the root of your project:
+    - Remove the current boilerplate files: `rm -rf docker docs .env`
+    - Extract the archive: `tar -xf ~/Downloads/docker-boilerplate-latest.tar.gz --strip-components=1`
+3. Use a git diff tool to reapply your project modifications to the updated files.
+   Don't forget to set the project name in .env.dist.
+4. Rebuild the images: `make build`
+5. *[Optional]*: run `make init-project version=xxx` (where "xxx" is your current version of Magento).
+   This command will update some files and packages in the Magento installation (e.g. gitlab-ci.yml).
+   **Warning**: Running this command will update your phpcs/phpstan rulesets.
+6. Review and commit the changes.
+   If you ran the step 5, you will also need to review and commit the changes made to the Magento directory.
+
 ## Links
 
 We encourage you to read the following resources:
