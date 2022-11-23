@@ -15,7 +15,8 @@ endif
 include .env
 
 # Docker
-DOCKER_COMPOSE := docker compose
+DOCKER_COMPOSE := docker compose --profile cron
+DOCKER_COMPOSE_NO_PROFILE := docker compose
 PHP_SERVICE := php
 PHP_XDEBUG_SERVICE := php_xdebug
 DB_SERVICE := db
@@ -33,11 +34,11 @@ help:
 ## Docker
 .PHONY: up
 up: ## Build and start containers. Pass the parameter "service=" to filter which containers to start. Example: make up service=php
-	$(DOCKER_COMPOSE) up -d --remove-orphans $(service)
+	$(DOCKER_COMPOSE_NO_PROFILE) up -d --remove-orphans $(service)
 
 .PHONY: down
 down: ## Stop and remove containers.
-	$(DOCKER_COMPOSE) down --remove-orphans
+	$(DOCKER_COMPOSE_NO_PROFILE) down --remove-orphans
 
 .PHONY: restart
 restart: ## Restart containers. Pass the parameter "service=" to filter which containers to restart.
@@ -87,7 +88,7 @@ db-export: up ## Dump the database. Pass the parameter "filename=" to set the fi
 .PHONY: toggle-cron
 toggle-cron: ## Enable/disable the cron container (disabled by default).
 	@if [[ $$($(DOCKER_COMPOSE) ps | grep cron) ]]; then CMD="$(DOCKER_COMPOSE) stop cron && $(DOCKER_COMPOSE) rm -f cron"; \
-	else CMD="$(DOCKER_COMPOSE) --profile cron up -d cron"; fi; \
+	else CMD="$(DOCKER_COMPOSE) up -d cron"; fi; \
 	echo "$$CMD"; eval "$$CMD"
 
 ## Magento
