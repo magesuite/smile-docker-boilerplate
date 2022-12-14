@@ -34,6 +34,7 @@
 !/build_options.ini
 !/magento-vars.php
 !/op-exclude.txt
+!/php.ini
 
 # Tools
 !/.gitlab-ci.yml

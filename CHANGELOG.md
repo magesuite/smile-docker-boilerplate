@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Fixed inconsistent behavior of the Makefile target `toggle-cron`.
+- Fixed missing files after Magento Cloud project initialization.
 
 ## [1.0.0-rc9] - 2022-10-13
 

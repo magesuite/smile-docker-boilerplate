@@ -209,20 +209,22 @@ get_composer_command () {
     # Prevents wildcard character from being expanded (e.g. the "composer show" command injected into compose require might return a package with the "*" constraint)
     COMMAND="set -f"
     DIR_OPT=""
-    TEMP_DIR="/tmp/magento-project"
+    TEMP_INIT_DIR="/tmp/magento-project"
 
     if [ "$CREATE_PROJECT" = "y" ]; then
-        DIR_OPT="-d $TEMP_DIR"
+        # Create composer.json file (and optionally Magento Cloud files) in a temporary directory, these files will be copied at the end if no error happened
+        DIR_OPT="-d $TEMP_INIT_DIR"
         if [ "$MAGENTO_EDITION" = "cloud" ]; then
-            # Clone the Magento cloud repository, then add missing dev packages by scanning the composer.json file of an enterprise project
             TEMP_EE_DIR="/tmp/ee-template"
-            append_command "git clone -b $MAGENTO_VERSION --depth 1 https://github.com/magento/magento-cloud.git $TEMP_DIR"
-            append_command "rm -rf $TEMP_DIR/.git $TEMP_DIR/composer.lock"
+            append_command "git clone -b $MAGENTO_VERSION --depth 1 https://github.com/magento/magento-cloud.git $TEMP_INIT_DIR"
+            append_command "rm -rf $TEMP_INIT_DIR/.git $TEMP_INIT_DIR/composer.lock"
+            # Add missing dev packages by scanning the composer.json file of an enterprise project
             append_command "composer create-project --no-install --no-plugins --repository=$MAGENTO_PACKAGIST_URL magento/project-enterprise-edition=$MAGENTO_VERSION $TEMP_EE_DIR"
             append_command "composer require $DIR_OPT --dev --no-update \$(composer show -d $TEMP_EE_DIR -s | sed -n '/^requires (dev)$/,/^$/p' | grep -v 'requires (dev)' | xargs echo -n)"
             append_command "rm -rf $TEMP_EE_DIR"
         else
-            append_command "composer create-project --no-install --no-plugins --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_DIR"
+            # Get composer.json file only
+            append_command "composer create-project --no-install --no-plugins --repository=$MAGENTO_PACKAGIST_URL magento/project-$MAGENTO_EDITION-edition=$MAGENTO_VERSION $TEMP_INIT_DIR"
         fi
     fi
 
@@ -254,7 +256,17 @@ get_composer_command () {
     fi
 
     if [ "$CREATE_PROJECT" = "y" ]; then
-        append_command "mv $TEMP_DIR/composer.json . && rm -rf $TEMP_DIR && composer install"
+        if [ "$MAGENTO_EDITION" = "cloud" ]; then
+            # Copy cloud files from the temporary directory to the Magento directory
+            CLOUD_FILES=(.magento m2-hotfixes .magento.app.yaml magento-vars.php op-exclude.txt php.ini)
+            for CLOUD_FILE in "${CLOUD_FILES[@]}"; do
+                append_command "[ -e $TEMP_INIT_DIR/$CLOUD_FILE ] && mv $TEMP_INIT_DIR/$CLOUD_FILE ."
+            done
+        fi
+
+        # Copy composer.json file from the temporary directory to the Magento directory, and install dependencies
+        append_command "mv $TEMP_INIT_DIR/composer.json . && rm -rf $TEMP_INIT_DIR"
+        append_command "composer install"
     elif [ "$COMPOSER_INVALIDATED" = "y" ]; then
         append_command "composer update"
     fi
@@ -263,7 +275,7 @@ get_composer_command () {
         append_command "vendor/bin/SmileAnalyser init --type Magento2"
     fi
 
-    echo $COMMAND
+    echo "$COMMAND"
 }
 
 # Add instructions to an existing command.
