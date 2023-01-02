@@ -104,6 +104,47 @@ To replace npm with yarn, apply the following changes:
     - Replace `npm:/home/www/.npm` with `yarn:/home/www/.cache/yarn`
     - Rename `npm` volume to `yarn`
 
+### Setting up Multiple Stores
+
+If you need to add stores (or websites), follow the steps below.
+
+1. Make sure that the store URLs are properly defined in the Magento configuration.
+
+2. In docker/conf/nginx/default-dev.conf, add the following code:
+
+   ```
+   map $http_host $MAGE_RUN_CODE {
+       default '';
+       myotherstore.docker.localhost myotherstore;
+   }
+   ```
+
+3. In the same file, add the following fastcgi params:
+
+   ```
+   fastcgi_param MAGE_RUN_TYPE store;
+   fastcgi_param MAGE_RUN_CODE $MAGE_RUN_CODE;
+   ```
+
+4. In compose.override.yaml, add Traefik labels to the `varnish` service (for each store/website):
+
+   ```
+   # Additional domains
+   - traefik.http.routers.$PROJECT_NAME-magento-myotherstore-http.rule=Host(`myotherstore.docker.localhost`)
+   - traefik.http.routers.$PROJECT_NAME-magento-myotherstore-http.entrypoints=http
+   - traefik.http.routers.$PROJECT_NAME-magento-myotherstore-https.rule=Host(`myotherstore.docker.localhost`)
+   - traefik.http.routers.$PROJECT_NAME-magento-myotherstore-https.entrypoints=https
+   - traefik.http.routers.$PROJECT_NAME-magento-myotherstore-https.tls=true
+   ```
+
+    You can also declare a Traefik label that matches multiple store URLs by using `HostRegexp` instead of `Host`.
+
+5. Run the following command:
+
+   ```
+   make up && make restart service=web
+   ```
+
 ## Troubleshooting
 
 If you experience any issue related to your Docker containers, please follow these steps.
