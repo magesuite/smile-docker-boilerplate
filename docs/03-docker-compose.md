@@ -137,13 +137,23 @@ If you need to add stores (or websites), follow the steps below.
    - traefik.http.routers.$PROJECT_NAME-magento-myotherstore-https.tls=true
    ```
 
-    You can also declare a Traefik label that matches multiple store URLs by using `HostRegexp` instead of `Host`.
-
 5. Run the following command:
 
    ```
    make up && make restart service=web
    ```
+
+Alternatively, you can use a regexp to define a single Traefik label for all stores.
+For example:
+
+```
+# Additional domains
+- traefik.http.routers.$PROJECT_NAME-magento-subdomains-http.rule=HostRegexp(`{subdomain:$PROJECT_NAME-[a-z0-9]+}.docker.localhost`)
+- traefik.http.routers.$PROJECT_NAME-magento-subdomains-http.entrypoints=http
+- traefik.http.routers.$PROJECT_NAME-magento-subdomains-https.rule=HostRegexp(`{subdomain:$PROJECT_NAME-[a-z0-9]+}.docker.localhost`)
+- traefik.http.routers.$PROJECT_NAME-magento-subdomains-https.entrypoints=https
+- traefik.http.routers.$PROJECT_NAME-magento-subdomains-https.tls=true
+```
 
 ## Troubleshooting
 
