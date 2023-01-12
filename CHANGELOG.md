@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Added how to set up multiple websites/stores.
+- Added .fleet directory to .gitignore
 
 ## [1.0.0-rc10] - 2022-12-14
 
