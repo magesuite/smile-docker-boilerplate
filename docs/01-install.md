@@ -102,8 +102,10 @@ This section will show you how to use this boilerplate with existing Magento sou
    ```
 
    This script will update the docker env files, and check if anything needs to be added to composer.json (Smile modules, Smile packagist repositories...).
-
    The full list of parameters handled by this script is [documented here](../docker/bin/setup#L6).
+
+   During the script execution, you will be prompted for Magento authentication keys.
+   Username is the Magento public key, password is the Magento private key.
 
 3. *Optional:* if you need to import a database dump file, run the following command:
    `make db-import filename=/path/to/dump.sql`

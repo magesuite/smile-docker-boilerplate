@@ -30,7 +30,7 @@ This boilerplate uses composer to install Magento.
 Magento projects have the following requirements:
 
 - Generate a [GitHub token](https://getcomposer.org/doc/articles/authentication-for-private-packages.md#github-oauth) if you don't already have one (no scope required).
-- Get [Magento access keys](https://devdocs.magento.com/guides/v2.4/install-gde/prereq/connect-auth.html).
+- Get [Magento access keys](https://experienceleague.adobe.com/docs/commerce-operations/installation-guide/prerequisites/authentication-keys.html).
 
 ### Smile Images
 
