@@ -54,6 +54,9 @@ Follow the steps below:
    The "EDITION" variable must be one of "community", "enterprise" or "cloud".
    The full list of parameters handled by this script is [documented here](../docker/bin/setup#L6).
 
+   During the script execution, you will be prompted for Magento authentication keys.
+   Username is the Magento public key, password is the Magento private key.
+
 2. *Cloud projects only*: in magento/composer.json, check if the following entry exists:
 
    ```json
