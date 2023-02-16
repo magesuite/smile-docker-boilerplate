@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## WIP
 
+- Compatibility with Magento 2.4.6.
 - Added a warning about Magento authentication keys to the Magento installation docs.
 
 ## [1.0.0-rc11] - 2023-01-12

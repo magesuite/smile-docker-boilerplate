@@ -154,6 +154,21 @@ You can move to the next step: [checking if the Magento store is available](#acc
 
 If the Magento store is available, you can move to the final step: [pushing the files to git](#initializing-the-repositories).
 
+## Disabling 2FA
+
+The admin area of Magento requires a 2FA authentication.
+Magento doesn't provide any way to disable it.
+
+If you want to bypass 2FA on a development environment, you can run the following commands:
+
+```php
+make composer c="require --dev markshust/magento2-module-disabletwofactorauth"
+make magento c="module:enable MarkShust_DisableTwoFactorAuth"
+make setup-upgrade
+```
+
+It will install a module that disables 2FA on development environments.
+
 ## Initializing the Repositories
 
 ### Creating the Repositories
