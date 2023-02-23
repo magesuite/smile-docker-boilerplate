@@ -4,18 +4,27 @@ services:
         depends_on:
             - web
         volumes:
-            - ./docker/conf/varnish/default-prod.vcl:/etc/varnish/default.vcl
+            - ./docker/conf/varnish/default-dev.vcl:/etc/varnish/default.vcl
 
     web:
         image: ${NGINX_IMAGE}
         depends_on:
             - php
+            - php_xdebug
         volumes:
-            - appdata:/var/www/html
-            - ./docker/conf/nginx/default-prod.conf:/etc/nginx/conf.d/default.conf
+            - ${MAGENTO_DIR}:/var/www/html:rw,cached
+            - ./docker/conf/nginx/default-dev.conf:/etc/nginx/conf.d/default.conf
 
     php:
-        image: ${PHP_FPM_IMAGE}
+        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
+        build:
+            context: ./docker/images/php
+            args:
+                APP_UID: ${DOCKER_UID}
+                APP_GID: ${DOCKER_GID}
+                PHP_VERSION: ${PHP_VERSION}
+        environment:
+            COMPOSER_AUTH: ${COMPOSER_AUTH:-}
         depends_on:
             - db
             - elasticsearch
@@ -23,10 +32,22 @@ services:
             - rabbitmq
             - redis
         volumes:
-            - appdata:/var/www/html
+            - ${MAGENTO_DIR}:/var/www/html:rw,cached
+            - composer:/home/www/.composer
+            - npm:/home/www/.npm
+
+    php_xdebug:
+        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
+        environment:
+            XDEBUG_MODE: develop,debug
+        extra_hosts:
+            - "host.docker.internal:host-gateway" # Matches xdebug.client_host
+        volumes:
+            - ${MAGENTO_DIR}:/var/www/html:rw,cached
 
     cron:
-        image: ${PHP_FPM_IMAGE}
+        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
+        user: root
         command: run-cron
         environment:
             CRONTAB: '* * * * * php /var/www/html/bin/magento cron:run >> /var/www/html/var/log/cron.log'
@@ -39,7 +60,7 @@ services:
         profiles:
             - cron
         volumes:
-            - appdata:/var/www/html
+            - ${MAGENTO_DIR}:/var/www/html:rw,cached
 
     db:
         image: ${MYSQL_IMAGE}
@@ -94,6 +115,8 @@ services:
 
 volumes:
     appdata:
+    composer:
     dbdata:
     esdata:
+    npm:
     rabbitmqdata:

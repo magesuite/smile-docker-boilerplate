@@ -9,47 +9,6 @@ services:
             - traefik.http.routers.$PROJECT_NAME-magento-https.rule=Host(`$PROJECT_NAME.docker.localhost`)
             - traefik.http.routers.$PROJECT_NAME-magento-https.entrypoints=https
             - traefik.http.routers.$PROJECT_NAME-magento-https.tls=true
-        volumes:
-            - ./docker/conf/varnish/default-dev.vcl:/etc/varnish/default.vcl
-
-    web:
-        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_web
-        build: ./docker/images/nginx
-        depends_on:
-            - php_xdebug
-        volumes:
-            - ${MAGENTO_DIR}:/var/www/html:rw,cached
-            - ./docker/conf/nginx/default-dev.conf:/etc/nginx/conf.d/default.conf
-
-    php:
-        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
-        build:
-            context: ./docker/images/php
-            args:
-                APP_UID: ${DOCKER_UID}
-                APP_GID: ${DOCKER_GID}
-                PHP_VERSION: ${PHP_VERSION}
-        environment:
-            COMPOSER_AUTH: ${COMPOSER_AUTH:-}
-        volumes:
-            - ${MAGENTO_DIR}:/var/www/html:rw,cached
-            - composer:/home/www/.composer
-            - npm:/home/www/.npm
-
-    php_xdebug:
-        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
-        environment:
-            XDEBUG_MODE: develop,debug
-        extra_hosts:
-            - "host.docker.internal:host-gateway" # Matches xdebug.client_host
-        volumes:
-            - ${MAGENTO_DIR}:/var/www/html:rw,cached
-
-    cron:
-        image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
-        user: root
-        volumes:
-            - ${MAGENTO_DIR}:/var/www/html:rw,cached
 
     elasticsearch:
         labels:
@@ -74,7 +33,3 @@ services:
             # Serve maildev over http
             - traefik.http.routers.$PROJECT_NAME-maildev-http.rule=Host(`maildev.$PROJECT_NAME.docker.localhost`)
             - traefik.http.routers.$PROJECT_NAME-maildev-http.entrypoints=http
-
-volumes:
-    composer:
-    npm:

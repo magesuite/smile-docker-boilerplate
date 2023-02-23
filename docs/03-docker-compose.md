@@ -74,7 +74,7 @@ volumes:
 
 ### Using Your SSH Keys Inside a Container
 
-If you need to use your SSH keys inside the php container, add the following configuration in compose.override.yaml:
+If you need to use your SSH keys inside the php container, add the following configuration in compose.yaml:
 
 ```yaml
 services:
@@ -100,7 +100,7 @@ To replace npm with yarn, apply the following changes:
 - In Makefile:
     - Replace `npm install` with `yarn install`.
     - Replace `npm exec grunt` with `yarn exec grunt`.
-- In compose.override.yaml:
+- In compose.yaml:
     - Replace `npm:/home/www/.npm` with `yarn:/home/www/.cache/yarn`
     - Rename `npm` volume to `yarn`
 

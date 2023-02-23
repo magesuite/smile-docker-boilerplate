@@ -18,18 +18,13 @@ Name | Description | Ports
 varnish | HTTP cache server. | 80
 web | Web server (nginx). | 8080
 php | php-fpm. | 9000
+php_xdebug | php-fpm with xdebug installed.<br>Automatically used when the xdebug session cookie is set. | 9000
 db | SQL database (mariadb). | 3306
 redis | Cache engine (stores Magento cache/sessions). | 6379
 elasticsearch | Search engine. | 9300
 maildev | Mail server. | 1025 (smtp)<br>1080 (web interface)
 rabbitmq | [Message broker](https://devdocs.magento.com/guides/v2.4/install-gde/prereq/install-rabbitmq.html). | 5672<br>15672 (web interface)
 cron | Runs the Magento crontab (disabled by default). | -
-
-The file compose.override.yaml defines an additional service:
-
-Name | Description | Ports
---- | --- | ---
-php_xdebug | php-fpm with xdebug installed.<br>Automatically used when the xdebug session cookie is set. | 9000
 
 ## Workflow
 
