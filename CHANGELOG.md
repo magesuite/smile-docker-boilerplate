@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Removed nginx reverse proxy (already managed by traefik).
 - Improved readability of compose files (compose.override.yaml file now only contains traefik labels).
+- Updated php image (Alpine 3.17 instead of Alpine 3.16)
 
 ## [1.0.0-rc12] - 2023-02-16
 
