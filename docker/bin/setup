@@ -119,7 +119,7 @@ init_composer_vars () {
     fi
 
     if [ "$ADD_GRUMPHP" = "y" ]; then
-        DEV_PACKAGES_LIST="$DEV_PACKAGES_LIST phpro/grumphp-shim"
+        DEV_PACKAGES_LIST="$DEV_PACKAGES_LIST phpro/grumphp-shim=^1.13"
     fi
 
     if [ "$ADD_SMILE_QUALITY_SUITE" = "y" ]; then
@@ -135,7 +135,8 @@ init_composer_vars () {
         DEV_PACKAGES_LIST="${DEV_PACKAGES_LIST:1}";
     fi
 
-    [ "$PACKAGES_LIST" = "" ] && [ "$DEV_PACKAGES_LIST" = "" ] && COMPOSER_INVALIDATED=n || COMPOSER_INVALIDATED=y
+    # Whether to run composer
+    [ "$CREATE_PROJECT" = "n" ] && [ "$PACKAGES_LIST" = "" ] && [ "$DEV_PACKAGES_LIST" = "" ] && [ "$ADD_SMILE_PACKAGIST" = "n" ] && [ "$ADD_DEPLOY_IGNORE" = "n" ] && RUN_COMPOSER=n || RUN_COMPOSER=y
 }
 
 # Display information about the project before running the setup.
@@ -178,7 +179,7 @@ display_project_information () {
 
         if [ "$CREATE_PROJECT" = "y" ]; then
             echo -e "- Run ${BLUE}composer install${NC}"
-        elif [ "$COMPOSER_INVALIDATED" = "y" ]; then
+        elif [ "$PACKAGES_LIST" != "" ] || [ "$DEV_PACKAGES_LIST" != "" ]; then
             echo -e "- Run ${BLUE}composer update${NC}"
         fi
     fi
@@ -267,7 +268,7 @@ get_composer_command () {
         # Copy composer.json file from the temporary directory to the Magento directory, and install dependencies
         append_command "mv $TEMP_INIT_DIR/composer.json . && rm -rf $TEMP_INIT_DIR"
         append_command "composer install"
-    elif [ "$COMPOSER_INVALIDATED" = "y" ]; then
+    elif [ "$PACKAGES_LIST" != "" ] || [ "$DEV_PACKAGES_LIST" != "" ]; then
         append_command "composer update"
     fi
 
@@ -328,7 +329,7 @@ fi
 
 # Composer actions that are not configurable through command-line
 [ "$ADD_SMILE_PACKAGES" = "y" ] && ADD_SMILE_PACKAGIST=y || ADD_SMILE_PACKAGIST=n
-ADD_DEPLOY_IGNORE=y
+[ $(version_compare "$MAGENTO_VERSION" "2.4.6") = "<" ] && ADD_DEPLOY_IGNORE=y || ADD_DEPLOY_IGNORE=n
 ADD_GRUMPHP=y
 ADD_SMILE_QUALITY_SUITE=y
 
@@ -339,7 +340,6 @@ ADD_SMILE_QUALITY_SUITE=y
 if [ "$CREATE_PROJECT" = "y" ]; then
     echo "No composer.json file found in $MAGENTO_DIR directory."
     echo "This setup will initialize a new Magento project."
-    RUN_COMPOSER=y
 else
     if [ -n "$EDITION" ]; then
         echo -e "${YELLOW}Your project is already initialized, the edition parameter will be ignored.${NC}" && echo
@@ -347,29 +347,35 @@ else
 
     echo "Magento is already installed in $MAGENTO_DIR."
     echo "This setup will update your project files (e.g. variables in env files)."
-    RUN_COMPOSER=n
 
     # Whether to add Smile packagist repositories
     if [ "$ADD_SMILE_PACKAGIST" = "y" ]; then
         if grep -F -e packagist.galaxy.intranet "$MAGENTO_DIR/composer.json" > /dev/null || grep -F -e packagist.smile.fr "$MAGENTO_DIR/composer.json" > /dev/null; then
             ADD_SMILE_PACKAGIST=n
-        else
-            RUN_COMPOSER=y
         fi
     fi
 
     # Whether to add Smile packages (added only if they are all missing)
     if [ "$ADD_SMILE_PACKAGES" = "y" ]; then
         SEARCH_PACKAGES="-e smile/module-debug-toolbar -e smile/module-patch -e smile/module-reconfigure -e smile-sa/smileanalyser"
-        grep -F $SEARCH_PACKAGES "$MAGENTO_DIR/composer.json" > /dev/null && ADD_SMILE_PACKAGES=n || RUN_COMPOSER=y
+        if grep -F $SEARCH_PACKAGES "$MAGENTO_DIR/composer.json" > /dev/null; then
+            ADD_SMILE_PACKAGES=n
+        fi
     fi
 
     # Whether to add GrumPHP / Smile Quality Suite
-    grep -F -e phpro/grumphp "$MAGENTO_DIR/composer.json" > /dev/null && ADD_GRUMPHP=n || RUN_COMPOSER=y
-    grep -F -e smile/magento2-smilelab-quality-suite "$MAGENTO_DIR/composer.json" > /dev/null && ADD_SMILE_QUALITY_SUITE=n || RUN_COMPOSER=y
+    if grep -F -e phpro/grumphp "$MAGENTO_DIR/composer.json" > /dev/null; then
+        ADD_GRUMPHP=n
+    fi
+
+    if grep -F -e smile/magento2-smilelab-quality-suite "$MAGENTO_DIR/composer.json" > /dev/null; then
+        ADD_SMILE_QUALITY_SUITE=n
+    fi
 
     # Whether to add magento-deploy-ignore
-    grep -F -e magento-deploy-ignore "$MAGENTO_DIR/composer.json" > /dev/null && ADD_DEPLOY_IGNORE=n || RUN_COMPOSER=y
+    if [ "$ADD_DEPLOY_IGNORE" = "y" ] && grep -F -e magento-deploy-ignore "$MAGENTO_DIR/composer.json" > /dev/null; then
+        ADD_DEPLOY_IGNORE=n
+    fi
 fi
 
 ########
