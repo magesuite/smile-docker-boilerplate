@@ -47,9 +47,9 @@ init_magento_edition () {
             echo -e "${RED}The Magento edition must be either \"community\", \"enterprise\" or \"cloud\".${NC}"
             exit 1
         fi
-    elif grep -F -e magento/magento-cloud-metapackage "$MAGENTO_DIR/composer.json" > /dev/null; then
+    elif grep -F magento/magento-cloud-metapackage "$MAGENTO_DIR/composer.json" > /dev/null; then
         MAGENTO_EDITION="cloud"
-    elif grep -F -e magento/product-enterprise-edition "$MAGENTO_DIR/composer.json" > /dev/null; then
+    elif grep -F magento/product-enterprise-edition "$MAGENTO_DIR/composer.json" > /dev/null; then
         MAGENTO_EDITION="enterprise"
     else
         MAGENTO_EDITION="community"
@@ -350,7 +350,7 @@ else
 
     # Whether to add Smile packagist repositories
     if [ "$ADD_SMILE_PACKAGIST" = "y" ]; then
-        if grep -F -e packagist.galaxy.intranet "$MAGENTO_DIR/composer.json" > /dev/null || grep -F -e packagist.smile.fr "$MAGENTO_DIR/composer.json" > /dev/null; then
+        if grep -F packagist.galaxy.intranet "$MAGENTO_DIR/composer.json" > /dev/null || grep -F packagist.smile.fr "$MAGENTO_DIR/composer.json" > /dev/null; then
             ADD_SMILE_PACKAGIST=n
         fi
     fi
@@ -364,16 +364,16 @@ else
     fi
 
     # Whether to add GrumPHP / Smile Quality Suite
-    if grep -F -e phpro/grumphp "$MAGENTO_DIR/composer.json" > /dev/null; then
+    if grep -F phpro/grumphp "$MAGENTO_DIR/composer.json" > /dev/null; then
         ADD_GRUMPHP=n
     fi
 
-    if grep -F -e smile/magento2-smilelab-quality-suite "$MAGENTO_DIR/composer.json" > /dev/null; then
+    if grep -F smile/magento2-smilelab-quality-suite "$MAGENTO_DIR/composer.json" > /dev/null; then
         ADD_SMILE_QUALITY_SUITE=n
     fi
 
     # Whether to add magento-deploy-ignore
-    if [ "$ADD_DEPLOY_IGNORE" = "y" ] && grep -F -e magento-deploy-ignore "$MAGENTO_DIR/composer.json" > /dev/null; then
+    if [ "$ADD_DEPLOY_IGNORE" = "y" ] && grep -F magento-deploy-ignore "$MAGENTO_DIR/composer.json" > /dev/null; then
         ADD_DEPLOY_IGNORE=n
     fi
 fi
