@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## WIP
+## [1.0.0-rc14] - 2023-03-02
 
 - Updated smile/module-debug-toolbar to version 6.1.
 - Optimized project initialization script (bin/setup).
@@ -83,6 +83,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release candidate.
 
+[1.0.0-rc14]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc13...1.0.0-rc14
 [1.0.0-rc13]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc12...1.0.0-rc13
 [1.0.0-rc12]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc11...1.0.0-rc12
 [1.0.0-rc11]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc10...1.0.0-rc11
