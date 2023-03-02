@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## WIP
 
+- Updated smile/module-debug-toolbar to version 6.1.
 - Optimized project initialization script (bin/setup).
 
 ## [1.0.0-rc13] - 2023-02-27
