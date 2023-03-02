@@ -105,7 +105,7 @@ fi
 print_and_run "$DOCKER_COMPOSE up -d --remove-orphans --wait $PHP_CONTAINER"
 
 # Install Magento
-print_and_run $INSTALL_COMMAND
+echo && print_and_run $INSTALL_COMMAND
 
 # Set run mode
 echo && print_and_run "$MAGENTO_COMMAND deploy:mode:set $MAGENTO_RUN_MODE"
