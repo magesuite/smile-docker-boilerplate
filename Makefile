@@ -81,9 +81,9 @@ db-import: up ## Import a database dump. Pass the parameter "filename=" to set t
 
 .PHONY: db-export
 db-export: service := --wait $(DB_SERVICE)
-db-export: up ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql).
+db-export: up ## Dump the database. Pass the parameter "filename=" to set the filename (default: dump.sql), or "args=" to specify a list of tables to dump.
 	$(eval filename ?= dump.sql)
-	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysqldump $(DB_CONNECTION)' > $(filename)
+	$(DOCKER_COMPOSE) exec $(DB_SERVICE) sh -c 'mysqldump $(DB_CONNECTION) --single-transaction --triggers $(args)' > $(filename)
 
 .PHONY: toggle-cron
 toggle-cron: ## Enable/disable the cron container (disabled by default).
