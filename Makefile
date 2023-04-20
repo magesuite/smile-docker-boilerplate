@@ -20,8 +20,12 @@ DOCKER_COMPOSE_NO_PROFILE := docker compose
 PHP_SERVICE := php
 PHP_XDEBUG_SERVICE := php_xdebug
 DB_SERVICE := db
-PHP_CLI := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE)
 DB_CONNECTION := --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD $$MYSQL_DATABASE
+PHP_CLI := $(DOCKER_COMPOSE) run --rm --no-deps $(PHP_SERVICE)
+
+# Apps
+COMPOSER := $(PHP_CLI) composer
+MAGENTO_BIN := $(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) bin/magento
 
 # Target dependencies
 MAGENTO_ENV := $(MAGENTO_DIR)/app/etc/env.php
@@ -102,7 +106,7 @@ magento: $(VENDOR_DIR) ## Run "bin/magento". Pass the parameter "c=" to run a gi
 	$(eval debug ?= 0)
 	@if [ "$(debug)" != "0" ] && [ "$(debug)" != "1" ]; then echo "The variable \"debug\" must be equal to 0 or 1."; exit 1; \
 	elif [ "$(debug)" = "1" ]; then CMD="$(DOCKER_COMPOSE) run --rm --env PHP_IDE_CONFIG=serverName=_ $(PHP_XDEBUG_SERVICE) php -dxdebug.start_with_request=yes bin/magento $(c)"; \
-	else CMD="$(DOCKER_COMPOSE) run --rm $(PHP_SERVICE) bin/magento $(c)"; fi; \
+	else CMD="$(MAGENTO_BIN) $(c)"; fi; \
 	echo "$$CMD"; eval "$$CMD"
 
 .PHONY: cache-clean
@@ -134,7 +138,7 @@ grunt: $(NODE_MODULES_DIR) ## Run grunt. Example: make grunt c=watch
 ## Composer
 .PHONY: composer
 composer: $(VENDOR_DIR) ## Run composer. Example: make composer c="require vendor/package:^1.0"
-	$(PHP_CLI) composer $(c)
+	$(COMPOSER) $(c)
 
 .PHONY: vendor-bin
 vendor-bin: $(VENDOR_DIR) ## Run a binary located in vendor/bin. Example: make vendor-bin c=phpcs
@@ -182,7 +186,7 @@ $(MAGENTO_ENV): | $(VENDOR_DIR)
 
 # Composer files
 $(VENDOR_DIR): | $(MAGENTO_DIR)/composer.json
-	$(PHP_CLI) composer install
+	$(COMPOSER) install
 
 $(MAGENTO_DIR)/composer.json:
 	$(error Please run `make init-project` to initialize the project)
