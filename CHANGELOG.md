@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `--single-transaction` and `--triggers` options to the `db-export` makefile target.
 - Added optional `args` parameter to the `db-export` makefile target (allows to specify a list of tables to dump).
 - Added support for xdebug profiling.
+- Updated nginx vhost configuration file.
 - Cron log is now less verbose.
 
 ## [1.0.0-rc14] - 2023-03-02
