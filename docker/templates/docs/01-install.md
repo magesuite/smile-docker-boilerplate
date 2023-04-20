@@ -10,7 +10,7 @@ Follow these steps:
 1. Go to the directory where you store your PHP projects, and clone the project repositories:
 
    ```
-   git clone git@git.smile.fr:{{ project_name }}/docker-boilerplate.git {{ project_name }} && cd "$_" && git clone git@git.smile.fr:{{ project_name }}/magento.git
+   git clone git@git.smile.fr:{{ project_name }}/docker-magento.git {{ project_name }} && cd "$_" && git clone git@git.smile.fr:{{ project_name }}/{{ project_name }}-magento.git
    ```
 
 2. Install Magento:

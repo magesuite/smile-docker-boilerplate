@@ -177,8 +177,8 @@ It will install a module that disables 2FA on development environments.
 
 2. Go to https://git.smile.fr/projects/new and create two repositories:
 
-   - One for the boilerplate. Example name: "docker-boilerplate".
-   - One for Magento files (if it doesn't already exist). Example name: "magento".
+   - One for the boilerplate. Example name: "docker-magento".
+   - One for Magento files (if it doesn't already exist). Example name: "myproject-magento".
 
 3. Update the file "docs/01-install.md" and update the sample git URLs.
    Don't forget to regularly update this file when necessary (e.g. adding a step to recommend running `make reconfigure env=dev` if your project uses the Smile reconfigure module).
@@ -187,22 +187,13 @@ It will install a module that disables 2FA on development environments.
    For example:
 
    ```
-   git init && git remote add origin git@git.smile.fr:myproject/docker-boilerplate.git
+   git init && git remote add origin git@git.smile.fr:myproject/docker-magento.git
    git add . && git commit -m "Initial commit" && git push origin master
 
    cd magento/
-   git init && git remote add origin git@git.smile.fr:myproject/magento.git
+   git init && git remote add origin git@git.smile.fr:myproject/myproject-magento.git
    git add . && git commit -m "Initial commit" && git push origin master
    ```
-
-You will end up with the following project structure:
-
-```
-myproject/
-   .git
-   magento/
-      .git
-```
 
 Alternatively, you could use a [git submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules), but that is quite complex to use on a day-to-day basis.
 
