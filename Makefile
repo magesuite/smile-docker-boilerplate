@@ -145,13 +145,11 @@ vendor-bin: $(VENDOR_DIR) ## Run a binary located in vendor/bin. Example: make v
 .PHONY: analyse
 analyse: $(VENDOR_DIR) ## Run a static code analysis on the entire codebase (files must be known to git).
 	$(PHP_CLI) vendor/bin/grumphp run --testsuite=static
+	$(PHP_CLI) vendor/bin/SmileAnalyser launch --strict --skipNotices yes
 
 .PHONY: pre-commit
 pre-commit: $(VENDOR_DIR) ## Run a static code analysis on staged files.
 	$(PHP_CLI) vendor/bin/grumphp git:pre-commit
-
-.PHONY: smileanalyser
-smileanalyser: $(VENDOR_DIR) ## Run smileanalyser.
 	$(PHP_CLI) vendor/bin/SmileAnalyser launch --strict --skipNotices yes
 
 .PHONY: tests
