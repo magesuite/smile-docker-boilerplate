@@ -110,6 +110,9 @@ echo && print_and_run $INSTALL_COMMAND
 # Set run mode
 echo && print_and_run "$MAGENTO_COMMAND deploy:mode:set $MAGENTO_RUN_MODE"
 
+# Disable module "Magento_Version"
+echo && print_and_run "$MAGENTO_COMMAND module:disable Magento_Version"
+
 # Set up Varnish
 if [ "$USE_VARNISH" = "true" ]; then
     echo && print_and_run "$MAGENTO_COMMAND config:set --scope=default --scope-code=0 system/full_page_cache/caching_application 2"
