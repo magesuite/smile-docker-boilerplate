@@ -39,7 +39,7 @@ services:
     php_xdebug:
         image: ${PROJECT_NAME?PROJECT_NAME must be set.}_php
         environment:
-            XDEBUG_MODE: develop,debug
+            XDEBUG_MODE: develop,debug,profile
         extra_hosts:
             - "host.docker.internal:host-gateway" # Matches xdebug.client_host
         volumes:

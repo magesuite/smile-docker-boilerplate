@@ -105,7 +105,7 @@ install: $(VENDOR_DIR) ## Install Magento. If you change a value in magento.env,
 magento: $(VENDOR_DIR) ## Run "bin/magento". Pass the parameter "c=" to run a given command. Example: make magento c=indexer:status
 	$(eval debug ?= 0)
 	@if [ "$(debug)" != "0" ] && [ "$(debug)" != "1" ]; then echo "The variable \"debug\" must be equal to 0 or 1."; exit 1; \
-	elif [ "$(debug)" = "1" ]; then CMD="$(DOCKER_COMPOSE) run --rm --env PHP_IDE_CONFIG=serverName=_ $(PHP_XDEBUG_SERVICE) php -dxdebug.start_with_request=yes bin/magento $(c)"; \
+	elif [ "$(debug)" = "1" ]; then CMD="$(DOCKER_COMPOSE) run --rm --env PHP_IDE_CONFIG=serverName=_ --env XDEBUG_SESSION=cli $(PHP_XDEBUG_SERVICE) php bin/magento $(c)"; \
 	else CMD="$(MAGENTO_BIN) $(c)"; fi; \
 	echo "$$CMD"; eval "$$CMD"
 
