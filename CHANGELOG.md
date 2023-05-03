@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `--single-transaction` and `--triggers` options to the `db-export` makefile target.
 - Added optional `args` parameter to the `db-export` makefile target (allows to specify a list of tables to dump).
 - Added support for xdebug profiling.
+- Changed nginx port from 8080 to 80.
 - Updated elasticsearch image from 7.17 to 8.4.
 - Updated mariadb image from 10.4 to 10.6.
 - Updated redis image from 6.2 to 7.0.

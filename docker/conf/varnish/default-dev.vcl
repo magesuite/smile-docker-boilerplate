@@ -7,7 +7,7 @@ import std;
 
 backend default {
     .host = "web";
-    .port = "8080";
+    .port = "80";
     .first_byte_timeout = 300s;
     .between_bytes_timeout = 300s;
 }
