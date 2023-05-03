@@ -7,13 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## WIP
 
-- Module "Magento_Version" is now automatically disabled when installing Magento for the first time.
-- Removed makefile target `smileanalyser`. SmileAnalyser is now launched in the targets `analyse` and `pre-commit`.
 - Added `--single-transaction` and `--triggers` options to the `db-export` makefile target.
 - Added optional `args` parameter to the `db-export` makefile target (allows to specify a list of tables to dump).
 - Added support for xdebug profiling.
 - Updated nginx vhost configuration file.
+- Removed makefile target `smileanalyser`. SmileAnalyser is now launched in the targets `analyse` and `pre-commit`.
+- Module "Magento_Version" is now automatically disabled when installing Magento for the first time.
 - Cron log is now less verbose.
+- Search engine is now always specified during installation.
 
 ## [1.0.0-rc14] - 2023-03-02
 

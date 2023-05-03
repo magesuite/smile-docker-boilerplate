@@ -39,6 +39,7 @@ INSTALL_COMMAND="$MAGENTO_COMMAND setup:install \
     --db-password=$MYSQL_PASSWORD \
     --elasticsearch-host=$ELASTICSEARCH_HOST \
     --elasticsearch-port=$ELASTICSEARCH_PORT \
+    --search-engine=$SEARCH_ENGINE \
     --base-url=$BASE_URL \
     --base-url-secure=$SECURE_BASE_URL \
     --use-secure=$USE_SECURE \
@@ -60,10 +61,6 @@ fi
 
 if [ -n "$CACHE_PREFIX" ]; then
     INSTALL_COMMAND="$INSTALL_COMMAND --cache-id-prefix=$CACHE_PREFIX --page-cache-id-prefix=$CACHE_PREFIX"
-fi
-
-if [ -n "$SEARCH_ENGINE" ]; then
-    INSTALL_COMMAND="$INSTALL_COMMAND --search-engine=$SEARCH_ENGINE"
 fi
 
 if [ "$USE_REDIS_CACHE" = "true" ]; then
