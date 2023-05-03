@@ -230,6 +230,11 @@ get_composer_command () {
     fi
 
     if [ $(version_compare "$MAGENTO_VERSION" "2.4.4") = "<" ]; then
+        # Code quality tools must be updated to avoid incompatibility issue with SmileLab standard
+        append_command "composer require $DIR_OPT --dev --no-update squizlabs/php_codesniffer:^3.7"
+        append_command "composer require $DIR_OPT --dev --no-update phpstan/phpstan:^1.9"
+
+        # Allow plugins were not automatically added in older versions
         append_command "composer config $DIR_OPT allow-plugins.dealerdirect/phpcodesniffer-composer-installer true"
         append_command "composer config $DIR_OPT allow-plugins.laminas/laminas-dependency-plugin true"
         append_command "composer config $DIR_OPT allow-plugins.magento/* true"
@@ -318,13 +323,15 @@ init_smile_packagist "$SMILE_PACKAGIST" # Sets SMILE_PACKAGIST
 # PHP version that was in .env file (compared against target php version to check if the php image must be rebuilt)
 PHP_VERSION_ENV="$PHP_VERSION"
 
-# PHP version (deducted from Magento version)
+# PHP version and PHPCS ruleset (deducted from Magento version)
+PHP_VERSION=8.2
+PHPCS_RULESET=SmileLab
+
 if [ $(version_compare "$MAGENTO_VERSION" "2.4.4") = "<" ]; then
     PHP_VERSION=7.4
+    PHPCS_RULESET=SmileLab-237-243
 elif [ $(version_compare "$MAGENTO_VERSION" "2.4.6") = "<" ]; then
     PHP_VERSION=8.1
-else
-    PHP_VERSION=8.2
 fi
 
 # Composer actions that are not configurable through command-line
@@ -461,7 +468,7 @@ echo && echo "Updating project files"
 # Copy Magento template files
 if [ -d "docker/templates/magento" ]; then
     for FILE in $(find docker/templates/magento -maxdepth 1 -type f); do
-        sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" "$FILE" > "$MAGENTO_DIR/$(basename "$FILE")"
+        sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" -e "s/{{ phpcs_ruleset }}/$PHPCS_RULESET/g" "$FILE" > "$MAGENTO_DIR/$(basename "$FILE")"
     done
     echo -e "${GREEN}✓ Copied ./docker/templates/magento/* to $MAGENTO_DIR.${NC}"
 fi

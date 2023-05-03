@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated redis image from 6.2 to 7.0.
 - Updated nginx vhost configuration file.
 - Removed makefile target `smileanalyser`. SmileAnalyser is now launched in the targets `analyse` and `pre-commit`.
+- Fixed SmileLab coding standard not working properly with Magento <2.4.4.
 - Module "Magento_Version" is now automatically disabled when installing Magento for the first time.
 - Cron log is now less verbose.
 - Search engine is now always specified during Magento installation.

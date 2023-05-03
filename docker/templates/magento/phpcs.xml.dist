@@ -10,7 +10,7 @@
     <arg value="p"/>
     <arg value="s"/>
 
-    <rule ref="SmileLab"/>
+    <rule ref="{{ phpcs_ruleset }}"/>
 
     <file>app/code</file>
     <file>app/design</file>
