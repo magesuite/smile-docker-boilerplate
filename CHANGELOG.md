@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## WIP
+## [1.0.0-rc15] - 2023-05-03
 
 - Added `--single-transaction` and `--triggers` options to the `db-export` makefile target.
 - Added optional `args` parameter to the `db-export` makefile target (allows to specify a list of tables to dump).
@@ -99,6 +99,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release candidate.
 
+[1.0.0-rc15]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc14...1.0.0-rc15
 [1.0.0-rc14]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc13...1.0.0-rc14
 [1.0.0-rc13]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc12...1.0.0-rc13
 [1.0.0-rc12]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc11...1.0.0-rc12
