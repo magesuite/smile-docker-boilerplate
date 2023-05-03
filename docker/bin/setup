@@ -315,7 +315,7 @@ init_magento_version "$VERSION" # Sets MAGENTO_VERSION
 init_smile_packages "$SMILE_PACKAGES" # Sets ADD_SMILE_PACKAGES
 init_smile_packagist "$SMILE_PACKAGIST" # Sets SMILE_PACKAGIST
 
-# Will be compared against PHP_VERSION to check if PHP image must be rebuilt
+# PHP version that was in .env file (compared against target php version to check if the php image must be rebuilt)
 PHP_VERSION_ENV="$PHP_VERSION"
 
 # PHP version (deducted from Magento version)
@@ -404,6 +404,16 @@ sedi "s/^PROJECT_NAME=.*/PROJECT_NAME=$PROJECT_NAME/" .env
 sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env.dist
 sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
 echo -e "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\" and \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.dist.${NC}"
+
+if [ $(version_compare "$MAGENTO_VERSION" "2.4.6") = "<" ]; then
+    ELASTICSEARCH_IMAGE=registry.smile.fr/magento2/elasticsearch:7.17-1
+    MYSQL_IMAGE=mariadb:10.4
+    sedi "s~^ELASTICSEARCH_IMAGE=.*~ELASTICSEARCH_IMAGE=$ELASTICSEARCH_IMAGE~" .env.dist
+    sedi "s~^ELASTICSEARCH_IMAGE=.*~ELASTICSEARCH_IMAGE=$ELASTICSEARCH_IMAGE~" .env
+    sedi "s~^MYSQL_IMAGE=.*~MYSQL_IMAGE=$MYSQL_IMAGE~" .env.dist
+    sedi "s~^MYSQL_IMAGE=.*~MYSQL_IMAGE=$MYSQL_IMAGE~" .env
+    echo -e "${GREEN}✓ Updated \$ELASTICSEARCH_IMAGE to \"$ELASTICSEARCH_IMAGE\" and \$MYSQL_IMAGE to \"$MYSQL_IMAGE\" in .env and .env.dist.${NC}"
+fi
 
 # Rebuild the PHP image if PHP version was changed
 if [ "$PHP_VERSION" != "$PHP_VERSION_ENV" ]; then
