@@ -1,5 +1,5 @@
 default:
-    image: registry.smile.fr/magento2/php:{{ php_version }}-fpm-dev-1
+    image: registry.smile.fr/magento2/php:{{ php_version }}-fpm-dev-2
     tags:
         - galaxy-docker-shared
     cache:
