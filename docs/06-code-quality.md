@@ -6,7 +6,6 @@ The following make targets can be used to analyse your code/run tests:
 
 - `make analyse`: run a static code analysis ([GrumPHP](../docker/templates/magento/grumphp.yaml.dist)) on the entire codebase (files must be known to git).
 - `make pre-commit`: run a static code analysis ([GrumPHP](../docker/templates/magento/grumphp.yaml.dist)) on staged files.
-- `make smileanalyser`: run [SmileAnalyser](https://git.smile.fr/dirtech/smileanalyser/).
 - `make tests`: run phpunit.
 
 **These targets must not report any error**!
