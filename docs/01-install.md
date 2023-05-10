@@ -7,7 +7,7 @@
 - Before initializing a Magento cloud project, you must request a Smile packagist account (https://packagist.smile.fr) to dirtech@smile.fr.
   This is necessary, otherwise Magento cloud won't be able to install Smile modules.
 
-## Installation
+## 1. Creating the Project Directory
 
 Open a terminal and apply the following steps:
 
@@ -31,27 +31,26 @@ Open a terminal and apply the following steps:
    git clone -q -c advice.detachedHead=false --depth 1 --branch latest git@git.smile.fr:magento2/docker-boilerplate "$PROJECT_NAME" && cd $_ && rm -rf .git
    ```
 
-4. The next step will depend on what you need to do:
+You have successfully initialized your project directory, which contains the docker files.
+The next step is to set up Magento.
 
-   - [Creating a **new Magento project** with the boilerplate.](#user-content-creating-a-new-magento-project-with-the-boilerplate)
-   - [Setting up the boilerplate with an **existing Magento codebase**.](#setting-up-the-boilerplate-with-an-existing-magento-codebase)
+## 2. Installing Magento
 
-### Creating a new Magento project with the boilerplate
+This step differs depending on whether you need to create a new Magento project from scratch, or move an existing project to the docker boilerplate.
 
-This section will show you how to initialize a new Magento project with the boilerplate.
+### Creating a new Magento Project
 
-Follow the steps below:
+Follow these steps if you need to create a new Magento project from scratch:
 
 1. Run the following command (**don't blindly copy it, make sure to set the version and edition that you need**):
 
    ```
-   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.5 EDITION=community
+   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.6 EDITION=community
    ```
 
-   This script will update the docker env files and run "composer create-project".
-   The Magento project is created in the "magento" directory.
+   This script will update the docker env files and initialize a Magento project in a subdirectory named "magento".
 
-   The "EDITION" variable must be one of "community", "enterprise" or "cloud".
+   The value of the "EDITION" variable must be one of "community", "enterprise" or "cloud".
    The full list of parameters handled by this script is [documented here](../docker/bin/setup#L6).
 
    During the script execution, you will be prompted for Magento authentication keys.
@@ -78,13 +77,13 @@ Follow the steps below:
    If you get the following error: "Could not connect to the Amqp Server", just run the command again.
 
 Magento is now installed.
-You can move to the next step: [checking if the Magento store is available](#accessing-the-magento-store).
+You can move to the next step: [checking if the Magento store is available](#3-accessing-the-magento-store).
 
-### Setting up the boilerplate with an existing Magento codebase
+### Setting up the boilerplate with an existing Magento Codebase
 
-This section will show you how to use this boilerplate with existing Magento sources.
+Follow these steps if you need to move an existing Magento project to the boilerplate:
 
-1. Move your Magento codebase to the directory "magento":
+1. Move your Magento codebase to the subdirectory "magento":
 
    ```
    mv ~/path/to/magento/ magento/
@@ -94,6 +93,8 @@ This section will show you how to use this boilerplate with existing Magento sou
 
    ```
    myproject/
+      docker/
+      docs/
       magento/
          <Magento files here, including composer.json>
    ```
@@ -101,7 +102,7 @@ This section will show you how to use this boilerplate with existing Magento sou
 2. Run the following command (**don't blindly copy it, the version must match your composer.json file**):
 
    ```
-   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.5
+   make init-project PROJECT="$PROJECT_NAME" VERSION=2.4.6
    ```
 
    This script will update the docker env files, and check if anything needs to be added to composer.json (Smile modules, Smile packagist repositories...).
@@ -119,18 +120,18 @@ This section will show you how to use this boilerplate with existing Magento sou
    make install
    ```
 
-   It will install and configure Magento by running setup:install (as well as several other commands, such as deploy:mode:set).
+   It will install Magento (or reconfigure it if a dump was imported) by running setup:install (as well as several other commands, such as deploy:mode:set).
 
    If you get the following error: "Could not connect to the Amqp Server", just run the command again.
 
-5. If you already had a .gitlab-ci.yml file in your Magento codebase, you might want to update it with the contents of [docker/templates/magento/.gitlab-ci.yml](../docker/templates/magento/.gitlab-ci.yml)
-   (you will have to manually replace "{php_ci_version}" with a valid php version, e.g. "81"). 
-   Same with the [.gitignore](../docker/templates/magento/.gitignore) file.
+5. The files located in the directory "docker/templates/magento" were automatically moved to the Magento subdirectory (.gitignore, .gitlab-ci.yml and code analysis config files).
+   You must check if the contents of these files need to be updated.
+   For example, you might need to add a missing location in .gitignore, or change the coding standard used in phpcs.xml.dist. By default, the coding standard used is [SmileLab](https://github.com/Smile-SA/magento2-smilelab-phpcs).
 
 Magento is now installed.
-You can move to the next step: [checking if the Magento store is available](#accessing-the-magento-store).
+You can move to the next step: [checking if the Magento store is available](#3-accessing-the-magento-store).
 
-## Accessing the Magento Store
+## 3. Accessing the Magento Store
 
 1. First, execute the following command to launch the containers that were not yet started:
 
@@ -152,9 +153,9 @@ You can move to the next step: [checking if the Magento store is available](#acc
    - Elasticsearch REST API: http://elastic.myproject.docker.localhost
    - Rabbitmq admin: http://rabbitmq.myproject.docker.localhost (user: "magento", password: "magento")
 
-If the Magento store is available, you can move to the final step: [pushing the files to git](#initializing-the-repositories).
+If the Magento store is available, you can now initialize the git repositories.
 
-## Initializing the Repositories
+## 4. Initializing the Repositories
 
 ### Creating the Repositories
 
@@ -205,7 +206,7 @@ In Settings > CI/CD, add a variable named "COMPOSER_AUTH":
 
 If you initialized a Magento cloud project, this variable must also contain the access keys to packagist.smile.fr.
 
-## Updating the Installation Documentation
+## 5. Updating the Installation Documentation
 
 You are encouraged to regularly update the file docs/01-install.md.
 
@@ -213,10 +214,10 @@ For example, in a lot of projects, the installation procedure is usually the fol
 
 1. Getting composer authentication keys from Bitwarden.
 2. Downloading and importing a database dump.
-3. Running the `make install` command.
-4. Running smilereconfigure.
+3. Running the `make install` command to create the env.php file.
+4. Running smilereconfigure with the `dev` environment.
 
-## Disabling 2FA
+## 6. Disabling 2FA
 
 The admin area of Magento requires a 2FA authentication.
 Magento doesn't provide any way to disable it.
