@@ -55,23 +55,6 @@ To apply a change:
 - If you added a new config file, you must recreate the container:
   `make up service=xxx`.
 
-### Persisting the Redis Cache
-
-By default, this boilerplate does not mount a volume on the redis container.
-This means that you will lose all cached data when the container is removed.
-
-If for some reason, your project requires to persist the Magento cache, add a volume named `redisdata` in compose.yaml:
-
-```yaml
-services:
-    redis:
-        volumes:
-            - redisdata:/data
-
-volumes:
-    redisdata:
-```
-
 ### Using Your SSH Keys Inside a Container
 
 If you need to use your SSH keys inside the php container, add the following configuration in compose.yaml:
@@ -107,19 +90,6 @@ services:
         extra_hosts:
             - "$PROJECT_NAME.docker.localhost:host-gateway"
 ```
-
-### Replacing npm with yarn
-
-Some packages require to use yarn instead of npm (e.g. elasticsuite premium).
-
-To replace npm with yarn, apply the following changes:
-
-- In Makefile:
-    - Replace `npm install` with `yarn install`.
-    - Replace `npm exec grunt` with `yarn exec grunt`.
-- In compose.yaml:
-    - Replace `npm:/home/www/.npm` with `yarn:/home/www/.cache/yarn`
-    - Rename `npm` volume to `yarn`
 
 ### Setting up Multiple Stores
 
@@ -171,6 +141,36 @@ For example:
 - traefik.http.routers.$PROJECT_NAME-magento-subdomains-https.entrypoints=https
 - traefik.http.routers.$PROJECT_NAME-magento-subdomains-https.tls=true
 ```
+
+### Persisting the Redis Cache
+
+By default, this boilerplate does not mount a volume on the redis container.
+This means that you will lose all cached data when the container is removed.
+
+If for some reason, your project requires to persist the Magento cache, add a volume named `redisdata` in compose.yaml:
+
+```yaml
+services:
+    redis:
+        volumes:
+            - redisdata:/data
+
+volumes:
+    redisdata:
+```
+
+### Replacing npm with yarn
+
+Some packages require to use yarn instead of npm (e.g. elasticsuite premium).
+
+To replace npm with yarn, apply the following changes:
+
+- In Makefile:
+    - Replace `npm install` with `yarn install`.
+    - Replace `npm exec grunt` with `yarn exec grunt`.
+- In compose.yaml:
+    - Replace `npm:/home/www/.npm` with `yarn:/home/www/.cache/yarn`
+    - Rename `npm` volume to `yarn`
 
 ## Troubleshooting
 
