@@ -91,6 +91,23 @@ services:
 
 Then, run the following command to apply the change: `make up service=php`
 
+### Making Magento Accessible From a Container
+
+By default, containers cannot reach the Magento base URL (https://myproject.docker.localhost).
+This is because this URL is handled by the Traefik proxy, which is not reachable from a docker container.
+
+However, there are tools such as [magepack](https://github.com/magesuite/magepack) that require the Magento base URL to be reachable from the container where the tool is installed.
+
+If you are using one of these tools, it is quite easy to make the Magento URL reachable.
+You just need to add the following configuration in compose.yaml:
+
+```yaml
+services:
+    <service_name>:
+        extra_hosts:
+            - "$PROJECT_NAME.docker.localhost:host-gateway"
+```
+
 ### Replacing npm with yarn
 
 Some packages require to use yarn instead of npm (e.g. elasticsuite premium).
