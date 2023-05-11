@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-rc17] - 2023-05-11
+
+- Updated the documentation.
+
 ## [1.0.0-rc16] - 2023-05-04
 
 - Updated php image version in .gitlab-ci.yml file.
@@ -103,6 +107,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First release candidate.
 
+[1.0.0-rc17]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc16...1.0.0-rc17
 [1.0.0-rc16]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc15...1.0.0-rc16
 [1.0.0-rc15]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc14...1.0.0-rc15
 [1.0.0-rc14]: https://git.smile.fr/magento2/docker-boilerplate/compare/1.0.0-rc13...1.0.0-rc14
