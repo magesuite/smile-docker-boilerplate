@@ -16,7 +16,7 @@ The following services are defined in compose.yaml:
 Name | Description | Ports
 --- | --- | ---
 varnish | HTTP cache server. | 80
-web | Web server (nginx). | 8080
+web | Web server (nginx). | 80
 php | php-fpm. | 9000
 php_xdebug | php-fpm with xdebug installed.<br>Automatically used when the xdebug session cookie is set. | 9000
 db | SQL database (mariadb). | 3306
