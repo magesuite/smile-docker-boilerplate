@@ -67,10 +67,9 @@ build: ## Build images. Pass the parameter "service=" to filter which images to 
 
 ## Services
 .PHONY: sh
-sh: ## Open a shell on the php container. Pass the parameter "service=" to connect to another container. Example: make sh service=redis
+sh: ## Open a shell to an active container (php by default). Pass the parameter "service=" to connect to specify the container name. Example: make sh service=redis
 	$(eval service ?= php) $(eval c ?= sh)
-	@[ "$(service)" = "$(PHP_SERVICE)" ] || [ "$(service)" = "$(PHP_XDEBUG_SERVICE)" ] \
-		&& CMD="$(DOCKER_COMPOSE) run --rm $(service) $(c)" || CMD="$(DOCKER_COMPOSE) exec $(service) $(c)"; echo "$$CMD" && $$CMD
+	$(DOCKER_COMPOSE) exec $(service) $(c)
 
 .PHONY: db
 db: service := --wait $(DB_SERVICE)
