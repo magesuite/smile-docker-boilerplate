@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Initializes the project (prepares env file, runs composer create-project/composer update).
-# Usage: PROJECT=myproject VERSION=2.4.5 ./setup
+# Usage: PROJECT=myproject VERSION=2.4.6 ./setup
 #
 # Mandatory variables:
 # - PROJECT             Project name. Must use only "a-z0-9-" characters. Optional if PROJECT_NAME is defined in .env.
@@ -61,7 +61,7 @@ init_magento_version () {
     MAGENTO_VERSION="$1"
 
     if [ -z "$MAGENTO_VERSION" ]; then
-        echo -e "${RED}You must set the variable \"VERSION\" (e.g. \"2.4.5\").${NC}"
+        echo -e "${RED}You must set the variable \"VERSION\" (e.g. \"2.4.6\").${NC}"
         exit 1
     fi
 
