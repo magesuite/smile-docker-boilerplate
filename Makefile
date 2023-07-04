@@ -63,7 +63,7 @@ top: ## Show running processes. Pass the parameter "service=" to filter which co
 
 .PHONY: build
 build: ## Build images. Pass the parameter "service=" to filter which images to build.
-	$(DOCKER_COMPOSE) build $(service)
+	$(DOCKER_COMPOSE) build --pull $(service)
 
 ## Services
 .PHONY: sh
