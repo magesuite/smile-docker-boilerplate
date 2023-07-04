@@ -473,12 +473,10 @@ if [ -d "docker/templates/magento" ]; then
     echo -e "${GREEN}✓ Copied ./docker/templates/magento/* to $MAGENTO_DIR.${NC}"
 fi
 
-# Copy documentation template files
-if [ -d "docker/templates/docs" ]; then
-    for FILE in $(find docker/templates/docs -maxdepth 1 -type f); do
-        sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" "$FILE" > "docs/$(basename "$FILE")"
-    done
-    echo -e "${GREEN}✓ Copied ./docker/templates/docs/* to ./docs.${NC}"
+# Copy README template file
+if [ -f "docker/templates/README.md" ]; then
+    sed -e "s/{{ project_name }}/$PROJECT_NAME/g" -e "s/{{ php_version }}/$PHP_VERSION/g" docker/templates/README.md > README.md
+    echo -e "${GREEN}✓ Updated README.md file.${NC}"
 fi
 
 # Rename sample files
