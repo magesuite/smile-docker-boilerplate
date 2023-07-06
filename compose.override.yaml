@@ -10,13 +10,13 @@ services:
             - traefik.http.routers.$PROJECT_NAME-magento-https.entrypoints=https
             - traefik.http.routers.$PROJECT_NAME-magento-https.tls=true
 
-    elasticsearch:
+    opensearch:
         labels:
             - traefik.enable=true
-            - traefik.http.services.${PROJECT_NAME?PROJECT_NAME must be set.}-elastic.loadbalancer.server.port=9200
-            # Serve elasticsearch over http
-            - traefik.http.routers.$PROJECT_NAME-elastic-http.rule=Host(`elastic.$PROJECT_NAME.docker.localhost`)
-            - traefik.http.routers.$PROJECT_NAME-elastic-http.entrypoints=http
+            - traefik.http.services.${PROJECT_NAME?PROJECT_NAME must be set.}-opensearch.loadbalancer.server.port=9200
+            # Serve search application over http
+            - traefik.http.routers.$PROJECT_NAME-opensearch-http.rule=Host(`opensearch.$PROJECT_NAME.docker.localhost`)
+            - traefik.http.routers.$PROJECT_NAME-opensearch-http.entrypoints=http
 
     rabbitmq:
         labels:

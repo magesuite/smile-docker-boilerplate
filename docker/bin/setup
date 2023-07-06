@@ -413,13 +413,14 @@ sedi "s/^PHP_VERSION=.*/PHP_VERSION=$PHP_VERSION/" .env
 echo -e "${GREEN}✓ Updated \$PROJECT_NAME to \"$PROJECT_NAME\" and \$PHP_VERSION to \"$PHP_VERSION\" in .env and .env.dist.${NC}"
 
 if [ $(version_compare "$MAGENTO_VERSION" "2.4.6") = "<" ]; then
-    ELASTICSEARCH_IMAGE=registry.smile.fr/magento2/elasticsearch:7.17-1
     MYSQL_IMAGE=mariadb:10.4
-    sedi "s~^ELASTICSEARCH_IMAGE=.*~ELASTICSEARCH_IMAGE=$ELASTICSEARCH_IMAGE~" .env.dist
-    sedi "s~^ELASTICSEARCH_IMAGE=.*~ELASTICSEARCH_IMAGE=$ELASTICSEARCH_IMAGE~" .env
+    OPENSEARCH_IMAGE=registry.smile.fr/magento2/opensearch:1.2-1
     sedi "s~^MYSQL_IMAGE=.*~MYSQL_IMAGE=$MYSQL_IMAGE~" .env.dist
     sedi "s~^MYSQL_IMAGE=.*~MYSQL_IMAGE=$MYSQL_IMAGE~" .env
-    echo -e "${GREEN}✓ Updated \$ELASTICSEARCH_IMAGE to \"$ELASTICSEARCH_IMAGE\" and \$MYSQL_IMAGE to \"$MYSQL_IMAGE\" in .env and .env.dist.${NC}"
+    sedi "s~^OPENSEARCH_IMAGE=.*~OPENSEARCH_IMAGE=$OPENSEARCH_IMAGE~" .env.dist
+    sedi "s~^OPENSEARCH_IMAGE=.*~OPENSEARCH_IMAGE=$OPENSEARCH_IMAGE~" .env
+    sedi "s~^SEARCH_ENGINE=opensearch~SEARCH_ENGINE=elasticsearch7~" docker/env/magento.env
+    echo -e "${GREEN}✓ Updated \$OPENSEARCH_IMAGE to \"$OPENSEARCH_IMAGE\" and \$MYSQL_IMAGE to \"$MYSQL_IMAGE\" in .env and .env.dist.${NC}"
 fi
 
 # Rebuild the PHP image if PHP version was changed

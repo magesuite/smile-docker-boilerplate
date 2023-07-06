@@ -27,7 +27,7 @@ services:
             COMPOSER_AUTH: ${COMPOSER_AUTH:-}
         depends_on:
             - db
-            - elasticsearch
+            - opensearch
             - maildev
             - rabbitmq
             - redis
@@ -53,7 +53,7 @@ services:
             CRONTAB: '* * * * * php /var/www/html/bin/magento cron:run | grep -v "Ran jobs by schedule" >> /var/www/html/var/log/magento.cron.log'
         depends_on:
             - db
-            - elasticsearch
+            - opensearch
             - maildev
             - rabbitmq
             - redis
@@ -75,19 +75,22 @@ services:
             - ./docker/conf/mysql/magento.cnf:/etc/mysql/conf.d/magento.cnf
             - dbdata:/var/lib/mysql
 
-    elasticsearch:
-        image: ${ELASTICSEARCH_IMAGE}
+    opensearch:
+        image: ${OPENSEARCH_IMAGE}
         ulimits:
             memlock:
                 soft: -1
                 hard: -1
         environment:
             - cluster.name=docker-cluster
+            - discovery.type=single-node
+            - discovery.seed_hosts=opensearch
             - bootstrap.memory_lock=true
+            - DISABLE_SECURITY_PLUGIN=true
         env_file:
-            - docker/env/elasticsearch.env
+            - docker/env/opensearch.env
         volumes:
-            - esdata:/usr/share/elasticsearch/data
+            - searchdata:/usr/share/opensearch/data
 
     redis:
         image: ${REDIS_IMAGE}
@@ -117,6 +120,6 @@ volumes:
     appdata:
     composer:
     dbdata:
-    esdata:
+    searchdata:
     npm:
     rabbitmqdata:

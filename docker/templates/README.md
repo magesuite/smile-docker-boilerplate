@@ -61,6 +61,7 @@ Then, follow these steps:
    ```
 
 Run the command `make ps` to check if all containers are up and running.
+If a container failed to start, please refer to the [troubleshooting section](https://git.smile.fr/magento2/docker-boilerplate/-/wikis/Working-With-Docker-Compose#troubleshooting).
 
 Magento is available at the following URLs:
 
@@ -70,7 +71,7 @@ Magento is available at the following URLs:
 There are other services available at the following URLs:
 
 - Maildev interface: http://maildev.{{ project_name }}.docker.localhost (this is where mails will be sent)
-- Elasticsearch REST API: http://elastic.{{ project_name }}.docker.localhost
+- Opensearch REST API: http://opensearch.{{ project_name }}.docker.localhost
 - Rabbitmq admin: http://rabbitmq.{{ project_name }}.docker.localhost (user: "magento", password: "magento")
 
 ## Documentation

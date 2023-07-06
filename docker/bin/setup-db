@@ -29,6 +29,13 @@ fi
 . ./docker/env/magento.env
 . ./docker/env/rabbitmq.env
 
+# Fixes https://github.com/magento/magento2/issues/37236 (setup:install not working if opensearch is the search engine)
+REVERT_OPENSEARCH="0"
+if [ "$SEARCH_ENGINE" = "opensearch" ]; then
+    SEARCH_ENGINE="elasticsearch7"
+    REVERT_OPENSEARCH="1"
+fi
+
 # Prepare the install command
 MAGENTO_COMMAND="$DOCKER_COMPOSE run --rm $PHP_CONTAINER bin/magento"
 
@@ -109,6 +116,13 @@ echo && print_and_run "$MAGENTO_COMMAND deploy:mode:set $MAGENTO_RUN_MODE"
 
 # Disable module "Magento_Version"
 echo && print_and_run "$MAGENTO_COMMAND module:disable Magento_Version"
+
+# If we used elasticsearch7 as a workaround so that the install command can succeed, revert to opensearch
+if [ "$REVERT_OPENSEARCH" = "1" ]; then
+    echo && print_and_run "$MAGENTO_COMMAND config:set catalog/search/engine opensearch"
+    echo && print_and_run "$MAGENTO_COMMAND config:set catalog/search/opensearch_server_hostname $ELASTICSEARCH_HOST"
+    echo && print_and_run "$MAGENTO_COMMAND config:set catalog/search/opensearch_server_port $ELASTICSEARCH_PORT"
+fi
 
 # Set up Varnish
 if [ "$USE_VARNISH" = "true" ]; then
